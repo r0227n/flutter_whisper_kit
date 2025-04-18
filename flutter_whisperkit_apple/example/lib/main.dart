@@ -31,10 +31,12 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
+      
       platformVersion =
-          await _flutterWhisperkitApplePlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+          await FlutterWhisperkitApple.getPlatformVersion() ?? 'Unknown platform version';
+    } on PlatformException catch (e) {
+      print(e);
+      platformVersion = 'Failed to get platform version.: $e';
     }
 
     // If the widget was removed from the tree while the asynchronous platform

@@ -1,0 +1,19 @@
+{
+    "NSPrivacyCollectedDataTypes": [],
+    "NSPrivacyTracking": false,
+    "NSPrivacyTrackingDomains": [],
+    "NSPrivacyLocalNetworkUsageDescription": {
+        "description": "This app needs access to local network to communicate with Flutter debugger",
+        "required": true
+    },
+    "NSPrivacyBonjourServices": {
+        "description": "This app needs access to Bonjour services for Flutter debugger communication",
+        "required": true,
+        "services": [
+            "_dartobservatory._tcp",
+            "_flutter._tcp",
+            "_dartdevtools._tcp",
+            "_dartvm._tcp"
+        ]
+    }
+} 
