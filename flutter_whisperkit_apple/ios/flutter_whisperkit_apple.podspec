@@ -15,13 +15,13 @@ A Flutter plugin that wraps WhisperKit for iOS/macOS for audio transcription.
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   
-  # WhisperKit依存関係（実際のバージョンとリポジトリを指定）
-  # s.dependency 'WhisperKit', '~> 1.0'
+  # WhisperKit dependency
+  s.dependency 'WhisperKit', '~> 1.0'
   
-  # プラットフォームの最小バージョン
+  # Minimum platform version
   s.platform = :ios, '16.0'
   
-  # Swift版のみ使用する場合
+  # Swift version
   s.swift_version = '5.0'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
 end
