@@ -11,11 +11,13 @@ let package = Package(
     products: [
         .library(name: "flutter-whisperkit-apple", targets: ["flutter_whisperkit_apple"])
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/argmaxinc/WhisperKit.git", from: "0.12.0")
+    ],
     targets: [
         .target(
             name: "flutter_whisperkit_apple",
-            dependencies: [],
+            dependencies: ["WhisperKit"],
             resources: [
                 // If your plugin requires a privacy manifest, for example if it collects user
                 // data, update the PrivacyInfo.xcprivacy file to describe your plugin's
