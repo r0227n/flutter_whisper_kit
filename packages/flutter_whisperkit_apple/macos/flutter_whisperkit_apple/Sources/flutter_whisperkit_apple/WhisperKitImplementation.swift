@@ -60,7 +60,7 @@ public class WhisperKitImplementation {
         }
     }
     
-    public func transcribeAudioFile(_ filePath: String) throws -> TranscriptionResult {
+    public func transcribeAudioFile(_ filePath: String) throws -> APITranscriptionResult {
         guard let whisperKit = whisperKit else {
             throw NSError(domain: "WhisperKitError", code: 1, userInfo: [NSLocalizedDescriptionKey: "WhisperKit not initialized"])
         }
@@ -70,14 +70,14 @@ public class WhisperKitImplementation {
             let result = try whisperKit.transcribe(audioFile: audioURL)
             
             let segments = result.segments.map { segment in
-                return TranscriptionSegment(
+                return APITranscriptionSegment(
                     text: segment.text,
                     startTime: segment.start,
                     endTime: segment.end
                 )
             }
             
-            return TranscriptionResult(
+            return APITranscriptionResult(
                 text: result.text,
                 segments: segments,
                 language: result.language
@@ -102,7 +102,7 @@ public class WhisperKitImplementation {
         }
     }
     
-    public func stopStreamingTranscription() throws -> TranscriptionResult {
+    public func stopStreamingTranscription() throws -> APITranscriptionResult {
         guard let whisperKit = whisperKit else {
             throw NSError(domain: "WhisperKitError", code: 1, userInfo: [NSLocalizedDescriptionKey: "WhisperKit not initialized"])
         }
@@ -150,7 +150,7 @@ public struct WhisperKitConfig {
     }
 }
 
-public struct TranscriptionSegment {
+public struct APITranscriptionSegment {
     public let text: String
     public let startTime: Double
     public let endTime: Double
@@ -162,14 +162,17 @@ public struct TranscriptionSegment {
     }
 }
 
-public struct TranscriptionResult {
+public struct APITranscriptionResult {
     public let text: String
-    public let segments: [TranscriptionSegment]
+    public let segments: [APITranscriptionSegment]
     public let language: String?
     
-    public init(text: String, segments: [TranscriptionSegment], language: String? = nil) {
+    public init(text: String, segments: [APITranscriptionSegment], language: String? = nil) {
         self.text = text
         self.segments = segments
         self.language = language
     }
 }
+
+public typealias TranscriptionSegment = APITranscriptionSegment
+public typealias TranscriptionResult = APITranscriptionResult
