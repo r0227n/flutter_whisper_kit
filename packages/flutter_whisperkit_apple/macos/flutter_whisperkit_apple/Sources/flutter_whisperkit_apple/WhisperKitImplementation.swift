@@ -1,10 +1,11 @@
 import Foundation
 import WhisperKit
 
+
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
     
-    public func initialize(config: WhisperKitConfig) throws -> Bool {
+    public func initialize(config: PigeonWhisperKitConfig) throws -> Bool {
         do {
             let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
@@ -124,7 +125,6 @@ public class WhisperKitImplementation {
         return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/WhisperKit/Models"
     }
 }
-
 public struct WhisperKitTranscriptionSegment {
     public let text: String
     public let startTime: Double
@@ -146,27 +146,5 @@ public struct WhisperKitTranscriptionResult {
         self.text = text
         self.segments = segments
         self.language = language
-    }
-}
-
-extension WhisperKit.Configuration {
-    public var modelPath: String? {
-        return nil // Default implementation
-    }
-    
-    public var modelVariant: String? {
-        return "tiny" // Default implementation
-    }
-    
-    public var vadFallbackSilenceThreshold: Double {
-        return 600 // Default implementation
-    }
-    
-    public var vadTemperature: Double {
-        return 0.15 // Default implementation
-    }
-    
-    public var enableLanguageIdentification: Bool {
-        return false // Default implementation
     }
 }
