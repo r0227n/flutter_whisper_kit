@@ -1,26 +1,24 @@
-
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'flutter_whisperkit_apple_platform_interface.dart';
-import 'src/whisper_kit_api.dart';
+import 'src/whisper_kit_api.dart' as pigeon;
 
 /// Configuration class for WhisperKit initialization
 class WhisperKitConfig {
   /// Path to the WhisperKit model
   final String? modelPath;
-  
+
   /// Enable Voice Activity Detection
   final bool? enableVAD;
-  
+
   /// Silence threshold for VAD fallback in milliseconds
   final int? vadFallbackSilenceThreshold;
-  
+
   /// Temperature parameter for VAD
   final double? vadTemperature;
-  
+
   /// Enable language identification
   final bool? enableLanguageIdentification;
 
@@ -34,8 +32,8 @@ class WhisperKitConfig {
   });
 
   /// Converts this config to the pigeon API config
-  WhisperKitConfig_pigeongenerated toPigeon() {
-    return WhisperKitConfig_pigeongenerated(
+  pigeon.WhisperKitConfig toPigeon() {
+    return pigeon.WhisperKitConfig(
       modelPath: modelPath,
       enableVAD: enableVAD,
       vadFallbackSilenceThreshold: vadFallbackSilenceThreshold,
@@ -49,10 +47,10 @@ class WhisperKitConfig {
 class TranscriptionSegment {
   /// The transcribed text for this segment
   final String text;
-  
+
   /// Start time of the segment in seconds
   final double startTime;
-  
+
   /// End time of the segment in seconds
   final double endTime;
 
@@ -64,7 +62,7 @@ class TranscriptionSegment {
   });
 
   /// Creates a TranscriptionSegment from a pigeon API segment
-  factory TranscriptionSegment.fromPigeon(TranscriptionSegment_pigeongenerated segment) {
+  factory TranscriptionSegment.fromPigeon(pigeon.TranscriptionSegment segment) {
     return TranscriptionSegment(
       text: segment.text,
       startTime: segment.startTime,
@@ -77,10 +75,10 @@ class TranscriptionSegment {
 class TranscriptionResult {
   /// The complete transcribed text
   final String text;
-  
+
   /// List of segments with timing information
   final List<TranscriptionSegment> segments;
-  
+
   /// Detected language code (if language identification is enabled)
   final String? language;
 
@@ -92,10 +90,13 @@ class TranscriptionResult {
   });
 
   /// Creates a TranscriptionResult from a pigeon API result
-  factory TranscriptionResult.fromPigeon(TranscriptionResult_pigeongenerated result) {
+  factory TranscriptionResult.fromPigeon(pigeon.TranscriptionResult result) {
     return TranscriptionResult(
       text: result.text,
-      segments: result.segments.map((segment) => TranscriptionSegment.fromPigeon(segment)).toList(),
+      segments:
+          result.segments
+              .map((segment) => TranscriptionSegment.fromPigeon(segment))
+              .toList(),
       language: result.language,
     );
   }
@@ -103,12 +104,12 @@ class TranscriptionResult {
 
 /// Flutter plugin for WhisperKit on iOS and macOS
 class FlutterWhisperkitApple {
-  final _api = WhisperKitApi();
+  final _api = pigeon.WhisperKitApi();
   final _eventChannel = const EventChannel('flutter_whisperkit_apple/events');
-  
+
   /// Stream of transcription progress updates
   late final Stream<double> _progressStream;
-  
+
   /// Stream of interim transcription results
   late final Stream<TranscriptionResult> _interimResultStream;
 
@@ -124,12 +125,12 @@ class FlutterWhisperkitApple {
     _progressStream = _eventChannel
         .receiveBroadcastStream('progress')
         .map((event) => event as double);
-    
+
     _interimResultStream = _eventChannel
         .receiveBroadcastStream('interimResult')
         .map((event) {
           final map = Map<String, dynamic>.from(event);
-          final result = TranscriptionResult_pigeongenerated.fromMap(map);
+          final result = pigeon.TranscriptionResult.decode(map);
           return TranscriptionResult.fromPigeon(result);
         });
   }
@@ -144,7 +145,9 @@ class FlutterWhisperkitApple {
   /// Returns true if initialization was successful
   Future<bool> initializeWhisperKit({WhisperKitConfig? config}) async {
     try {
-      return await _api.initializeWhisperKit(config?.toPigeon() ?? WhisperKitConfig_pigeongenerated());
+      return await _api.initializeWhisperKit(
+        config?.toPigeon() ?? pigeon.WhisperKitConfig(),
+      );
     } on PlatformException catch (e) {
       throw 'Failed to initialize WhisperKit: ${e.message}';
     }
@@ -198,5 +201,6 @@ class FlutterWhisperkitApple {
   Stream<double> get onTranscriptionProgress => _progressStream;
 
   /// Stream of interim transcription results
-  Stream<TranscriptionResult> get onInterimTranscriptionResult => _interimResultStream;
+  Stream<TranscriptionResult> get onInterimTranscriptionResult =>
+      _interimResultStream;
 }
