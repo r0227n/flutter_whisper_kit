@@ -1,10 +1,11 @@
 import Foundation
 import WhisperKit
 
+
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
     
-    public func initialize(config: WhisperKit.Configuration) throws -> Bool {
+    public func initialize(config: PigeonWhisperKitConfig) throws -> Bool {
         do {
             let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
@@ -110,27 +111,5 @@ public class WhisperKitImplementation {
     
     static var defaultModelPath: String {
         return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/WhisperKit/Models"
-    }
-}
-
-extension WhisperKit.Configuration {
-    public var modelPath: String? {
-        return nil // Default implementation
-    }
-    
-    public var modelVariant: String? {
-        return "tiny" // Default implementation
-    }
-    
-    public var vadFallbackSilenceThreshold: Double {
-        return 600 // Default implementation
-    }
-    
-    public var vadTemperature: Double {
-        return 0.15 // Default implementation
-    }
-    
-    public var enableLanguageIdentification: Bool {
-        return false // Default implementation
     }
 }
