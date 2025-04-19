@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "flutter_whisperkit_apple",
     platforms: [
-        .macOS("10.14")
+        .macOS(.v13)
     ],
     products: [
         .library(name: "flutter-whisperkit-apple", targets: ["flutter_whisperkit_apple"])
