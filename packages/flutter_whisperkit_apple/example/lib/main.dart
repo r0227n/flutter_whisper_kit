@@ -53,7 +53,21 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('Plugin example app')),
-        body: Center(child: Text('Running on: $_platformVersion\n')),
+        body: Center(
+          child: Column(
+            children: [
+              Text('Running on: $_platformVersion\n'),
+              ElevatedButton(
+                onPressed: () async {
+                  final result = await _flutterWhisperkitApplePlugin
+                      .createWhisperKit(model: 'base.en', modelRepo: 'openai');
+                  print(result);
+                },
+                child: Text('Initialize'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
