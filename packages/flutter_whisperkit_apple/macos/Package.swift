@@ -17,7 +17,7 @@ let package = Package(
     targets: [
         .target(
             name: "flutter_whisperkit_apple",
-            dependencies: ["WhisperKit"]
+            dependencies: ["WhisperKit"],
             resources: [
                 // If your plugin requires a privacy manifest, for example if it collects user
                 // data, update the PrivacyInfo.xcprivacy file to describe your plugin's
