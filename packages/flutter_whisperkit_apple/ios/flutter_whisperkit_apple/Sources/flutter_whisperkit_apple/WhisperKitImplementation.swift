@@ -4,7 +4,7 @@ import WhisperKit
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
     
-    public func initialize(config: WhisperKit.Configuration) throws -> Bool {
+    public func initialize(config: WhisperKitConfig) throws -> Bool {
         do {
             let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
@@ -59,7 +59,7 @@ public class WhisperKitImplementation {
         }
     }
     
-    public func transcribeAudioFile(_ filePath: String) throws -> TranscriptionResult {
+    public func transcribeAudioFile(_ filePath: String) throws -> WhisperKitTranscriptionResult {
         guard let whisperKit = whisperKit else {
             throw NSError(domain: "WhisperKitError", code: 1, userInfo: [NSLocalizedDescriptionKey: "WhisperKit not initialized"])
         }
@@ -68,7 +68,19 @@ public class WhisperKitImplementation {
             let audioURL = URL(fileURLWithPath: filePath)
             let result = try whisperKit.transcribe(audioFile: audioURL)
             
-            return result
+            let segments = result.segments.map { segment in
+                return WhisperKitTranscriptionSegment(
+                    text: segment.text,
+                    startTime: segment.start,
+                    endTime: segment.end
+                )
+            }
+            
+            return WhisperKitTranscriptionResult(
+                text: result.text,
+                segments: segments,
+                language: result.language
+            )
         } catch {
             print("Transcription error: \(error)")
             throw error
@@ -89,7 +101,7 @@ public class WhisperKitImplementation {
         }
     }
     
-    public func stopStreamingTranscription() throws -> TranscriptionResult {
+    public func stopStreamingTranscription() throws -> WhisperKitTranscriptionResult {
         guard let whisperKit = whisperKit else {
             throw NSError(domain: "WhisperKitError", code: 1, userInfo: [NSLocalizedDescriptionKey: "WhisperKit not initialized"])
         }
@@ -109,6 +121,30 @@ public class WhisperKitImplementation {
     
     static var defaultModelPath: String {
         return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/WhisperKit/Models"
+    }
+}
+
+public struct WhisperKitTranscriptionSegment {
+    public let text: String
+    public let startTime: Double
+    public let endTime: Double
+    
+    public init(text: String, startTime: Double, endTime: Double) {
+        self.text = text
+        self.startTime = startTime
+        self.endTime = endTime
+    }
+}
+
+public struct WhisperKitTranscriptionResult {
+    public let text: String
+    public let segments: [WhisperKitTranscriptionSegment]
+    public let language: String?
+    
+    public init(text: String, segments: [WhisperKitTranscriptionSegment], language: String? = nil) {
+        self.text = text
+        self.segments = segments
+        self.language = language
     }
 }
 
