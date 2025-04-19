@@ -16,5 +16,5 @@ samples, guidance on mobile development, and a full API reference.
 ## Run the code generation command
 
 ```bash
-flutter pub run pigeon --input pigeons/whisper_kit_api.dart
+flutter pub run pigeon --input pigeons/whisper_kit_api.dart --swift_out 'ios/Classes/WhisperKitApi.swift'
 ```

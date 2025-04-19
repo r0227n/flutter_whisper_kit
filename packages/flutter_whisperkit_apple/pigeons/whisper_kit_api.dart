@@ -1,19 +1,9 @@
 import 'package:pigeon/pigeon.dart';
 
-const String _kInput = 'pigeons/whisper_kit_api.dart';
-const String _kDartOut = 'lib/src/whisper_kit_api.dart';
-
 @ConfigurePigeon(
   PigeonOptions(
-    input: _kInput,
-    dartOut: _kDartOut,
-    swiftOut: 'ios/Classes/WhisperKitApi.swift',
-  ),
-)
-@ConfigurePigeon(
-  PigeonOptions(
-    input: _kInput,
-    dartOut: _kDartOut,
+    input: 'pigeons/whisper_kit_api.dart',
+    dartOut: 'lib/src/whisper_kit_api.dart',
     swiftOut: 'macos/Classes/WhisperKitApi.swift',
   ),
 )
