@@ -94,8 +94,8 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
             let pigeonSegments = result.segments.map { segment in
                 return PigeonTranscriptionSegment(
                     text: segment.text,
-                    startTime: segment.start,
-                    endTime: segment.end
+                    startTime: segment.startTime,
+                    endTime: segment.endTime
                 )
             }
             

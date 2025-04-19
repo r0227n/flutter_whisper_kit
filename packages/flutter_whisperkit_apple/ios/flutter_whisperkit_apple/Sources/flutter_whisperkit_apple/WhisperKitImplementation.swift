@@ -1,52 +1,72 @@
 import Foundation
 import WhisperKit
+import Flutter
 
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
     
-    public func initialize(config: WhisperKitConfig) throws -> Bool {
+    public func initialize(config: PigeonWhisperKitConfig) throws -> Bool {
         do {
             let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
-            var modelVariant: ModelVariant = .tiny
-            if let modelVariantStr = config.modelVariant {
-                switch modelVariantStr.lowercased() {
-                case "tiny": modelVariant = .tiny
-                case "base": modelVariant = .base
-                case "small": modelVariant = .small
-                case "medium": modelVariant = .medium
-                case "large": modelVariant = .large
-                default: modelVariant = .tiny
-                }
+            var modelVariant: WhisperKit.ModelVariant = .tiny
+            if let modelVariantStr = config.modelPath?.components(separatedBy: "/").last {
+                if modelVariantStr.contains("tiny") { modelVariant = .tiny }
+                else if modelVariantStr.contains("base") { modelVariant = .base }
+                else if modelVariantStr.contains("small") { modelVariant = .small }
+                else if modelVariantStr.contains("medium") { modelVariant = .medium }
+                else if modelVariantStr.contains("large") { modelVariant = .large }
+            }
+            
+            var audioEncoderComputeUnits: ComputeUnits = .cpuAndNeuralEngine
+            var textDecoderComputeUnits: ComputeUnits = .cpuAndNeuralEngine
+            
+            if #available(iOS 16.0, *) {
+                audioEncoderComputeUnits = .cpuAndNeuralEngine
+                textDecoderComputeUnits = .cpuAndNeuralEngine
+            } else {
+                audioEncoderComputeUnits = .cpuAndGPU
+                textDecoderComputeUnits = .cpuAndGPU
             }
             
             let computeOptions = ModelComputeOptions(
-                preferGPU: true,
-                computeUnits: .all
+                audioEncoderCompute: audioEncoderComputeUnits,
+                textDecoderCompute: textDecoderComputeUnits
             )
             
-            let audioProcessingOptions = AudioProcessingOptions(
-                enableVAD: config.enableVAD,
-                vadMode: .quality,
-                vadSilenceThreshold: config.vadFallbackSilenceThreshold / 1000.0,
-                vadSpeechThreshold: config.vadTemperature
-            )
-            
-            whisperKit = try WhisperKit(
+            let whisperKitConfig = WhisperKit.Configuration(
+                model: modelVariant.rawValue,
                 modelFolder: modelPath,
-                modelVariant: modelVariant,
-                modelCompute: computeOptions,
-                audioProcessing: audioProcessingOptions,
-                verbose: true
+                computeOptions: computeOptions,
+                audioProcessingOptions: {
+                    let options = AudioProcessingOptions()
+                    options.vadEnabled = config.enableVAD ?? false
+                    if let silenceThreshold = config.vadFallbackSilenceThreshold {
+                        options.vadSilenceThreshold = Double(silenceThreshold) / 1000.0
+                    }
+                    if let speechThreshold = config.vadTemperature {
+                        options.vadSpeechThreshold = speechThreshold
+                    }
+                    return options
+                }(),
+                languageIdentificationOptions: {
+                    let options = LanguageIdentificationOptions()
+                    options.enabled = config.enableLanguageIdentification ?? false
+                    return options
+                }(),
+                verbose: true,
+                logLevel: .info
             )
             
-            if config.enableLanguageIdentification {
+            whisperKit = try WhisperKit(config: whisperKitConfig)
+            
+            if config.enableLanguageIdentification ?? false {
                 NotificationCenter.default.addObserver(
-                    forName: .whisperKitModelStateDidChange,
+                    forName: Notification.Name.whisperKitDidChangeModelState,
                     object: whisperKit,
                     queue: .main
                 ) { notification in
-                    if let modelState = notification.userInfo?["modelState"] as? ModelState,
+                    if let modelState = notification.userInfo?["modelState"] as? WhisperKit.ModelState,
                        modelState == .unloaded {
                     }
                 }
@@ -66,7 +86,7 @@ public class WhisperKitImplementation {
         
         do {
             let audioURL = URL(fileURLWithPath: filePath)
-            let result = try whisperKit.transcribe(audioFile: audioURL)
+            let result = try whisperKit.transcribe(audioURL: audioURL)
             
             let segments = result.segments.map { segment in
                 return WhisperKitTranscriptionSegment(
@@ -145,27 +165,5 @@ public struct WhisperKitTranscriptionResult {
         self.text = text
         self.segments = segments
         self.language = language
-    }
-}
-
-extension WhisperKit.Configuration {
-    public var modelPath: String? {
-        return nil // Default implementation
-    }
-    
-    public var modelVariant: String? {
-        return "tiny" // Default implementation
-    }
-    
-    public var vadFallbackSilenceThreshold: Double {
-        return 600 // Default implementation
-    }
-    
-    public var vadTemperature: Double {
-        return 0.15 // Default implementation
-    }
-    
-    public var enableLanguageIdentification: Bool {
-        return false // Default implementation
     }
 }

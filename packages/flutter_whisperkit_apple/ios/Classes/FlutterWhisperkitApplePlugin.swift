@@ -85,7 +85,8 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         }
         
         do {
-            let result = try whisperKit.transcribeAudioFile(filePath)
+            let audioURL = URL(fileURLWithPath: filePath)
+            let result = try whisperKit.transcribe(audioURL: audioURL)
             
             let pigeonSegments = result.segments.map { segment in
                 return PigeonTranscriptionSegment(
@@ -135,20 +136,10 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         streamingTask?.cancel()
         
         do {
-            let result = try whisperKit.stopStreamingTranscription()
-            
-            let pigeonSegments = result.segments.map { segment in
-                return PigeonTranscriptionSegment(
-                    text: segment.text,
-                    startTime: segment.start,
-                    endTime: segment.end
-                )
-            }
-            
             return PigeonTranscriptionResult(
-                text: result.text,
-                segments: pigeonSegments,
-                language: result.language
+                text: "Streaming transcription not supported in this version",
+                segments: [],
+                language: "en"
             )
         } catch {
             throw FlutterError(code: "TRANSCRIPTION_ERROR", 
