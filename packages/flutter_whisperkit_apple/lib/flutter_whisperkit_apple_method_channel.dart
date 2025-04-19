@@ -14,4 +14,21 @@ class MethodChannelFlutterWhisperkitApple extends FlutterWhisperkitApplePlatform
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
+  
+  @override
+  Future<String?> createWhisperKit(String model, String modelRepo) async {
+    try {
+      final result = await methodChannel.invokeMethod<String>(
+        'createWhisperKit',
+        {
+          'model': model,
+          'modelRepo': modelRepo,
+        },
+      );
+      return result;
+    } on PlatformException catch (e) {
+      debugPrint('Error creating WhisperKit: ${e.message}');
+      throw e;
+    }
+  }
 }
