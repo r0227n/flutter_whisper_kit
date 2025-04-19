@@ -12,44 +12,46 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         instance.events = WhisperKitEvents(binaryMessenger: registrar.messenger)
     }
     
-    public func getPlatformVersion() throws -> String {
+    public func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void) {
         let version = ProcessInfo.processInfo.operatingSystemVersion
-        return "macOS \(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
+        let versionString = "macOS \(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
+        completion(.success(versionString))
     }
     
-    public func initializeWhisperKit(config: WhisperKitConfig_pigeongenerated) throws -> Bool {
+    public func initializeWhisperKit(config: WhisperKitConfig, completion: @escaping (Result<Bool, Error>) -> Void) {
         let whisperConfig = WhisperKitConfig(
             modelPath: config.modelPath,
             enableVAD: config.enableVAD ?? false,
-            vadFallbackSilenceThreshold: config.vadFallbackSilenceThreshold ?? 0,
+            vadFallbackSilenceThreshold: Int(config.vadFallbackSilenceThreshold ?? 0),
             vadTemperature: config.vadTemperature ?? 0.0,
             enableLanguageIdentification: config.enableLanguageIdentification ?? false
         )
         
         do {
             whisperKit = try WhisperKit(config: whisperConfig)
-            return true
+            completion(.success(true))
         } catch {
-            throw FlutterError(code: "INITIALIZATION_ERROR", 
-                              message: "Failed to initialize WhisperKit: \(error.localizedDescription)", 
-                              details: nil)
+            completion(.failure(FlutterError(code: "INITIALIZATION_ERROR", 
+                                           message: "Failed to initialize WhisperKit: \(error.localizedDescription)", 
+                                           details: nil)))
         }
     }
     
-    public func transcribeAudioFile(filePath: String) throws -> TranscriptionResult_pigeongenerated {
+    public func transcribeAudioFile(filePath: String, completion: @escaping (Result<TranscriptionResult, Error>) -> Void) {
         guard let whisperKit = whisperKit else {
-            throw FlutterError(code: "NOT_INITIALIZED", 
-                              message: "WhisperKit is not initialized", 
-                              details: nil)
+            completion(.failure(FlutterError(code: "NOT_INITIALIZED", 
+                                           message: "WhisperKit is not initialized", 
+                                           details: nil)))
+            return
         }
         
         do {
             let result = try whisperKit.transcribeAudioFile(filePath)
             
-            return TranscriptionResult_pigeongenerated(
+            let transcriptionResult = TranscriptionResult(
                 text: result.text,
                 segments: result.segments.map { segment in
-                    TranscriptionSegment_pigeongenerated(
+                    TranscriptionSegment(
                         text: segment.text,
                         startTime: segment.startTime,
                         endTime: segment.endTime
@@ -57,18 +59,21 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
                 },
                 language: result.language
             )
+            
+            completion(.success(transcriptionResult))
         } catch {
-            throw FlutterError(code: "TRANSCRIPTION_ERROR", 
-                              message: "Failed to transcribe audio file: \(error.localizedDescription)", 
-                              details: nil)
+            completion(.failure(FlutterError(code: "TRANSCRIPTION_ERROR", 
+                                           message: "Failed to transcribe audio file: \(error.localizedDescription)", 
+                                           details: nil)))
         }
     }
     
-    public func startStreamingTranscription() throws -> Bool {
+    public func startStreamingTranscription(completion: @escaping (Result<Bool, Error>) -> Void) {
         guard let whisperKit = whisperKit else {
-            throw FlutterError(code: "NOT_INITIALIZED", 
-                              message: "WhisperKit is not initialized", 
-                              details: nil)
+            completion(.failure(FlutterError(code: "NOT_INITIALIZED", 
+                                           message: "WhisperKit is not initialized", 
+                                           details: nil)))
+            return
         }
         
         streamingTask = Task {
@@ -79,14 +84,15 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
             }
         }
         
-        return true
+        completion(.success(true))
     }
     
-    public func stopStreamingTranscription() throws -> TranscriptionResult_pigeongenerated {
+    public func stopStreamingTranscription(completion: @escaping (Result<TranscriptionResult, Error>) -> Void) {
         guard let whisperKit = whisperKit else {
-            throw FlutterError(code: "NOT_INITIALIZED", 
-                              message: "WhisperKit is not initialized", 
-                              details: nil)
+            completion(.failure(FlutterError(code: "NOT_INITIALIZED", 
+                                           message: "WhisperKit is not initialized", 
+                                           details: nil)))
+            return
         }
         
         streamingTask?.cancel()
@@ -94,10 +100,10 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         do {
             let result = try whisperKit.stopStreamingTranscription()
             
-            return TranscriptionResult_pigeongenerated(
+            let transcriptionResult = TranscriptionResult(
                 text: result.text,
                 segments: result.segments.map { segment in
-                    TranscriptionSegment_pigeongenerated(
+                    TranscriptionSegment(
                         text: segment.text,
                         startTime: segment.startTime,
                         endTime: segment.endTime
@@ -105,20 +111,23 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
                 },
                 language: result.language
             )
+            
+            completion(.success(transcriptionResult))
         } catch {
-            throw FlutterError(code: "TRANSCRIPTION_ERROR", 
-                              message: "Failed to stop streaming transcription: \(error.localizedDescription)", 
-                              details: nil)
+            completion(.failure(FlutterError(code: "TRANSCRIPTION_ERROR", 
+                                           message: "Failed to stop streaming transcription: \(error.localizedDescription)", 
+                                           details: nil)))
         }
     }
     
-    public func getAvailableModels() throws -> [String] {
+    public func getAvailableModels(completion: @escaping (Result<[String], Error>) -> Void) {
         do {
-            return try WhisperKit.getAvailableModels()
+            let models = try WhisperKit.getAvailableModels()
+            completion(.success(models))
         } catch {
-            throw FlutterError(code: "MODEL_ERROR", 
-                              message: "Failed to get available models: \(error.localizedDescription)", 
-                              details: nil)
+            completion(.failure(FlutterError(code: "MODEL_ERROR", 
+                                           message: "Failed to get available models: \(error.localizedDescription)", 
+                                           details: nil)))
         }
     }
 }
