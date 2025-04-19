@@ -2,14 +2,6 @@ import Foundation
 import WhisperKit
 import FlutterMacOS
 
-struct PigeonWhisperKitConfig {
-    var modelPath: String?
-    var modelVariant: String?
-    var enableVAD: Bool?
-    var vadFallbackSilenceThreshold: Int64?
-    var vadTemperature: Double?
-    var enableLanguageIdentification: Bool?
-}
 
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
@@ -19,37 +11,45 @@ public class WhisperKitImplementation {
             let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
             var modelVariant: WhisperKit.ModelVariant = .tiny
-            if let modelVariantStr = config.modelVariant {
-                switch modelVariantStr.lowercased() {
-                case "tiny": modelVariant = .tiny
-                case "base": modelVariant = .base
-                case "small": modelVariant = .small
-                case "medium": modelVariant = .medium
-                case "large": modelVariant = .large
-                default: modelVariant = .tiny
-                }
+            if let modelVariantStr = config.modelPath?.components(separatedBy: "/").last {
+                if modelVariantStr.contains("tiny") { modelVariant = .tiny }
+                else if modelVariantStr.contains("base") { modelVariant = .base }
+                else if modelVariantStr.contains("small") { modelVariant = .small }
+                else if modelVariantStr.contains("medium") { modelVariant = .medium }
+                else if modelVariantStr.contains("large") { modelVariant = .large }
             }
             
-            let configuration = WhisperKit.Configuration()
-            
-            configuration.computeOptions.preferGPU = true
-            configuration.computeOptions.computeUnits = .all
-            
-            configuration.audioProcessingOptions.vadEnabled = config.enableVAD ?? false
-            if let silenceThreshold = config.vadFallbackSilenceThreshold {
-                configuration.audioProcessingOptions.vadSilenceThreshold = Double(silenceThreshold) / 1000.0
-            }
-            if let speechThreshold = config.vadTemperature {
-                configuration.audioProcessingOptions.vadSpeechThreshold = speechThreshold
-            }
-            
-            configuration.languageIdentificationOptions.enabled = config.enableLanguageIdentification ?? false
-            
-            // Initialize WhisperKit
-            whisperKit = try WhisperKit(
-                modelPath: modelPath,
-                configuration: configuration
+            let whisperKitConfig = WhisperKit.Configuration(
+                model: modelVariant.rawValue,
+                modelFolder: modelPath,
+                computeOptions: {
+                    let options = ModelComputeOptions()
+                    options.preferGPU = true
+                    options.computeUnits = .all
+                    return options
+                }(),
+                audioProcessingOptions: {
+                    let options = AudioProcessingOptions()
+                    options.vadEnabled = config.enableVAD ?? false
+                    if let silenceThreshold = config.vadFallbackSilenceThreshold {
+                        options.vadSilenceThreshold = Double(silenceThreshold) / 1000.0
+                    }
+                    if let speechThreshold = config.vadTemperature {
+                        options.vadSpeechThreshold = speechThreshold
+                    }
+                    return options
+                }(),
+                languageIdentificationOptions: {
+                    let options = LanguageIdentificationOptions()
+                    options.enabled = config.enableLanguageIdentification ?? false
+                    return options
+                }(),
+                verbose: true,
+                logLevel: .info
             )
+            
+            // Initialize WhisperKit with the config
+            whisperKit = try WhisperKit(config: whisperKitConfig)
             
             if config.enableLanguageIdentification ?? false {
                 NotificationCenter.default.addObserver(
