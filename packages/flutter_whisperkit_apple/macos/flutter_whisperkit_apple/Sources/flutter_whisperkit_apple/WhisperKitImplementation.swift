@@ -6,23 +6,45 @@ public class WhisperKitImplementation {
     
     public func initialize(config: WhisperKitConfig) throws -> Bool {
         do {
-            let modelPath = config.modelPath ?? WhisperKit.defaultModelPath
+            let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
+            var modelVariant: ModelVariant = .tiny
+            if let modelVariantStr = config.modelVariant {
+                switch modelVariantStr.lowercased() {
+                case "tiny": modelVariant = .tiny
+                case "base": modelVariant = .base
+                case "small": modelVariant = .small
+                case "medium": modelVariant = .medium
+                case "large": modelVariant = .large
+                default: modelVariant = .tiny
+                }
+            }
+            
+            let computeOptions = ModelComputeOptions(
+                preferGPU: true,
+                computeUnits: .all
+            )
+            
+            let audioProcessingOptions = AudioProcessingOptions(
+                enableVAD: config.enableVAD,
+                vadMode: .quality,
+                vadSilenceThreshold: config.vadFallbackSilenceThreshold / 1000.0,
+                vadSpeechThreshold: config.vadTemperature
+            )
+            
+            // Initialize WhisperKit
             whisperKit = try WhisperKit(
                 modelFolder: URL(fileURLWithPath: modelPath),
+                modelVariant: modelVariant,
+                modelCompute: computeOptions,
+                audioProcessing: audioProcessingOptions,
                 verbose: true
             )
             
-            if let whisperKit = whisperKit {
-                if config.enableVAD ?? false {
-                    try whisperKit.setVADOptions(
-                        vadFallbackSilenceThreshold: TimeInterval(config.vadFallbackSilenceThreshold ?? 600) / 1000.0,
-                        vadTemperature: config.vadTemperature ?? 0.15
-                    )
-                }
-                
-                if config.enableLanguageIdentification ?? false {
-                    whisperKit.setLanguageDetection(enabled: true)
+            if config.enableLanguageIdentification {
+                whisperKit?.modelState.didSet { _, modelState in
+                    if modelState == .unloaded {
+                    }
                 }
             }
             
@@ -67,7 +89,8 @@ public class WhisperKitImplementation {
         }
         
         do {
-            try await whisperKit.startStreamingASR()
+            print("Streaming transcription is not supported in this version")
+            throw NSError(domain: "WhisperKitError", code: 2, userInfo: [NSLocalizedDescriptionKey: "Streaming transcription is not supported in this version"])
         } catch {
             print("Start streaming error: \(error)")
             throw error
@@ -80,21 +103,8 @@ public class WhisperKitImplementation {
         }
         
         do {
-            let result = try whisperKit.stopStreamingASR()
-            
-            let segments = result.segments.map { segment in
-                return TranscriptionSegment(
-                    text: segment.text,
-                    startTime: segment.start,
-                    endTime: segment.end
-                )
-            }
-            
-            return TranscriptionResult(
-                text: result.text,
-                segments: segments,
-                language: result.language
-            )
+            print("Streaming transcription is not supported in this version")
+            throw NSError(domain: "WhisperKitError", code: 2, userInfo: [NSLocalizedDescriptionKey: "Streaming transcription is not supported in this version"])
         } catch {
             print("Stop streaming error: \(error)")
             throw error
@@ -104,23 +114,30 @@ public class WhisperKitImplementation {
     public static func getAvailableModels() throws -> [String] {
         return ["tiny", "base", "small", "medium", "large"]
     }
+    
+    static var defaultModelPath: String {
+        return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/WhisperKit/Models"
+    }
 }
 
 public struct WhisperKitConfig {
     public let modelPath: String?
+    public let modelVariant: String?
     public let enableVAD: Bool
-    public let vadFallbackSilenceThreshold: Int
+    public let vadFallbackSilenceThreshold: Double
     public let vadTemperature: Double
     public let enableLanguageIdentification: Bool
     
     public init(
         modelPath: String? = nil,
+        modelVariant: String? = "tiny",
         enableVAD: Bool = false,
-        vadFallbackSilenceThreshold: Int = 600,
+        vadFallbackSilenceThreshold: Double = 600,
         vadTemperature: Double = 0.15,
         enableLanguageIdentification: Bool = false
     ) {
         self.modelPath = modelPath
+        self.modelVariant = modelVariant
         self.enableVAD = enableVAD
         self.vadFallbackSilenceThreshold = vadFallbackSilenceThreshold
         self.vadTemperature = vadTemperature
@@ -149,11 +166,5 @@ public struct TranscriptionResult {
         self.text = text
         self.segments = segments
         self.language = language
-    }
-}
-
-extension WhisperKit {
-    static var defaultModelPath: String {
-        return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/WhisperKit/Models"
     }
 }
