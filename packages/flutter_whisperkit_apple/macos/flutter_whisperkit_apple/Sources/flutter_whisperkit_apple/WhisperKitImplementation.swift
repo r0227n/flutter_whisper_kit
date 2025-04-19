@@ -2,7 +2,7 @@ import Foundation
 import WhisperKit
 import FlutterMacOS
 
-struct PigeonWhisperKitConfigImplementation {
+struct PigeonWhisperKitConfig {
     var modelPath: String?
     var modelVariant: String?
     var enableVAD: Bool?
@@ -14,11 +14,11 @@ struct PigeonWhisperKitConfigImplementation {
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
     
-    public func initialize(config: PigeonWhisperKitConfigImplementation) throws -> Bool {
+    public func initialize(config: PigeonWhisperKitConfig) throws -> Bool {
         do {
             let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
-            var modelVariant: ModelVariant = .tiny
+            var modelVariant: WhisperKit.ModelVariant = .tiny
             if let modelVariantStr = config.modelVariant {
                 switch modelVariantStr.lowercased() {
                 case "tiny": modelVariant = .tiny
@@ -30,34 +30,34 @@ public class WhisperKitImplementation {
                 }
             }
             
-            let computeOptions = ModelComputeOptions(
-                preferGPU: true,
-                computeUnits: .all
-            )
+            let configuration = WhisperKit.Configuration()
             
-            let audioProcessingOptions = AudioProcessingOptions(
-                enableVAD: config.enableVAD,
-                vadMode: .quality,
-                vadSilenceThreshold: config.vadFallbackSilenceThreshold / 1000.0,
-                vadSpeechThreshold: config.vadTemperature
-            )
+            configuration.computeOptions.preferGPU = true
+            configuration.computeOptions.computeUnits = .all
+            
+            configuration.audioProcessingOptions.vadEnabled = config.enableVAD ?? false
+            if let silenceThreshold = config.vadFallbackSilenceThreshold {
+                configuration.audioProcessingOptions.vadSilenceThreshold = Double(silenceThreshold) / 1000.0
+            }
+            if let speechThreshold = config.vadTemperature {
+                configuration.audioProcessingOptions.vadSpeechThreshold = speechThreshold
+            }
+            
+            configuration.languageIdentificationOptions.enabled = config.enableLanguageIdentification ?? false
             
             // Initialize WhisperKit
             whisperKit = try WhisperKit(
-                modelFolder: modelPath,
-                modelVariant: modelVariant,
-                modelCompute: computeOptions,
-                audioProcessing: audioProcessingOptions,
-                verbose: true
+                modelPath: modelPath,
+                configuration: configuration
             )
             
-            if config.enableLanguageIdentification {
+            if config.enableLanguageIdentification ?? false {
                 NotificationCenter.default.addObserver(
-                    forName: .whisperKitModelStateDidChange,
+                    forName: Notification.Name.whisperKitDidChangeModelState,
                     object: whisperKit,
                     queue: .main
                 ) { notification in
-                    if let modelState = notification.userInfo?["modelState"] as? ModelState,
+                    if let modelState = notification.userInfo?["modelState"] as? WhisperKit.ModelState,
                        modelState == .unloaded {
                     }
                 }
@@ -77,7 +77,7 @@ public class WhisperKitImplementation {
         
         do {
             let audioURL = URL(fileURLWithPath: filePath)
-            let result = try whisperKit.transcribe(audioFile: audioURL)
+            let result = try whisperKit.transcribe(audioURL: audioURL)
             
             let segments = result.segments.map { segment in
                 return WhisperKitTranscriptionSegment(
