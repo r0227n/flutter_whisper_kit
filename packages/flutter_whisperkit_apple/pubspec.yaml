@@ -23,5 +23,7 @@ flutter:
     platforms:
       ios:
         pluginClass: FlutterWhisperkitApplePlugin
+        swift_package_manager: true
       macos:
         pluginClass: FlutterWhisperkitApplePlugin
+        swift_package_manager: true
