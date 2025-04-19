@@ -32,7 +32,6 @@ public class WhisperKitImplementation {
                 vadSpeechThreshold: config.vadTemperature
             )
             
-            // Initialize WhisperKit
             whisperKit = try WhisperKit(
                 modelFolder: modelPath,
                 modelVariant: modelVariant,
