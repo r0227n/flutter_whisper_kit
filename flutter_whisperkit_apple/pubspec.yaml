@@ -1,0 +1,40 @@
+name: flutter_whisperkit_apple
+description: A Flutter plugin for WhisperKit on iOS and macOS.
+version: 0.0.1
+homepage: https://github.com/r0227n/flutter_whisperkit_apple
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  pigeon: ^18.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  pigeon: ^18.0.0
+
+
+flutter:
+  plugin:
+    platforms:
+      ios:
+        pluginClass: FlutterWhisperkitApplePlugin
+      macos:
+        pluginClass: FlutterWhisperkitApplePlugin
+
+pigeon:
+  input: pigeons/whisper_kit_api.dart
+  dart_out: lib/src/whisper_kit_api.dart
+  objc_header_out: ios/Classes/WhisperKitApi.h
+  objc_source_out: ios/Classes/WhisperKitApi.m
+  objc_prefix: FLT
+  macos_header_out: macos/Classes/WhisperKitApi.h
+  macos_source_out: macos/Classes/WhisperKitApi.m
+  macos_prefix: FLT
+  swift_out: ios/Classes/WhisperKitApi.swift
+  macos_swift_out: macos/Classes/WhisperKitApi.swift
