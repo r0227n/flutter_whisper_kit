@@ -17,15 +17,58 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
     }
     
     public func initializeWhisperKit(config: PigeonWhisperKitConfig) throws -> Bool {
-        let whisperConfig = WhisperKit.Configuration()
-        whisperConfig.computeOptions.modelFolder = config.modelPath ?? ""
-        whisperConfig.vadOptions.enabled = config.enableVAD ?? false
-        whisperConfig.vadOptions.silenceThreshold = Double(config.vadFallbackSilenceThreshold ?? 0)
-        whisperConfig.vadOptions.speechThreshold = config.vadTemperature ?? 0.0
-        whisperConfig.languageIdentificationOptions.enabled = config.enableLanguageIdentification ?? false
-        
         do {
-            whisperKit = try WhisperKit(config: whisperConfig)
+            var audioEncoderComputeUnits: ComputeUnits = .cpuAndNeuralEngine
+            var textDecoderComputeUnits: ComputeUnits = .cpuAndNeuralEngine
+            
+            if #available(iOS 16.0, *) {
+                audioEncoderComputeUnits = .cpuAndNeuralEngine
+                textDecoderComputeUnits = .cpuAndNeuralEngine
+            } else {
+                audioEncoderComputeUnits = .cpuAndGPU
+                textDecoderComputeUnits = .cpuAndGPU
+            }
+            
+            let computeOptions = ModelComputeOptions(
+                audioEncoderCompute: audioEncoderComputeUnits,
+                textDecoderCompute: textDecoderComputeUnits
+            )
+            
+            let modelFolder = config.modelPath ?? NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] + "/WhisperKit/Models"
+            let modelName = modelFolder.components(separatedBy: "/").last ?? "tiny"
+            
+            var modelVariant = "tiny"
+            if modelName.contains("tiny") { modelVariant = "tiny" }
+            else if modelName.contains("base") { modelVariant = "base" }
+            else if modelName.contains("small") { modelVariant = "small" }
+            else if modelName.contains("medium") { modelVariant = "medium" }
+            else if modelName.contains("large") { modelVariant = "large" }
+            
+            let whisperKitConfig = WhisperKit.Configuration(
+                model: modelVariant,
+                modelFolder: modelFolder,
+                computeOptions: computeOptions,
+                audioProcessingOptions: {
+                    let options = AudioProcessingOptions()
+                    options.vadEnabled = config.enableVAD ?? false
+                    if let silenceThreshold = config.vadFallbackSilenceThreshold {
+                        options.vadSilenceThreshold = Double(silenceThreshold) / 1000.0
+                    }
+                    if let speechThreshold = config.vadTemperature {
+                        options.vadSpeechThreshold = speechThreshold
+                    }
+                    return options
+                }(),
+                languageIdentificationOptions: {
+                    let options = LanguageIdentificationOptions()
+                    options.enabled = config.enableLanguageIdentification ?? false
+                    return options
+                }(),
+                verbose: true,
+                logLevel: .info
+            )
+            
+            whisperKit = try WhisperKit(config: whisperKitConfig)
             return true
         } catch {
             throw FlutterError(code: "INITIALIZATION_ERROR", 
