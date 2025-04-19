@@ -17,6 +17,13 @@ const String _kDartOut = 'lib/src/whisper_kit_api.dart';
     swiftOut: 'macos/Classes/WhisperKitApi.swift',
   ),
 )
+@ConfigurePigeon(
+  PigeonOptions(
+    input: _kInput,
+    dartOut: _kDartOut,
+    swiftOut: 'macos/Runner/WhisperKitApi.g.swift',
+  ),
+)
 class WhisperKitConfig {
   final String? modelPath;
   final bool? enableVAD;
