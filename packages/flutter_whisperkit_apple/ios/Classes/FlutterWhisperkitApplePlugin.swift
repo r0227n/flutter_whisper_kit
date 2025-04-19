@@ -16,14 +16,13 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         return "iOS " + UIDevice.current.systemVersion
     }
     
-    public func initializeWhisperKit(config: WhisperKitConfig_pigeongenerated) throws -> Bool {
-        let whisperConfig = WhisperKitConfig(
-            modelPath: config.modelPath,
-            enableVAD: config.enableVAD ?? false,
-            vadFallbackSilenceThreshold: config.vadFallbackSilenceThreshold ?? 0,
-            vadTemperature: config.vadTemperature ?? 0.0,
-            enableLanguageIdentification: config.enableLanguageIdentification ?? false
-        )
+    public func initializeWhisperKit(config: PigeonWhisperKitConfig) throws -> Bool {
+        let whisperConfig = WhisperKit.Configuration()
+        whisperConfig.computeOptions.modelFolder = config.modelPath ?? ""
+        whisperConfig.vadOptions.enabled = config.enableVAD ?? false
+        whisperConfig.vadOptions.silenceThreshold = Double(config.vadFallbackSilenceThreshold ?? 0)
+        whisperConfig.vadOptions.speechThreshold = config.vadTemperature ?? 0.0
+        whisperConfig.languageIdentificationOptions.enabled = config.enableLanguageIdentification ?? false
         
         do {
             whisperKit = try WhisperKit(config: whisperConfig)
@@ -35,7 +34,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         }
     }
     
-    public func transcribeAudioFile(filePath: String) throws -> TranscriptionResult_pigeongenerated {
+    public func transcribeAudioFile(filePath: String) throws -> PigeonTranscriptionResult {
         guard let whisperKit = whisperKit else {
             throw FlutterError(code: "NOT_INITIALIZED", 
                               message: "WhisperKit is not initialized", 
@@ -45,15 +44,17 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         do {
             let result = try whisperKit.transcribeAudioFile(filePath)
             
-            return TranscriptionResult_pigeongenerated(
+            let pigeonSegments = result.segments.map { segment in
+                return PigeonTranscriptionSegment(
+                    text: segment.text,
+                    startTime: segment.start,
+                    endTime: segment.end
+                )
+            }
+            
+            return PigeonTranscriptionResult(
                 text: result.text,
-                segments: result.segments.map { segment in
-                    TranscriptionSegment_pigeongenerated(
-                        text: segment.text,
-                        startTime: segment.startTime,
-                        endTime: segment.endTime
-                    )
-                },
+                segments: pigeonSegments,
                 language: result.language
             )
         } catch {
@@ -81,7 +82,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         return true
     }
     
-    public func stopStreamingTranscription() throws -> TranscriptionResult_pigeongenerated {
+    public func stopStreamingTranscription() throws -> PigeonTranscriptionResult {
         guard let whisperKit = whisperKit else {
             throw FlutterError(code: "NOT_INITIALIZED", 
                               message: "WhisperKit is not initialized", 
@@ -93,15 +94,17 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         do {
             let result = try whisperKit.stopStreamingTranscription()
             
-            return TranscriptionResult_pigeongenerated(
+            let pigeonSegments = result.segments.map { segment in
+                return PigeonTranscriptionSegment(
+                    text: segment.text,
+                    startTime: segment.start,
+                    endTime: segment.end
+                )
+            }
+            
+            return PigeonTranscriptionResult(
                 text: result.text,
-                segments: result.segments.map { segment in
-                    TranscriptionSegment_pigeongenerated(
-                        text: segment.text,
-                        startTime: segment.startTime,
-                        endTime: segment.endTime
-                    )
-                },
+                segments: pigeonSegments,
                 language: result.language
             )
         } catch {
@@ -119,57 +122,5 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
                               message: "Failed to get available models: \(error.localizedDescription)", 
                               details: nil)
         }
-    }
-}
-
-private class WhisperKit {
-    struct WhisperKitConfig {
-        let modelPath: String?
-        let enableVAD: Bool
-        let vadFallbackSilenceThreshold: Int
-        let vadTemperature: Double
-        let enableLanguageIdentification: Bool
-    }
-    
-    struct TranscriptionSegment {
-        let text: String
-        let startTime: Double
-        let endTime: Double
-    }
-    
-    struct TranscriptionResult {
-        let text: String
-        let segments: [TranscriptionSegment]
-        let language: String?
-    }
-    
-    init(config: WhisperKitConfig) throws {
-    }
-    
-    func transcribeAudioFile(_ filePath: String) throws -> TranscriptionResult {
-        return TranscriptionResult(
-            text: "Sample transcription",
-            segments: [
-                TranscriptionSegment(text: "Sample segment", startTime: 0.0, endTime: 1.0)
-            ],
-            language: "en"
-        )
-    }
-    
-    func startStreamingTranscription() async throws {
-    }
-    
-    func stopStreamingTranscription() throws -> TranscriptionResult {
-        return TranscriptionResult(
-            text: "Sample transcription",
-            segments: [
-                TranscriptionSegment(text: "Sample segment", startTime: 0.0, endTime: 1.0)
-            ],
-            language: "en"
-        )
-    }
-    
-    static func getAvailableModels() throws -> [String] {
-        return ["tiny", "base", "small", "medium", "large"]
     }
 }

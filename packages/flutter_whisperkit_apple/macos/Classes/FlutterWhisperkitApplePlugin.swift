@@ -19,15 +19,14 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         completion(.success(versionString))
     }
     
-    public func initializeWhisperKit(config: WhisperKitConfig, completion: @escaping (Result<Bool, Error>) -> Void) {
+    public func initializeWhisperKit(config: PigeonWhisperKitConfig, completion: @escaping (Result<Bool, Error>) -> Void) {
         do {
-            let whisperConfig = WhisperKitImplementation.WhisperKitConfig(
-                modelPath: config.modelPath,
-                enableVAD: config.enableVAD ?? false,
-                vadFallbackSilenceThreshold: Int(config.vadFallbackSilenceThreshold ?? 0),
-                vadTemperature: config.vadTemperature ?? 0.0,
-                enableLanguageIdentification: config.enableLanguageIdentification ?? false
-            )
+            let whisperConfig = WhisperKit.Configuration()
+            whisperConfig.computeOptions.modelFolder = config.modelPath ?? ""
+            whisperConfig.vadOptions.enabled = config.enableVAD ?? false
+            whisperConfig.vadOptions.silenceThreshold = Double(config.vadFallbackSilenceThreshold ?? 0)
+            whisperConfig.vadOptions.speechThreshold = config.vadTemperature ?? 0.0
+            whisperConfig.languageIdentificationOptions.enabled = config.enableLanguageIdentification ?? false
             
             whisperKitImplementation = WhisperKitImplementation()
             let result = try whisperKitImplementation?.initialize(config: whisperConfig) ?? false
@@ -40,7 +39,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         }
     }
     
-    public func transcribeAudioFile(filePath: String, completion: @escaping (Result<TranscriptionResult, Error>) -> Void) {
+    public func transcribeAudioFile(filePath: String, completion: @escaping (Result<PigeonTranscriptionResult, Error>) -> Void) {
         guard let whisperKitImplementation = whisperKitImplementation else {
             completion(.failure(FlutterError(code: "NOT_INITIALIZED", 
                                            message: "WhisperKit is not initialized", 
@@ -51,19 +50,21 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         do {
             let result = try whisperKitImplementation.transcribeAudioFile(filePath)
             
-            let transcriptionResult = TranscriptionResult(
+            let pigeonSegments = result.segments.map { segment in
+                return PigeonTranscriptionSegment(
+                    text: segment.text,
+                    startTime: segment.start,
+                    endTime: segment.end
+                )
+            }
+            
+            let pigeonResult = PigeonTranscriptionResult(
                 text: result.text,
-                segments: result.segments.map { segment in
-                    TranscriptionSegment(
-                        text: segment.text,
-                        startTime: segment.startTime,
-                        endTime: segment.endTime
-                    )
-                },
+                segments: pigeonSegments,
                 language: result.language
             )
             
-            completion(.success(transcriptionResult))
+            completion(.success(pigeonResult))
         } catch {
             print("Transcription error: \(error)")
             completion(.failure(FlutterError(code: "TRANSCRIPTION_ERROR", 
@@ -91,7 +92,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         completion(.success(true))
     }
     
-    public func stopStreamingTranscription(completion: @escaping (Result<TranscriptionResult, Error>) -> Void) {
+    public func stopStreamingTranscription(completion: @escaping (Result<PigeonTranscriptionResult, Error>) -> Void) {
         guard let whisperKitImplementation = whisperKitImplementation else {
             completion(.failure(FlutterError(code: "NOT_INITIALIZED", 
                                            message: "WhisperKit is not initialized", 
@@ -104,19 +105,21 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         do {
             let result = try whisperKitImplementation.stopStreamingTranscription()
             
-            let transcriptionResult = TranscriptionResult(
+            let pigeonSegments = result.segments.map { segment in
+                return PigeonTranscriptionSegment(
+                    text: segment.text,
+                    startTime: segment.start,
+                    endTime: segment.end
+                )
+            }
+            
+            let pigeonResult = PigeonTranscriptionResult(
                 text: result.text,
-                segments: result.segments.map { segment in
-                    TranscriptionSegment(
-                        text: segment.text,
-                        startTime: segment.startTime,
-                        endTime: segment.endTime
-                    )
-                },
+                segments: pigeonSegments,
                 language: result.language
             )
             
-            completion(.success(transcriptionResult))
+            completion(.success(pigeonResult))
         } catch {
             print("Stop streaming error: \(error)")
             completion(.failure(FlutterError(code: "TRANSCRIPTION_ERROR", 

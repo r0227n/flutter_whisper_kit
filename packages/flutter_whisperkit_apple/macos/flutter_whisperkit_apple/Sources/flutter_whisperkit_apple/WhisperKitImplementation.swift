@@ -4,7 +4,7 @@ import WhisperKit
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
     
-    public func initialize(config: APIWhisperKitConfig) throws -> Bool {
+    public func initialize(config: WhisperKit.Configuration) throws -> Bool {
         do {
             let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
@@ -60,7 +60,7 @@ public class WhisperKitImplementation {
         }
     }
     
-    public func transcribeAudioFile(_ filePath: String) throws -> APITranscriptionResult {
+    public func transcribeAudioFile(_ filePath: String) throws -> TranscriptionResult {
         guard let whisperKit = whisperKit else {
             throw NSError(domain: "WhisperKitError", code: 1, userInfo: [NSLocalizedDescriptionKey: "WhisperKit not initialized"])
         }
@@ -69,19 +69,7 @@ public class WhisperKitImplementation {
             let audioURL = URL(fileURLWithPath: filePath)
             let result = try whisperKit.transcribe(audioFile: audioURL)
             
-            let segments = result.segments.map { segment in
-                return APITranscriptionSegment(
-                    text: segment.text,
-                    startTime: segment.start,
-                    endTime: segment.end
-                )
-            }
-            
-            return APITranscriptionResult(
-                text: result.text,
-                segments: segments,
-                language: result.language
-            )
+            return result
         } catch {
             print("Transcription error: \(error)")
             throw error
@@ -102,7 +90,7 @@ public class WhisperKitImplementation {
         }
     }
     
-    public func stopStreamingTranscription() throws -> APITranscriptionResult {
+    public func stopStreamingTranscription() throws -> TranscriptionResult {
         guard let whisperKit = whisperKit else {
             throw NSError(domain: "WhisperKitError", code: 1, userInfo: [NSLocalizedDescriptionKey: "WhisperKit not initialized"])
         }
@@ -125,56 +113,24 @@ public class WhisperKitImplementation {
     }
 }
 
-public struct APIWhisperKitConfig {
-    public let modelPath: String?
-    public let modelVariant: String?
-    public let enableVAD: Bool
-    public let vadFallbackSilenceThreshold: Double
-    public let vadTemperature: Double
-    public let enableLanguageIdentification: Bool
+extension WhisperKit.Configuration {
+    public var modelPath: String? {
+        return nil // Default implementation
+    }
     
-    public init(
-        modelPath: String? = nil,
-        modelVariant: String? = "tiny",
-        enableVAD: Bool = false,
-        vadFallbackSilenceThreshold: Double = 600,
-        vadTemperature: Double = 0.15,
-        enableLanguageIdentification: Bool = false
-    ) {
-        self.modelPath = modelPath
-        self.modelVariant = modelVariant
-        self.enableVAD = enableVAD
-        self.vadFallbackSilenceThreshold = vadFallbackSilenceThreshold
-        self.vadTemperature = vadTemperature
-        self.enableLanguageIdentification = enableLanguageIdentification
+    public var modelVariant: String? {
+        return "tiny" // Default implementation
+    }
+    
+    public var vadFallbackSilenceThreshold: Double {
+        return 600 // Default implementation
+    }
+    
+    public var vadTemperature: Double {
+        return 0.15 // Default implementation
+    }
+    
+    public var enableLanguageIdentification: Bool {
+        return false // Default implementation
     }
 }
-
-public typealias WhisperKitConfig = APIWhisperKitConfig
-
-public struct APITranscriptionSegment {
-    public let text: String
-    public let startTime: Double
-    public let endTime: Double
-    
-    public init(text: String, startTime: Double, endTime: Double) {
-        self.text = text
-        self.startTime = startTime
-        self.endTime = endTime
-    }
-}
-
-public struct APITranscriptionResult {
-    public let text: String
-    public let segments: [APITranscriptionSegment]
-    public let language: String?
-    
-    public init(text: String, segments: [APITranscriptionSegment], language: String? = nil) {
-        self.text = text
-        self.segments = segments
-        self.language = language
-    }
-}
-
-public typealias TranscriptionSegment = APITranscriptionSegment
-public typealias TranscriptionResult = APITranscriptionResult

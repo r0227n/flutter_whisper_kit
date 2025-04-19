@@ -69,7 +69,7 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct WhisperKitConfig {
+struct PigeonWhisperKitConfig {
   var modelPath: String? = nil
   var enableVAD: Bool? = nil
   var vadFallbackSilenceThreshold: Int64? = nil
@@ -78,14 +78,14 @@ struct WhisperKitConfig {
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> WhisperKitConfig? {
+  static func fromList(_ pigeonVar_list: [Any?]) -> PigeonWhisperKitConfig? {
     let modelPath: String? = nilOrValue(pigeonVar_list[0])
     let enableVAD: Bool? = nilOrValue(pigeonVar_list[1])
     let vadFallbackSilenceThreshold: Int64? = nilOrValue(pigeonVar_list[2])
     let vadTemperature: Double? = nilOrValue(pigeonVar_list[3])
     let enableLanguageIdentification: Bool? = nilOrValue(pigeonVar_list[4])
 
-    return WhisperKitConfig(
+    return PigeonWhisperKitConfig(
       modelPath: modelPath,
       enableVAD: enableVAD,
       vadFallbackSilenceThreshold: vadFallbackSilenceThreshold,
@@ -105,19 +105,19 @@ struct WhisperKitConfig {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct TranscriptionSegment {
+struct PigeonTranscriptionSegment {
   var text: String
   var startTime: Double
   var endTime: Double
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> TranscriptionSegment? {
+  static func fromList(_ pigeonVar_list: [Any?]) -> PigeonTranscriptionSegment? {
     let text = pigeonVar_list[0] as! String
     let startTime = pigeonVar_list[1] as! Double
     let endTime = pigeonVar_list[2] as! Double
 
-    return TranscriptionSegment(
+    return PigeonTranscriptionSegment(
       text: text,
       startTime: startTime,
       endTime: endTime
@@ -133,19 +133,19 @@ struct TranscriptionSegment {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct TranscriptionResult {
+struct PigeonTranscriptionResult {
   var text: String
-  var segments: [TranscriptionSegment]
+  var segments: [PigeonTranscriptionSegment]
   var language: String? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> TranscriptionResult? {
+  static func fromList(_ pigeonVar_list: [Any?]) -> PigeonTranscriptionResult? {
     let text = pigeonVar_list[0] as! String
-    let segments = pigeonVar_list[1] as! [TranscriptionSegment]
+    let segments = pigeonVar_list[1] as! [PigeonTranscriptionSegment]
     let language: String? = nilOrValue(pigeonVar_list[2])
 
-    return TranscriptionResult(
+    return PigeonTranscriptionResult(
       text: text,
       segments: segments,
       language: language
@@ -164,11 +164,11 @@ private class WhisperKitApiPigeonCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
     case 129:
-      return WhisperKitConfig.fromList(self.readValue() as! [Any?])
+      return PigeonWhisperKitConfig.fromList(self.readValue() as! [Any?])
     case 130:
-      return TranscriptionSegment.fromList(self.readValue() as! [Any?])
+      return PigeonTranscriptionSegment.fromList(self.readValue() as! [Any?])
     case 131:
-      return TranscriptionResult.fromList(self.readValue() as! [Any?])
+      return PigeonTranscriptionResult.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
     }
@@ -177,13 +177,13 @@ private class WhisperKitApiPigeonCodecReader: FlutterStandardReader {
 
 private class WhisperKitApiPigeonCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? WhisperKitConfig {
+    if let value = value as? PigeonWhisperKitConfig {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? TranscriptionSegment {
+    } else if let value = value as? PigeonTranscriptionSegment {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? TranscriptionResult {
+    } else if let value = value as? PigeonTranscriptionResult {
       super.writeByte(131)
       super.writeValue(value.toList())
     } else {
@@ -210,10 +210,10 @@ class WhisperKitApiPigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WhisperKitApi {
   func getPlatformVersion(completion: @escaping (Result<String, Error>) -> Void)
-  func initializeWhisperKit(config: WhisperKitConfig, completion: @escaping (Result<Bool, Error>) -> Void)
-  func transcribeAudioFile(filePath: String, completion: @escaping (Result<TranscriptionResult, Error>) -> Void)
+  func initializeWhisperKit(config: PigeonWhisperKitConfig, completion: @escaping (Result<Bool, Error>) -> Void)
+  func transcribeAudioFile(filePath: String, completion: @escaping (Result<PigeonTranscriptionResult, Error>) -> Void)
   func startStreamingTranscription(completion: @escaping (Result<Bool, Error>) -> Void)
-  func stopStreamingTranscription(completion: @escaping (Result<TranscriptionResult, Error>) -> Void)
+  func stopStreamingTranscription(completion: @escaping (Result<PigeonTranscriptionResult, Error>) -> Void)
   func getAvailableModels(completion: @escaping (Result<[String], Error>) -> Void)
 }
 
@@ -242,7 +242,7 @@ class WhisperKitApiSetup {
     if let api = api {
       initializeWhisperKitChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let configArg = args[0] as! WhisperKitConfig
+        let configArg = args[0] as! PigeonWhisperKitConfig
         api.initializeWhisperKit(config: configArg) { result in
           switch result {
           case .success(let res):
@@ -322,7 +322,7 @@ class WhisperKitApiSetup {
 /// Generated protocol from Pigeon that represents Flutter messages that can be called from Swift.
 protocol WhisperKitEventsProtocol {
   func onTranscriptionProgress(progress progressArg: Double, completion: @escaping (Result<Void, PigeonError>) -> Void)
-  func onInterimTranscriptionResult(result resultArg: TranscriptionResult, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func onInterimTranscriptionResult(result resultArg: PigeonTranscriptionResult, completion: @escaping (Result<Void, PigeonError>) -> Void)
 }
 class WhisperKitEvents: WhisperKitEventsProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
@@ -352,7 +352,7 @@ class WhisperKitEvents: WhisperKitEventsProtocol {
       }
     }
   }
-  func onInterimTranscriptionResult(result resultArg: TranscriptionResult, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+  func onInterimTranscriptionResult(result resultArg: PigeonTranscriptionResult, completion: @escaping (Result<Void, PigeonError>) -> Void) {
     let channelName: String = "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitEvents.onInterimTranscriptionResult\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([resultArg] as [Any?]) { response in
