@@ -4,7 +4,7 @@ import WhisperKit
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
     
-    public func initialize(config: WhisperKitConfig) throws -> Bool {
+    public func initialize(config: APIWhisperKitConfig) throws -> Bool {
         do {
             let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
@@ -124,7 +124,7 @@ public class WhisperKitImplementation {
     }
 }
 
-public struct WhisperKitConfig {
+public struct APIWhisperKitConfig {
     public let modelPath: String?
     public let modelVariant: String?
     public let enableVAD: Bool
@@ -148,6 +148,8 @@ public struct WhisperKitConfig {
         self.enableLanguageIdentification = enableLanguageIdentification
     }
 }
+
+public typealias WhisperKitConfig = APIWhisperKitConfig
 
 public struct APITranscriptionSegment {
     public let text: String
