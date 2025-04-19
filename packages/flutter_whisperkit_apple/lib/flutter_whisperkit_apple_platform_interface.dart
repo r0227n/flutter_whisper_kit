@@ -8,7 +8,8 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static FlutterWhisperkitApplePlatform _instance = MethodChannelFlutterWhisperkitApple();
+  static FlutterWhisperkitApplePlatform _instance =
+      MethodChannelFlutterWhisperkitApple();
 
   /// The default instance of [FlutterWhisperkitApplePlatform] to use.
   ///
@@ -25,5 +26,9 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
 
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  Future<String?> createWhisperKit(String? model, String? modelRepo) {
+    throw UnimplementedError('createWhisperKit() has not been implemented.');
   }
 }

@@ -32,7 +32,8 @@ class _MyAppState extends State<MyApp> {
     // We also handle the message potentially returning null.
     try {
       platformVersion =
-          await _flutterWhisperkitApplePlugin.getPlatformVersion() ?? 'Unknown platform version';
+          await _flutterWhisperkitApplePlugin.getPlatformVersion() ??
+          'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -51,11 +52,21 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
+        appBar: AppBar(title: const Text('Plugin example app')),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Column(
+            children: [
+              Text('Running on: $_platformVersion\n'),
+              ElevatedButton(
+                onPressed: () async {
+                  final result = await _flutterWhisperkitApplePlugin
+                      .createWhisperKit(model: 'base.en', modelRepo: 'openai');
+                  print(result);
+                },
+                child: Text('Initialize'),
+              ),
+            ],
+          ),
         ),
       ),
     );

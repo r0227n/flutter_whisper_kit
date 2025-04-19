@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "flutter_whisperkit_apple",
     platforms: [
-        .macOS("10.14")
+        .iOS(.v16),
     ],
     products: [
         .library(name: "flutter-whisperkit-apple", targets: ["flutter_whisperkit_apple"])
@@ -17,10 +17,10 @@ let package = Package(
     targets: [
         .target(
             name: "flutter_whisperkit_apple",
-            dependencies: ["WhisperKit"]
+            dependencies: ["WhisperKit"],
             resources: [
-                // If your plugin requires a privacy manifest, for example if it collects user
-                // data, update the PrivacyInfo.xcprivacy file to describe your plugin's
+                // If your plugin requires a privacy manifest, for example if it uses any required
+                // reason APIs, update the PrivacyInfo.xcprivacy file to describe your plugin's
                 // privacy impact, and then uncomment these lines. For more information, see
                 // https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
                 // .process("PrivacyInfo.xcprivacy"),
