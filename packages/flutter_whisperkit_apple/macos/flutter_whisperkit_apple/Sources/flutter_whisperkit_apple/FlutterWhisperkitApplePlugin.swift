@@ -3,6 +3,8 @@ import FlutterMacOS
 import WhisperKit
 
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
+  private var whisperKit: WhisperKit?
+  
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "flutter_whisperkit_apple", binaryMessenger: registrar.messenger)
     let instance = FlutterWhisperkitApplePlugin()
@@ -14,17 +16,13 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
     case "getPlatformVersion":
       result("macOS " + ProcessInfo.processInfo.operatingSystemVersionString)
     case "createWhisperKit":
-      guard let args = call.arguments as? [String: Any],
-            let model = args["model"] as? String,
-            let modelRepo = args["modelRepo"] as? String else {
-        result(FlutterError(code: "INVALID_ARGUMENTS", message: "Invalid arguments", details: nil))
-        return
-      }
-      
       Task {
         do {
-          let whisperKit = try await createWhisperKit(model: model, modelRepo: modelRepo)
-          result("WhisperKit instance created successfully")
+          let args = call.arguments as? [String: Any]
+          let model = args?["model"] as? String
+          let modelRepo = args?["modelRepo"] as? String
+     
+          result("WhisperKit instance created successfully: \(model) \(modelRepo)")
         } catch {
           result(FlutterError(code: "WHISPERKIT_INIT_ERROR", message: error.localizedDescription, details: nil))
         }
@@ -32,10 +30,5 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
     default:
       result(FlutterMethodNotImplemented)
     }
-  }
-  
-  public func createWhisperKit(model: String, modelRepo: String) async throws -> WhisperKit? {
-    let config = WhisperKitConfig(model: model, modelRepo: modelRepo)
-    return try await WhisperKit(config)
   }
 }
