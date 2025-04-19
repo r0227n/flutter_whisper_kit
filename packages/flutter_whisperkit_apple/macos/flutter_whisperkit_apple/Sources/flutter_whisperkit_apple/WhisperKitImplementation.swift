@@ -1,6 +1,15 @@
 import Foundation
 import WhisperKit
+import FlutterMacOS
 
+struct PigeonWhisperKitConfig {
+    var modelPath: String?
+    var modelVariant: String?
+    var enableVAD: Bool?
+    var vadFallbackSilenceThreshold: Int64?
+    var vadTemperature: Double?
+    var enableLanguageIdentification: Bool?
+}
 
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
