@@ -35,7 +35,8 @@ class _MyAppState extends State<MyApp> {
     // We also handle the message potentially returning null.
     try {
       platformVersion =
-          await _flutterWhisperkitApplePlugin.getPlatformVersion() ?? 'Unknown platform version';
+          await _flutterWhisperkitApplePlugin.getPlatformVersion() ??
+              'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -66,10 +67,12 @@ class _MyAppState extends State<MyApp> {
       );
 
       // Initialize WhisperKit with the configuration
-      final result = await _flutterWhisperkitApplePlugin.initializeWhisperKit(config: config);
-      
+      final result = await _flutterWhisperkitApplePlugin.initializeWhisperKit(
+          config: config);
+
       setState(() {
-        _whisperKitStatus = result ? 'Initialized successfully' : 'Initialization failed';
+        _whisperKitStatus =
+            result ? 'Initialized successfully' : 'Initialization failed';
       });
 
       // Get available models
@@ -103,37 +106,42 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Running on: $_platformVersion', 
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Running on: $_platformVersion',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
-              const Text('WhisperKit Integration Demo', 
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const Text('WhisperKit Integration Demo',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               Text('Status: $_whisperKitStatus',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: _whisperKitStatus.contains('success') ? Colors.green : 
-                         _whisperKitStatus.contains('Error') ? Colors.red : Colors.black,
-                )),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: _whisperKitStatus.contains('success')
+                        ? Colors.green
+                        : _whisperKitStatus.contains('Error')
+                            ? Colors.red
+                            : Colors.black,
+                  )),
               const SizedBox(height: 10),
-              Text('Available Models: $_availableModels', style: const TextStyle(fontSize: 16)),
+              Text('Available Models: $_availableModels',
+                  style: const TextStyle(fontSize: 16)),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _isInitializing ? null : _initializeWhisperKit,
-                child: _isInitializing 
-                  ? const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        SizedBox(width: 10),
-                        Text('Initializing...'),
-                      ],
-                    )
-                  : const Text('Initialize WhisperKit'),
+                child: _isInitializing
+                    ? const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          SizedBox(width: 10),
+                          Text('Initializing...'),
+                        ],
+                      )
+                    : const Text('Initialize WhisperKit'),
               ),
               const SizedBox(height: 20),
               const Card(
@@ -143,16 +151,18 @@ class _MyAppState extends State<MyApp> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('WhisperKit Configuration', 
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Text('WhisperKit Configuration',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
                       SizedBox(height: 10),
                       Text('• Voice Activity Detection (VAD): Enabled'),
                       Text('• VAD Fallback Silence Threshold: 600ms'),
                       Text('• VAD Temperature: 0.15'),
                       Text('• Language Identification: Enabled'),
                       SizedBox(height: 10),
-                      Text('This example demonstrates the initialization of WhisperKit v0.12.0 '
-                           'using Swift Package Manager for iOS and macOS platforms.'),
+                      Text(
+                          'This example demonstrates the initialization of WhisperKit v0.12.0 '
+                          'using Swift Package Manager for iOS and macOS platforms.'),
                     ],
                   ),
                 ),

@@ -2,7 +2,7 @@ import Foundation
 import WhisperKit
 import FlutterMacOS
 
-struct PigeonWhisperKitConfig {
+struct PigeonWhisperKitConfigImplementation {
     var modelPath: String?
     var modelVariant: String?
     var enableVAD: Bool?
@@ -14,7 +14,7 @@ struct PigeonWhisperKitConfig {
 public class WhisperKitImplementation {
     private var whisperKit: WhisperKit?
     
-    public func initialize(config: PigeonWhisperKitConfig) throws -> Bool {
+    public func initialize(config: PigeonWhisperKitConfigImplementation) throws -> Bool {
         do {
             let modelPath = config.modelPath ?? WhisperKitImplementation.defaultModelPath
             
