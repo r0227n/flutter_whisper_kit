@@ -1,5 +1,6 @@
 import FlutterMacOS
 import Foundation
+import WhisperKit
 
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitApi {
     private var whisperKit: WhisperKit?
