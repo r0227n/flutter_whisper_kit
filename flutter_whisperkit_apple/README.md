@@ -1,6 +1,6 @@
 # Flutter WhisperKit Apple
 
-A Flutter plugin for WhisperKit on iOS and macOS platforms.
+A Flutter plugin for WhisperKit on iOS and macOS platforms. This plugin provides a bridge between Flutter applications and Apple's WhisperKit framework for on-device speech recognition.
 
 ## Features
 
@@ -8,6 +8,8 @@ A Flutter plugin for WhisperKit on iOS and macOS platforms.
 - Transcribe audio files
 - Stream real-time transcription
 - Get available WhisperKit models
+- Voice Activity Detection (VAD) support
+- Language identification
 
 ## Getting Started
 
@@ -55,6 +57,8 @@ Add the following to your `DebugProfile.entitlements` and `Release.entitlements`
 
 ### Initialize WhisperKit
 
+The WhisperKit initialization method is the core functionality that sets up the speech recognition engine. This method must be called before any other WhisperKit functionality can be used.
+
 ```dart
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 
@@ -66,14 +70,24 @@ await flutterWhisperkitApple.initializeWhisperKit();
 // Or initialize with custom configuration
 await flutterWhisperkitApple.initializeWhisperKit(
   config: WhisperKitConfig(
-    modelPath: 'path/to/model',
-    enableVAD: true,
-    vadFallbackSilenceThreshold: 3000,
-    vadTemperature: 0.5,
-    enableLanguageIdentification: true,
+    modelPath: 'path/to/model',  // Optional: Path to a custom model
+    enableVAD: true,             // Optional: Enable Voice Activity Detection
+    vadFallbackSilenceThreshold: 3000,  // Optional: Silence threshold in milliseconds
+    vadTemperature: 0.5,         // Optional: Temperature parameter for VAD
+    enableLanguageIdentification: true,  // Optional: Enable language detection
   ),
 );
 ```
+
+#### WhisperKitConfig Properties
+
+| Property | Type | Description | Default |
+|----------|------|-------------|---------|
+| modelPath | String? | Path to a custom WhisperKit model | null (uses default model) |
+| enableVAD | bool? | Enable Voice Activity Detection | false |
+| vadFallbackSilenceThreshold | int? | Silence threshold for VAD in milliseconds | 0 |
+| vadTemperature | double? | Temperature parameter for VAD | 0.0 |
+| enableLanguageIdentification | bool? | Enable automatic language detection | false |
 
 ### Transcribe Audio File
 
