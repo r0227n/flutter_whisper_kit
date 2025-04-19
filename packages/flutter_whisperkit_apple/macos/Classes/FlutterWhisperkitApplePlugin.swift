@@ -1,8 +1,9 @@
 import FlutterMacOS
 import Foundation
+import flutter_whisperkit_apple
 
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitApi {
-    private var whisperKit: WhisperKit?
+    private var whisperKitImplementation: WhisperKitImplementation?
     private var streamingTask: Task<Void, Never>?
     private var events: WhisperKitEvents?
     
@@ -19,18 +20,20 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
     }
     
     public func initializeWhisperKit(config: WhisperKitConfig, completion: @escaping (Result<Bool, Error>) -> Void) {
-        let whisperConfig = WhisperKitConfig(
-            modelPath: config.modelPath,
-            enableVAD: config.enableVAD ?? false,
-            vadFallbackSilenceThreshold: Int(config.vadFallbackSilenceThreshold ?? 0),
-            vadTemperature: config.vadTemperature ?? 0.0,
-            enableLanguageIdentification: config.enableLanguageIdentification ?? false
-        )
-        
         do {
-            whisperKit = try WhisperKit(config: whisperConfig)
-            completion(.success(true))
+            let whisperConfig = WhisperKitImplementation.WhisperKitConfig(
+                modelPath: config.modelPath,
+                enableVAD: config.enableVAD ?? false,
+                vadFallbackSilenceThreshold: Int(config.vadFallbackSilenceThreshold ?? 0),
+                vadTemperature: config.vadTemperature ?? 0.0,
+                enableLanguageIdentification: config.enableLanguageIdentification ?? false
+            )
+            
+            whisperKitImplementation = WhisperKitImplementation()
+            let result = try whisperKitImplementation?.initialize(config: whisperConfig) ?? false
+            completion(.success(result))
         } catch {
+            print("WhisperKit initialization error: \(error)")
             completion(.failure(FlutterError(code: "INITIALIZATION_ERROR", 
                                            message: "Failed to initialize WhisperKit: \(error.localizedDescription)", 
                                            details: nil)))
@@ -38,7 +41,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
     }
     
     public func transcribeAudioFile(filePath: String, completion: @escaping (Result<TranscriptionResult, Error>) -> Void) {
-        guard let whisperKit = whisperKit else {
+        guard let whisperKitImplementation = whisperKitImplementation else {
             completion(.failure(FlutterError(code: "NOT_INITIALIZED", 
                                            message: "WhisperKit is not initialized", 
                                            details: nil)))
@@ -46,7 +49,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         }
         
         do {
-            let result = try whisperKit.transcribeAudioFile(filePath)
+            let result = try whisperKitImplementation.transcribeAudioFile(filePath)
             
             let transcriptionResult = TranscriptionResult(
                 text: result.text,
@@ -62,6 +65,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
             
             completion(.success(transcriptionResult))
         } catch {
+            print("Transcription error: \(error)")
             completion(.failure(FlutterError(code: "TRANSCRIPTION_ERROR", 
                                            message: "Failed to transcribe audio file: \(error.localizedDescription)", 
                                            details: nil)))
@@ -69,7 +73,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
     }
     
     public func startStreamingTranscription(completion: @escaping (Result<Bool, Error>) -> Void) {
-        guard let whisperKit = whisperKit else {
+        guard let whisperKitImplementation = whisperKitImplementation else {
             completion(.failure(FlutterError(code: "NOT_INITIALIZED", 
                                            message: "WhisperKit is not initialized", 
                                            details: nil)))
@@ -78,7 +82,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         
         streamingTask = Task {
             do {
-                try await whisperKit.startStreamingTranscription()
+                try await whisperKitImplementation.startStreamingTranscription()
             } catch {
                 print("Streaming transcription error: \(error)")
             }
@@ -88,7 +92,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
     }
     
     public func stopStreamingTranscription(completion: @escaping (Result<TranscriptionResult, Error>) -> Void) {
-        guard let whisperKit = whisperKit else {
+        guard let whisperKitImplementation = whisperKitImplementation else {
             completion(.failure(FlutterError(code: "NOT_INITIALIZED", 
                                            message: "WhisperKit is not initialized", 
                                            details: nil)))
@@ -98,7 +102,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
         streamingTask?.cancel()
         
         do {
-            let result = try whisperKit.stopStreamingTranscription()
+            let result = try whisperKitImplementation.stopStreamingTranscription()
             
             let transcriptionResult = TranscriptionResult(
                 text: result.text,
@@ -114,6 +118,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
             
             completion(.success(transcriptionResult))
         } catch {
+            print("Stop streaming error: \(error)")
             completion(.failure(FlutterError(code: "TRANSCRIPTION_ERROR", 
                                            message: "Failed to stop streaming transcription: \(error.localizedDescription)", 
                                            details: nil)))
@@ -122,64 +127,13 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin, WhisperKitAp
     
     public func getAvailableModels(completion: @escaping (Result<[String], Error>) -> Void) {
         do {
-            let models = try WhisperKit.getAvailableModels()
+            let models = try WhisperKitImplementation.getAvailableModels()
             completion(.success(models))
         } catch {
+            print("Get available models error: \(error)")
             completion(.failure(FlutterError(code: "MODEL_ERROR", 
                                            message: "Failed to get available models: \(error.localizedDescription)", 
                                            details: nil)))
         }
-    }
-}
-
-private class WhisperKit {
-    struct WhisperKitConfig {
-        let modelPath: String?
-        let enableVAD: Bool
-        let vadFallbackSilenceThreshold: Int
-        let vadTemperature: Double
-        let enableLanguageIdentification: Bool
-    }
-    
-    struct TranscriptionSegment {
-        let text: String
-        let startTime: Double
-        let endTime: Double
-    }
-    
-    struct TranscriptionResult {
-        let text: String
-        let segments: [TranscriptionSegment]
-        let language: String?
-    }
-    
-    init(config: WhisperKitConfig) throws {
-    }
-    
-    func transcribeAudioFile(_ filePath: String) throws -> TranscriptionResult {
-        return TranscriptionResult(
-            text: "Sample transcription",
-            segments: [
-                TranscriptionSegment(text: "Sample segment", startTime: 0.0, endTime: 1.0)
-            ],
-            language: "en"
-        )
-    }
-    
-    func startStreamingTranscription() async throws {
-    }
-    
-    func stopStreamingTranscription() throws -> TranscriptionResult {
-        return TranscriptionResult(
-            text: "Sample transcription",
-            segments: [
-                TranscriptionSegment(text: "Sample segment", startTime: 0.0, endTime: 1.0)
-            ],
-            language: "en"
-        )
-    }
-    
-    static func getAvailableModels() throws -> [String] {
-        return ["tiny", "base", "small", "medium", "large"]
     }
 }
