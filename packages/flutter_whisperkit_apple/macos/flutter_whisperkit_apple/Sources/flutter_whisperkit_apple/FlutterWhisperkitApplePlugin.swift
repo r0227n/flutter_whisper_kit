@@ -1,11 +1,14 @@
 import Cocoa
 import FlutterMacOS
+import WhisperKit
 
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
+  private var implementation: WhisperKitImplementation?
+  
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "flutter_whisperkit_apple", binaryMessenger: registrar.messenger)
     let instance = FlutterWhisperkitApplePlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
+    instance.implementation = WhisperKitImplementation(binaryMessenger: registrar.messenger)
+    WhisperKitApiSetup.setUp(binaryMessenger: registrar.messenger, api: instance.implementation)
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
