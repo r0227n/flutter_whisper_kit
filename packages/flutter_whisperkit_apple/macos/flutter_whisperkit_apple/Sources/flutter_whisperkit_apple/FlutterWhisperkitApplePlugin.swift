@@ -40,6 +40,22 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     
     Task {
       do {
+        let modelDirURL = getModelFolderPath()
+        
+        do {
+          if !FileManager.default.fileExists(atPath: modelDirURL.path) {
+            try FileManager.default.createDirectory(at: modelDirURL, withIntermediateDirectories: true, attributes: nil)
+          }
+          
+          let testFile = modelDirURL.appendingPathComponent("test_write_permission.txt")
+          try "test".write(to: testFile, atomically: true, encoding: .utf8)
+          try FileManager.default.removeItem(at: testFile)
+        } catch {
+          throw NSError(domain: "WhisperKitError", code: 1004, userInfo: [
+            NSLocalizedDescriptionKey: "Cannot write to model directory: \(error.localizedDescription)"
+          ])
+        }
+        
         if whisperKit == nil {
           let config = WhisperKitConfig(
               verbose: true,
@@ -61,12 +77,26 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         let localModels = await getLocalModels()
         
         if localModels.contains(variant) && !(redownload ?? false) {
-          modelFolder = getModelFolderPath().appendingPathComponent(variant)
+          modelFolder = modelDirURL.appendingPathComponent(variant)
         } else {
-          modelFolder = try await WhisperKit.download(
-              variant: variant,
-              from: modelRepo ?? "argmaxinc/whisperkit-coreml"
-          )
+          let downloadDestination = modelDirURL.appendingPathComponent(variant)
+          
+          if !FileManager.default.fileExists(atPath: downloadDestination.path) {
+            try FileManager.default.createDirectory(at: downloadDestination, withIntermediateDirectories: true, attributes: nil)
+          }
+          
+          do {
+            modelFolder = try await WhisperKit.download(
+                variant: variant,
+                from: modelRepo ?? "argmaxinc/whisperkit-coreml",
+                to: downloadDestination
+            )
+          } catch {
+            print("Download error: \(error.localizedDescription)")
+            throw NSError(domain: "WhisperKitError", code: 1005, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to download model: \(error.localizedDescription)"
+            ])
+          }
         }
         
         if let folder = modelFolder {
@@ -83,6 +113,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           ])
         }
       } catch {
+        print("LoadModel error: \(error.localizedDescription)")
         completion(.failure(error))
       }
     }
@@ -92,18 +123,23 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     switch modelStorageLocation {
     case .packageDirectory:
       if let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
-        let modelDir = appSupport.appendingPathComponent("WhisperKitModels")
-        try? FileManager.default.createDirectory(at: modelDir, withIntermediateDirectories: true)
-        return modelDir
+        return appSupport.appendingPathComponent("WhisperKitModels")
       }
       return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
         
     case .userFolder:
       if let downloads = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first {
-        let modelDir = downloads.appendingPathComponent("WhisperKitModels")
-        try? FileManager.default.createDirectory(at: modelDir, withIntermediateDirectories: true)
-        return modelDir
+        let testFile = downloads.appendingPathComponent("whisperkit_write_test.txt")
+        do {
+          try "test".write(to: testFile, atomically: true, encoding: .utf8)
+          try FileManager.default.removeItem(at: testFile)
+          
+          return downloads.appendingPathComponent("WhisperKitModels")
+        } catch {
+          print("Cannot write to Downloads directory: \(error.localizedDescription)")
+        }
       }
+      
       return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
     }
   }
