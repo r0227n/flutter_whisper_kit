@@ -10,6 +10,14 @@ class MockFlutterWhisperkitApplePlatform
 
   @override
   Future<String?> getPlatformVersion() => Future.value('42');
+  
+  @override
+  Future<String?> createWhisperKit(String? model, String? modelRepo) => 
+      Future.value('WhisperKit created');
+      
+  @override
+  Future<String?> transcribeCurrentFile(String? filePath) => 
+      Future.value('Transcription result');
 }
 
 void main() {
@@ -25,5 +33,13 @@ void main() {
     FlutterWhisperkitApplePlatform.instance = fakePlatform;
 
     expect(await flutterWhisperkitApplePlugin.getPlatformVersion(), '42');
+  });
+  
+  test('transcribeCurrentFile', () async {
+    FlutterWhisperkitApple flutterWhisperkitApplePlugin = FlutterWhisperkitApple();
+    MockFlutterWhisperkitApplePlatform fakePlatform = MockFlutterWhisperkitApplePlatform();
+    FlutterWhisperkitApplePlatform.instance = fakePlatform;
+
+    expect(await flutterWhisperkitApplePlugin.transcribeCurrentFile('test.wav'), 'Transcription result');
   });
 }
