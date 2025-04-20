@@ -1,51 +1,33 @@
 ---
 name: Devin Task
-about: Devin Task Template
+about: Create a task for Devin AI to implement
 title: '[Devin] '
-labels: task
+labels: devin task
 assignees: ''
 
 ---
 
-### 概要（What）
+## Task Description
+<!-- Provide a clear and concise description of what you want Devin to implement -->
 
-<!-- このIssueでは何をしてほしいかを簡潔に記述してください。  
-例: 特定のバグ修正、新機能追加、既存コードの改善 など -->
+## Requirements
+<!-- List the specific requirements for this task -->
+- [ ] Requirement 1
+- [ ] Requirement 2
+- [ ] Requirement 3
 
----
+## Implementation Details
+<!-- Provide any specific implementation details or constraints -->
 
-### 作業対象（Where）
+## Expected Behavior
+<!-- Describe what you expect to happen when the implementation is complete -->
 
-<!-- 対象となるファイル、ディレクトリ、モジュール名など  
-例: `lib/screens/home_screen.dart` -->
+## Additional Context
+<!-- Add any other context, references, or screenshots about the task here -->
 
----
-
-### 背景・目的（Why）
-
-<!-- なぜこの作業が必要なのか、ビジネスや技術的な理由を記述してください。  
-例: ユーザーが画像投稿時にクラッシュする問題のため -->
-
----
-
-### 実装方針・制約（How）
-
-<!-- 使用してほしい技術、避けるべき方法、既知の問題などを記述してください。  
-例: 外部ライブラリを追加せずに対応／既存のRiverpod構成を維持する -->
-
----
-
-### 完了条件（Definition of Done）
-
-- [ ] 該当機能が期待通り動作すること（再現手順 or テストケースで確認）
-- [ ] 単体テストまたはUIテストが追加・修正されていること（必要に応じて）
-- [ ] Lint／静的解析エラーがないこと
-- [ ] PRに変更内容の要約が記載されていること
-- [ ] 既存機能に影響がないことを確認済み
-
----
-
-### 補足情報（任意）
-
-<!-- - 関連Issue: `#123`
-- スクリーンショット、再現手順、ログなどがあれば記載 -->
+## Work Rules
+<!-- Rules for Devin to follow when implementing this task -->
+- Once you've finished modifying a file, commit the change
+- Use **one commit per file**, and make sure each commit message clearly explains **why** the change was made
+- Create a new branch from the specified base branch
+- Open a pull request when the implementation is complete
