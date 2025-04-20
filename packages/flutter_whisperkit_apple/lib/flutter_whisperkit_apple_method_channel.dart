@@ -33,4 +33,20 @@ class MethodChannelFlutterWhisperkitApple
       throw e;
     }
   }
+
+  @override
+  Future<String?> transcribeCurrentFile(String? filePath) async {
+    try {
+      final result = await methodChannel.invokeMethod<String>(
+        'transcribeCurrentFile',
+        {
+          'filePath': filePath,
+        },
+      );
+      return result;
+    } on PlatformException catch (e) {
+      debugPrint('Error transcribing file: ${e.message}');
+      throw e;
+    }
+  }
 }

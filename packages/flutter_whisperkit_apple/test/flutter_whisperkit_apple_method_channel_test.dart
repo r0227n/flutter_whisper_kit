@@ -24,4 +24,8 @@ void main() {
   test('getPlatformVersion', () async {
     expect(await platform.getPlatformVersion(), '42');
   });
+  
+  test('transcribeCurrentFile', () async {
+    expect(await platform.transcribeCurrentFile('/path/to/file.mp3'), '42');
+  });
 }

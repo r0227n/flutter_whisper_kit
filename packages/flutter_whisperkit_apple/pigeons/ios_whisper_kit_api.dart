@@ -14,4 +14,6 @@ abstract class WhisperKitMessage {
   String? getPlatformVersion();
   @async
   String? createWhisperKit(String? model, String? modelRepo);
+  @async
+  String? transcribeCurrentFile(String? filePath);
 }

@@ -90,6 +90,7 @@ class WhisperKitMessagePigeonCodec: FlutterStandardMessageCodec, @unchecked Send
 protocol WhisperKitMessage {
   func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void)
   func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void)
+  func transcribeCurrentFile(filePath: String?, completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -130,6 +131,23 @@ class WhisperKitMessageSetup {
       }
     } else {
       createWhisperKitChannel.setMessageHandler(nil)
+    }
+    let transcribeCurrentFileChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeCurrentFile\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      transcribeCurrentFileChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let filePathArg: String? = nilOrValue(args[0])
+        api.transcribeCurrentFile(filePath: filePathArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      transcribeCurrentFileChannel.setMessageHandler(nil)
     }
   }
 }

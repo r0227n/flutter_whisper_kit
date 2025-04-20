@@ -68,6 +68,16 @@ class _MyAppState extends State<MyApp> {
                 },
                 child: Text('Initialize'),
               ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  // Replace with a real audio file path for testing
+                  final result = await _flutterWhisperkitApplePlugin
+                      .transcribeCurrentFile('/path/to/audio/file.mp3');
+                  print(result);
+                },
+                child: Text('Transcribe File'),
+              ),
             ],
           ),
         ),
