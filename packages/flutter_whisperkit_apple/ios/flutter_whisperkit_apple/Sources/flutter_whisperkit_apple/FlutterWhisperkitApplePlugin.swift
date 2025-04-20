@@ -3,7 +3,7 @@ import UIKit
 import WhisperKit
 import Foundation
 
-enum ModelStorageLocation: Int {
+enum ModelStorageLocation: Int64 {
     case packageDirectory = 0
     case userFolder = 1
 }
@@ -28,7 +28,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       }
   }
   
-  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int?, completion: @escaping (Result<String?, Error>) -> Void) {
+  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void) {
     guard let variant = variant else {
       completion(.failure(NSError(domain: "WhisperKitError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Model variant is required"])))
       return
