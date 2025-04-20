@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
+
+// TODO: あとでlibrayファイルを作成する
+// ignore: implementation_imports
+import 'package:flutter_whisperkit_apple/src/whisper_kit_message.g.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +20,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  final _flutterWhisperkitApplePlugin = FlutterWhisperkitApple();
+  final _flutterWhisperkitApplePlugin = WhisperKitMessage();
 
   @override
   void initState() {
@@ -60,7 +63,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: () async {
                   final result = await _flutterWhisperkitApplePlugin
-                      .createWhisperKit(model: 'base.en', modelRepo: 'openai');
+                      .createWhisperKit('base', 'openai');
                   print(result);
                 },
                 child: Text('Initialize'),

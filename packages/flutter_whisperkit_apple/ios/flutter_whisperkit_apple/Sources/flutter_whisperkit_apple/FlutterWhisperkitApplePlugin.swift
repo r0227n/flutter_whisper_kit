@@ -2,34 +2,27 @@ import Flutter
 import UIKit
 import WhisperKit
 
-
-public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
-  private var whisperKit: WhisperKit?
-  
-  public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "flutter_whisperkit_apple", binaryMessenger: registrar.messenger)
-    let instance = FlutterWhisperkitApplePlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
+private class WhisperKitApiImpl: WhisperKitMessage {
+  func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void) {
+    completion(.success("macOS " + ProcessInfo.processInfo.operatingSystemVersionString))
   }
-
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    switch call.method {
-    case "getPlatformVersion":
-      result("macOS " + ProcessInfo.processInfo.operatingSystemVersionString)
-    case "createWhisperKit":
-      Task {
+  
+  func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void) {
+    Task {
         do {
-          let args = call.arguments as? [String: Any]
-          let model = args?["model"] as? String
-          let modelRepo = args?["modelRepo"] as? String
+          let pipe = try? await WhisperKit()
      
-          result("WhisperKit instance created successfully: \(model) \(modelRepo)")
+          completion(.success("WhisperKit instance created successfully: \(model ?? "default") \(modelRepo ?? "default")"))
         } catch {
-          result(FlutterError(code: "WHISPERKIT_INIT_ERROR", message: error.localizedDescription, details: nil))
+          completion(.failure(error))
         }
       }
-    default:
-      result(FlutterMethodNotImplemented)
-    }
+  }
+}
+
+public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
+  public static func register(with registrar: FlutterPluginRegistrar) {
+    // Pigeonで生成されたSetupコードを呼び出す
+    WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger, api: WhisperKitApiImpl())
   }
 }
