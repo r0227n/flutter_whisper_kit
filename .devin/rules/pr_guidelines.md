@@ -20,6 +20,10 @@ This document outlines the standards and procedures for creating and managing pu
 **Purpose**: To ensure comprehensive and consistent PR descriptions that provide necessary context for reviewers.
 
 ```markdown
+## Issue
+
+Close #ISSUE_NUMBER
+
 ## Description
 [Clear description of changes]
 
