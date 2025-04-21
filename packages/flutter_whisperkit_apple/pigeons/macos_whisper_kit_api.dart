@@ -16,4 +16,6 @@ abstract class WhisperKitMessage {
   String? createWhisperKit(String? model, String? modelRepo);
   @async
   String? loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation);
+  @async
+  String? transcribeCurrentFile(String? filePath);
 }

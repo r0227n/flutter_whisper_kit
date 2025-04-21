@@ -118,6 +118,83 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
+  func transcribeCurrentFile(filePath: String?, completion: @escaping (Result<String?, Error>) -> Void) {
+    guard let filePath = filePath else {
+      completion(.failure(NSError(domain: "WhisperKitError", code: 2001, userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
+      return
+    }
+    
+    guard let whisperKit = whisperKit else {
+      completion(.failure(NSError(domain: "WhisperKitError", code: 2002, userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])))
+      return
+    }
+    
+    Task {
+      do {
+        print("Loading audio file: \(filePath)")
+        let loadingStart = Date()
+        let audioFileSamples = try await Task {
+          try autoreleasepool {
+            try AudioProcessor.loadAudioAsFloatArray(fromPath: filePath)
+          }
+        }.value
+        print("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
+        
+        let transcription = try await whisperKit.transcribe(audioArray: audioFileSamples)
+        
+        var transcriptionDict: [String: Any] = [:]
+        
+        if let segments = transcription?.segments {
+          var segmentsArray: [[String: Any]] = []
+          
+          for segment in segments {
+            var segmentDict: [String: Any] = [
+              "text": segment.text,
+              "start": segment.start,
+              "end": segment.end
+            ]
+            
+            if let tokens = segment.tokens {
+              segmentDict["tokens"] = tokens
+            }
+            
+            segmentsArray.append(segmentDict)
+          }
+          
+          transcriptionDict["segments"] = segmentsArray
+        }
+        
+        if let timings = transcription?.timings {
+          transcriptionDict["timings"] = [
+            "audioFile": timings.audioFile,
+            "featureExtraction": timings.featureExtraction,
+            "model": timings.model,
+            "firstToken": timings.firstToken,
+            "decodingLoop": timings.decodingLoop,
+            "totalElapsed": timings.totalElapsed,
+            "tokensPerSecond": timings.tokensPerSecond,
+            "realTimeFactor": timings.realTimeFactor,
+            "speedFactor": timings.speedFactor
+          ]
+        }
+        
+        do {
+          let jsonData = try JSONSerialization.data(withJSONObject: transcriptionDict, options: [])
+          if let jsonString = String(data: jsonData, encoding: .utf8) {
+            completion(.success(jsonString))
+          } else {
+            throw NSError(domain: "WhisperKitError", code: 2004, userInfo: [NSLocalizedDescriptionKey: "Failed to create JSON string from transcription result"])
+          }
+        } catch {
+          throw NSError(domain: "WhisperKitError", code: 2003, userInfo: [NSLocalizedDescriptionKey: "Failed to serialize transcription result: \(error.localizedDescription)"])
+        }
+      } catch {
+        print("TranscribeCurrentFile error: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
   private func getModelFolderPath() -> URL {
     switch modelStorageLocation {
     case .packageDirectory:

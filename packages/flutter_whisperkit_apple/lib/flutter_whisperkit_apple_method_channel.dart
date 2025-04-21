@@ -38,4 +38,14 @@ class MethodChannelFlutterWhisperkitApple
       throw e;
     }
   }
+  
+  @override
+  Future<String?> transcribeCurrentFile(String? filePath) async {
+    try {
+      return _whisperKitMessage.transcribeCurrentFile(filePath);
+    } on PlatformException catch (e) {
+      debugPrint('Error transcribing file: ${e.message}');
+      throw e;
+    }
+  }
 }

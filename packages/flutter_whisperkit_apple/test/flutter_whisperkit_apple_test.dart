@@ -19,6 +19,10 @@ class MockFlutterWhisperkitApplePlatform
   @override
   Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation) => 
       Future.value('Model loaded successfully');
+      
+  @override
+  Future<String?> transcribeCurrentFile(String? filePath) => 
+      Future.value('{"segments":[{"text":"Test transcription"}]}');
 }
 
 void main() {

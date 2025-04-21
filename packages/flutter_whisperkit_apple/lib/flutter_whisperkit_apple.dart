@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+
 import 'flutter_whisperkit_apple_platform_interface.dart';
+import 'src/models/transcription_result.dart';
 
 /// The main entry point for the Flutter WhisperKit Apple plugin.
 class FlutterWhisperkitApple {
@@ -32,5 +37,32 @@ class FlutterWhisperkitApple {
       redownload,
       storageLocation,
     );
+  }
+  
+  /// Transcribes an audio file at the specified path.
+  ///
+  /// [filePath] - The path to the audio file to transcribe.
+  ///
+  /// Returns a JSON string containing the transcription result with segments and timing information.
+  Future<String?> transcribeCurrentFile(String? filePath) {
+    return FlutterWhisperkitApplePlatform.instance.transcribeCurrentFile(filePath);
+  }
+  
+  /// Transcribes an audio file at the specified path and returns a parsed [TranscriptionResult].
+  ///
+  /// [filePath] - The path to the audio file to transcribe.
+  ///
+  /// Returns a [TranscriptionResult] object containing the transcription segments and timing information.
+  Future<TranscriptionResult?> transcribeCurrentFileAndParse(String? filePath) async {
+    final jsonString = await transcribeCurrentFile(filePath);
+    if (jsonString == null) return null;
+    
+    try {
+      final Map<String, dynamic> json = jsonDecode(jsonString) as Map<String, dynamic>;
+      return TranscriptionResult.fromJson(json);
+    } catch (e) {
+      debugPrint('Error parsing transcription result: $e');
+      rethrow;
+    }
   }
 }
