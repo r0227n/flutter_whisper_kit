@@ -88,7 +88,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           do {
             modelFolder = try await WhisperKit.download(
                 variant: variant,
-                from: "argmaxinc/whisperkit-coreml",
+                from: modelRepo ?? "argmaxinc/whisperkit-coreml"
             )
           } catch {
             print("Download error: \(error.localizedDescription)")
