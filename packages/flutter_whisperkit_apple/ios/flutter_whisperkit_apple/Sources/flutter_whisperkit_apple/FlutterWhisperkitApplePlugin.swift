@@ -156,6 +156,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     // Pigeonで生成されたSetupコードを呼び出す
-    WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger, api: WhisperKitApiImpl())
+      WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger(), api: WhisperKitApiImpl())
   }
 }
