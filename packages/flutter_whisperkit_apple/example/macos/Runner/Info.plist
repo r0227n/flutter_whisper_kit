@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>This app needs to access your Downloads folder to store WhisperKit models</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>This app needs to access your Documents folder to store WhisperKit models</string>
+	<key>NSNetworkVolumesUsageDescription</key>
+	<string>This app needs to access network volumes to store WhisperKit models</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>This app needs to access your Desktop folder to store WhisperKit models</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
