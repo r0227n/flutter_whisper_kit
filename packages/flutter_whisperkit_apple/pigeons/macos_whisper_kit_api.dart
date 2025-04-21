@@ -14,4 +14,6 @@ abstract class WhisperKitMessage {
   String? getPlatformVersion();
   @async
   String? createWhisperKit(String? model, String? modelRepo);
+  @async
+  String? loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation);
 }

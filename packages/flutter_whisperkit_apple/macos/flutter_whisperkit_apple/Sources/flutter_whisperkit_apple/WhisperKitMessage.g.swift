@@ -90,6 +90,7 @@ class WhisperKitMessagePigeonCodec: FlutterStandardMessageCodec, @unchecked Send
 protocol WhisperKitMessage {
   func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void)
   func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void)
+  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -130,6 +131,26 @@ class WhisperKitMessageSetup {
       }
     } else {
       createWhisperKitChannel.setMessageHandler(nil)
+    }
+    let loadModelChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.loadModel\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      loadModelChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let variantArg: String? = nilOrValue(args[0])
+        let modelRepoArg: String? = nilOrValue(args[1])
+        let redownloadArg: Bool? = nilOrValue(args[2])
+        let storageLocationArg: Int64? = nilOrValue(args[3])
+        api.loadModel(variant: variantArg, modelRepo: modelRepoArg, redownload: redownloadArg, storageLocation: storageLocationArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      loadModelChannel.setMessageHandler(nil)
     }
   }
 }
