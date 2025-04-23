@@ -21,16 +21,16 @@ class _MyAppState extends State<MyApp> {
   String _modelStatus = 'No model loaded';
   bool _isLoading = false;
   double _loadingProgress = 0.0;
-  
+
   // Use the proper plugin class instead of the generated message class
   final _flutterWhisperkitApple = FlutterWhisperkitApple();
-  
+
   // Use the model loader for a cleaner API
   final _modelLoader = WhisperKitModelLoader();
-  
+
   // Selected model variant
   String _selectedVariant = 'tiny-en';
-  
+
   // Selected storage location
   ModelStorageLocation _storageLocation = ModelStorageLocation.packageDirectory;
 
@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> {
       _platformVersion = platformVersion;
     });
   }
-  
+
   // Initialize WhisperKit
   Future<void> _initializeWhisperKit() async {
     try {
@@ -70,9 +70,9 @@ class _MyAppState extends State<MyApp> {
         _selectedVariant,
         'argmaxinc/whisperkit-coreml',
       );
-      
+
       if (!mounted) return;
-      
+
       setState(() {
         _modelStatus = 'WhisperKit initialized: $result';
       });
@@ -82,7 +82,7 @@ class _MyAppState extends State<MyApp> {
       });
     }
   }
-  
+
   // Load a model using the model loader
   Future<void> _loadModel({bool redownload = false}) async {
     setState(() {
@@ -90,11 +90,11 @@ class _MyAppState extends State<MyApp> {
       _loadingProgress = 0.0;
       _modelStatus = 'Loading model $_selectedVariant...';
     });
-    
+
     try {
       // Set the storage location
       _modelLoader.setStorageLocation(_storageLocation);
-      
+
       // Load the model
       final result = await _modelLoader.loadModel(
         variant: _selectedVariant,
@@ -106,9 +106,9 @@ class _MyAppState extends State<MyApp> {
           });
         },
       );
-      
+
       if (!mounted) return;
-      
+
       setState(() {
         _isLoading = false;
         _modelStatus = 'Model loaded: $result';
@@ -135,10 +135,13 @@ class _MyAppState extends State<MyApp> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text('Running on: $_platformVersion\n'),
-              
+
               const SizedBox(height: 20),
-              const Text('Model Settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              
+              const Text(
+                'Model Settings',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
               // Model variant selection
               DropdownButton<String>(
                 value: _selectedVariant,
@@ -151,17 +154,28 @@ class _MyAppState extends State<MyApp> {
                     });
                   }
                 },
-                items: <String>['tiny-en', 'tiny', 'base-en', 'base', 'small-en', 'small', 'medium-en', 'medium', 'large-v2', 'large-v3']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+                items:
+                    <String>[
+                      'tiny-en',
+                      'tiny',
+                      'base-en',
+                      'base',
+                      'small-en',
+                      'small',
+                      'medium-en',
+                      'medium',
+                      'large-v2',
+                      'large-v3',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
               ),
-              
+
               const SizedBox(height: 10),
-              
+
               // Storage location selection
               Row(
                 children: [
@@ -192,45 +206,48 @@ class _MyAppState extends State<MyApp> {
                   const Text('User Folder'),
                 ],
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Initialize button
               ElevatedButton(
                 onPressed: _initializeWhisperKit,
                 child: const Text('Initialize WhisperKit'),
               ),
-              
+
               const SizedBox(height: 10),
-              
+
               // Load model button
               ElevatedButton(
                 onPressed: _isLoading ? null : () => _loadModel(),
                 child: const Text('Load Model'),
               ),
-              
+
               const SizedBox(height: 10),
-              
+
               // Force redownload button
               ElevatedButton(
-                onPressed: _isLoading ? null : () => _loadModel(redownload: true),
+                onPressed:
+                    _isLoading ? null : () => _loadModel(redownload: true),
                 child: const Text('Force Redownload Model'),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Loading progress
               if (_isLoading)
                 Column(
                   children: [
                     LinearProgressIndicator(value: _loadingProgress),
                     const SizedBox(height: 5),
-                    Text('Loading: ${(_loadingProgress * 100).toStringAsFixed(1)}%'),
+                    Text(
+                      'Loading: ${(_loadingProgress * 100).toStringAsFixed(1)}%',
+                    ),
                   ],
                 ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Status display
               Container(
                 padding: const EdgeInsets.all(10),
@@ -242,6 +259,15 @@ class _MyAppState extends State<MyApp> {
                   'Status: $_modelStatus',
                   style: const TextStyle(fontFamily: 'monospace'),
                 ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final result = await _flutterWhisperkitApple
+                      .transcribeFromFile('assets/test.mp3');
+
+                  print('Transcribed: $result');
+                },
+                child: const Text('Transcribe'),
               ),
             ],
           ),
