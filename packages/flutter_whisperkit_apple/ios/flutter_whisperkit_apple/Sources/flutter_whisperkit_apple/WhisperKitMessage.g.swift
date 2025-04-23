@@ -128,101 +128,131 @@ func deepHashWhisperKitMessage(value: Any?, hasher: inout Hasher) {
 
     
 
+enum DecodingTask: Int {
+  case transcribe = 0
+  case translate = 1
+}
+
+enum ChunkingStrategy: Int {
+  case none = 0
+  case vad = 1
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct DecodingOptionsMessage: Hashable {
-  var task: String? = nil
+  var verbose: Bool
+  var task: DecodingTask
   var language: String? = nil
-  var temperature: Double? = nil
-  var sampleLen: Int64? = nil
-  var bestOf: Int64? = nil
-  var beamSize: Int64? = nil
-  var patience: Double? = nil
-  var lengthPenalty: Double? = nil
-  var suppressBlank: Bool? = nil
-  var suppressTokens: Bool? = nil
-  var withoutTimestamps: Bool? = nil
+  var temperature: Double
+  var temperatureIncrementOnFallback: Double
+  var temperatureFallbackCount: Int64
+  var sampleLength: Int64
+  var topK: Int64
+  var usePrefillPrompt: Bool
+  var usePrefillCache: Bool
+  var detectLanguage: Bool
+  var skipSpecialTokens: Bool
+  var withoutTimestamps: Bool
+  var wordTimestamps: Bool
   var maxInitialTimestamp: Double? = nil
-  var wordTimestamps: Bool? = nil
-  var prependPunctuations: String? = nil
-  var appendPunctuations: String? = nil
-  var logProbThreshold: Double? = nil
-  var noSpeechThreshold: Double? = nil
+  var clipTimestamps: [Double]? = nil
+  var promptTokens: [Int64]? = nil
+  var prefixTokens: [Int64]? = nil
+  var suppressBlank: Bool
+  var supressTokens: [Int64]
   var compressionRatioThreshold: Double? = nil
-  var conditionOnPreviousText: String? = nil
-  var prompt: String? = nil
-  var chunkingStrategy: String? = nil
+  var logProbThreshold: Double? = nil
+  var firstTokenLogProbThreshold: Double? = nil
+  var noSpeechThreshold: Double? = nil
+  var concurrentWorkerCount: Int64
+  var chunkingStrategy: ChunkingStrategy? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ pigeonVar_list: [Any?]) -> DecodingOptionsMessage? {
-    let task: String? = nilOrValue(pigeonVar_list[0])
-    let language: String? = nilOrValue(pigeonVar_list[1])
-    let temperature: Double? = nilOrValue(pigeonVar_list[2])
-    let sampleLen: Int64? = nilOrValue(pigeonVar_list[3])
-    let bestOf: Int64? = nilOrValue(pigeonVar_list[4])
-    let beamSize: Int64? = nilOrValue(pigeonVar_list[5])
-    let patience: Double? = nilOrValue(pigeonVar_list[6])
-    let lengthPenalty: Double? = nilOrValue(pigeonVar_list[7])
-    let suppressBlank: Bool? = nilOrValue(pigeonVar_list[8])
-    let suppressTokens: Bool? = nilOrValue(pigeonVar_list[9])
-    let withoutTimestamps: Bool? = nilOrValue(pigeonVar_list[10])
-    let maxInitialTimestamp: Double? = nilOrValue(pigeonVar_list[11])
-    let wordTimestamps: Bool? = nilOrValue(pigeonVar_list[12])
-    let prependPunctuations: String? = nilOrValue(pigeonVar_list[13])
-    let appendPunctuations: String? = nilOrValue(pigeonVar_list[14])
-    let logProbThreshold: Double? = nilOrValue(pigeonVar_list[15])
-    let noSpeechThreshold: Double? = nilOrValue(pigeonVar_list[16])
-    let compressionRatioThreshold: Double? = nilOrValue(pigeonVar_list[17])
-    let conditionOnPreviousText: String? = nilOrValue(pigeonVar_list[18])
-    let prompt: String? = nilOrValue(pigeonVar_list[19])
-    let chunkingStrategy: String? = nilOrValue(pigeonVar_list[20])
+    let verbose = pigeonVar_list[0] as! Bool
+    let task = pigeonVar_list[1] as! DecodingTask
+    let language: String? = nilOrValue(pigeonVar_list[2])
+    let temperature = pigeonVar_list[3] as! Double
+    let temperatureIncrementOnFallback = pigeonVar_list[4] as! Double
+    let temperatureFallbackCount = pigeonVar_list[5] as! Int64
+    let sampleLength = pigeonVar_list[6] as! Int64
+    let topK = pigeonVar_list[7] as! Int64
+    let usePrefillPrompt = pigeonVar_list[8] as! Bool
+    let usePrefillCache = pigeonVar_list[9] as! Bool
+    let detectLanguage = pigeonVar_list[10] as! Bool
+    let skipSpecialTokens = pigeonVar_list[11] as! Bool
+    let withoutTimestamps = pigeonVar_list[12] as! Bool
+    let wordTimestamps = pigeonVar_list[13] as! Bool
+    let maxInitialTimestamp: Double? = nilOrValue(pigeonVar_list[14])
+    let clipTimestamps: [Double]? = nilOrValue(pigeonVar_list[15])
+    let promptTokens: [Int64]? = nilOrValue(pigeonVar_list[16])
+    let prefixTokens: [Int64]? = nilOrValue(pigeonVar_list[17])
+    let suppressBlank = pigeonVar_list[18] as! Bool
+    let supressTokens = pigeonVar_list[19] as! [Int64]
+    let compressionRatioThreshold: Double? = nilOrValue(pigeonVar_list[20])
+    let logProbThreshold: Double? = nilOrValue(pigeonVar_list[21])
+    let firstTokenLogProbThreshold: Double? = nilOrValue(pigeonVar_list[22])
+    let noSpeechThreshold: Double? = nilOrValue(pigeonVar_list[23])
+    let concurrentWorkerCount = pigeonVar_list[24] as! Int64
+    let chunkingStrategy: ChunkingStrategy? = nilOrValue(pigeonVar_list[25])
 
     return DecodingOptionsMessage(
+      verbose: verbose,
       task: task,
       language: language,
       temperature: temperature,
-      sampleLen: sampleLen,
-      bestOf: bestOf,
-      beamSize: beamSize,
-      patience: patience,
-      lengthPenalty: lengthPenalty,
-      suppressBlank: suppressBlank,
-      suppressTokens: suppressTokens,
+      temperatureIncrementOnFallback: temperatureIncrementOnFallback,
+      temperatureFallbackCount: temperatureFallbackCount,
+      sampleLength: sampleLength,
+      topK: topK,
+      usePrefillPrompt: usePrefillPrompt,
+      usePrefillCache: usePrefillCache,
+      detectLanguage: detectLanguage,
+      skipSpecialTokens: skipSpecialTokens,
       withoutTimestamps: withoutTimestamps,
-      maxInitialTimestamp: maxInitialTimestamp,
       wordTimestamps: wordTimestamps,
-      prependPunctuations: prependPunctuations,
-      appendPunctuations: appendPunctuations,
-      logProbThreshold: logProbThreshold,
-      noSpeechThreshold: noSpeechThreshold,
+      maxInitialTimestamp: maxInitialTimestamp,
+      clipTimestamps: clipTimestamps,
+      promptTokens: promptTokens,
+      prefixTokens: prefixTokens,
+      suppressBlank: suppressBlank,
+      supressTokens: supressTokens,
       compressionRatioThreshold: compressionRatioThreshold,
-      conditionOnPreviousText: conditionOnPreviousText,
-      prompt: prompt,
+      logProbThreshold: logProbThreshold,
+      firstTokenLogProbThreshold: firstTokenLogProbThreshold,
+      noSpeechThreshold: noSpeechThreshold,
+      concurrentWorkerCount: concurrentWorkerCount,
       chunkingStrategy: chunkingStrategy
     )
   }
   func toList() -> [Any?] {
     return [
+      verbose,
       task,
       language,
       temperature,
-      sampleLen,
-      bestOf,
-      beamSize,
-      patience,
-      lengthPenalty,
-      suppressBlank,
-      suppressTokens,
+      temperatureIncrementOnFallback,
+      temperatureFallbackCount,
+      sampleLength,
+      topK,
+      usePrefillPrompt,
+      usePrefillCache,
+      detectLanguage,
+      skipSpecialTokens,
       withoutTimestamps,
-      maxInitialTimestamp,
       wordTimestamps,
-      prependPunctuations,
-      appendPunctuations,
-      logProbThreshold,
-      noSpeechThreshold,
+      maxInitialTimestamp,
+      clipTimestamps,
+      promptTokens,
+      prefixTokens,
+      suppressBlank,
+      supressTokens,
       compressionRatioThreshold,
-      conditionOnPreviousText,
-      prompt,
+      logProbThreshold,
+      firstTokenLogProbThreshold,
+      noSpeechThreshold,
+      concurrentWorkerCount,
       chunkingStrategy,
     ]
   }
@@ -237,6 +267,18 @@ private class WhisperKitMessagePigeonCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
     case 129:
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return DecodingTask(rawValue: enumResultAsInt)
+      }
+      return nil
+    case 130:
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return ChunkingStrategy(rawValue: enumResultAsInt)
+      }
+      return nil
+    case 131:
       return DecodingOptionsMessage.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -246,8 +288,14 @@ private class WhisperKitMessagePigeonCodecReader: FlutterStandardReader {
 
 private class WhisperKitMessagePigeonCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? DecodingOptionsMessage {
+    if let value = value as? DecodingTask {
       super.writeByte(129)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? ChunkingStrategy {
+      super.writeByte(130)
+      super.writeValue(value.rawValue)
+    } else if let value = value as? DecodingOptionsMessage {
+      super.writeByte(131)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)

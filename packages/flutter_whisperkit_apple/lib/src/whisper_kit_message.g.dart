@@ -14,161 +14,6 @@ PlatformException _createConnectionError(String channelName) {
     message: 'Unable to establish connection on channel: "$channelName".',
   );
 }
-bool _deepEquals(Object? a, Object? b) {
-  if (a is List && b is List) {
-    return a.length == b.length &&
-        a.indexed
-        .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
-  }
-  if (a is Map && b is Map) {
-    return a.length == b.length && a.entries.every((MapEntry<Object?, Object?> entry) =>
-        (b as Map<Object?, Object?>).containsKey(entry.key) &&
-        _deepEquals(entry.value, b[entry.key]));
-  }
-  return a == b;
-}
-
-
-class DecodingOptionsMessage {
-  DecodingOptionsMessage({
-    this.task,
-    this.language,
-    this.temperature,
-    this.sampleLen,
-    this.bestOf,
-    this.beamSize,
-    this.patience,
-    this.lengthPenalty,
-    this.suppressBlank,
-    this.suppressTokens,
-    this.withoutTimestamps,
-    this.maxInitialTimestamp,
-    this.wordTimestamps,
-    this.prependPunctuations,
-    this.appendPunctuations,
-    this.logProbThreshold,
-    this.noSpeechThreshold,
-    this.compressionRatioThreshold,
-    this.conditionOnPreviousText,
-    this.prompt,
-    this.chunkingStrategy,
-  });
-
-  String? task;
-
-  String? language;
-
-  double? temperature;
-
-  int? sampleLen;
-
-  int? bestOf;
-
-  int? beamSize;
-
-  double? patience;
-
-  double? lengthPenalty;
-
-  bool? suppressBlank;
-
-  bool? suppressTokens;
-
-  bool? withoutTimestamps;
-
-  double? maxInitialTimestamp;
-
-  bool? wordTimestamps;
-
-  String? prependPunctuations;
-
-  String? appendPunctuations;
-
-  double? logProbThreshold;
-
-  double? noSpeechThreshold;
-
-  double? compressionRatioThreshold;
-
-  String? conditionOnPreviousText;
-
-  String? prompt;
-
-  String? chunkingStrategy;
-
-  List<Object?> _toList() {
-    return <Object?>[
-      task,
-      language,
-      temperature,
-      sampleLen,
-      bestOf,
-      beamSize,
-      patience,
-      lengthPenalty,
-      suppressBlank,
-      suppressTokens,
-      withoutTimestamps,
-      maxInitialTimestamp,
-      wordTimestamps,
-      prependPunctuations,
-      appendPunctuations,
-      logProbThreshold,
-      noSpeechThreshold,
-      compressionRatioThreshold,
-      conditionOnPreviousText,
-      prompt,
-      chunkingStrategy,
-    ];
-  }
-
-  Object encode() {
-    return _toList();  }
-
-  static DecodingOptionsMessage decode(Object result) {
-    result as List<Object?>;
-    return DecodingOptionsMessage(
-      task: result[0] as String?,
-      language: result[1] as String?,
-      temperature: result[2] as double?,
-      sampleLen: result[3] as int?,
-      bestOf: result[4] as int?,
-      beamSize: result[5] as int?,
-      patience: result[6] as double?,
-      lengthPenalty: result[7] as double?,
-      suppressBlank: result[8] as bool?,
-      suppressTokens: result[9] as bool?,
-      withoutTimestamps: result[10] as bool?,
-      maxInitialTimestamp: result[11] as double?,
-      wordTimestamps: result[12] as bool?,
-      prependPunctuations: result[13] as String?,
-      appendPunctuations: result[14] as String?,
-      logProbThreshold: result[15] as double?,
-      noSpeechThreshold: result[16] as double?,
-      compressionRatioThreshold: result[17] as double?,
-      conditionOnPreviousText: result[18] as String?,
-      prompt: result[19] as String?,
-      chunkingStrategy: result[20] as String?,
-    );
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  bool operator ==(Object other) {
-    if (other is! DecodingOptionsMessage || other.runtimeType != runtimeType) {
-      return false;
-    }
-    if (identical(this, other)) {
-      return true;
-    }
-    return _deepEquals(encode(), other.encode());
-  }
-
-  @override
-  // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
-}
 
 
 class _PigeonCodec extends StandardMessageCodec {
@@ -178,9 +23,6 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is DecodingOptionsMessage) {
-      buffer.putUint8(129);
-      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -189,8 +31,6 @@ class _PigeonCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 129: 
-        return DecodingOptionsMessage.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -279,7 +119,7 @@ class WhisperKitMessage {
     }
   }
 
-  Future<String?> transcribeFromFile(String filePath, DecodingOptionsMessage? options) async {
+  Future<String?> transcribeFromFile(String filePath, Map<Object?, Object?>? options) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeFromFile$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,

@@ -8,55 +8,6 @@ import 'package:pigeon/pigeon.dart';
     dartPackageName: 'flutter_whisperkit_apple',
   ),
 )
-
-class DecodingOptionsMessage {
-  String? task;
-  String? language;
-  double? temperature;
-  int? sampleLen;
-  int? bestOf;
-  int? beamSize;
-  double? patience;
-  double? lengthPenalty;
-  bool? suppressBlank;
-  bool? suppressTokens;
-  bool? withoutTimestamps;
-  double? maxInitialTimestamp;
-  bool? wordTimestamps;
-  String? prependPunctuations;
-  String? appendPunctuations;
-  double? logProbThreshold;
-  double? noSpeechThreshold;
-  double? compressionRatioThreshold;
-  String? conditionOnPreviousText;
-  String? prompt;
-  String? chunkingStrategy;
-
-  DecodingOptionsMessage({
-    this.task,
-    this.language,
-    this.temperature,
-    this.sampleLen,
-    this.bestOf,
-    this.beamSize,
-    this.patience,
-    this.lengthPenalty,
-    this.suppressBlank,
-    this.suppressTokens,
-    this.withoutTimestamps,
-    this.maxInitialTimestamp,
-    this.wordTimestamps,
-    this.prependPunctuations,
-    this.appendPunctuations,
-    this.logProbThreshold,
-    this.noSpeechThreshold,
-    this.compressionRatioThreshold,
-    this.conditionOnPreviousText,
-    this.prompt,
-    this.chunkingStrategy,
-  });
-}
-
 @HostApi()
 abstract class WhisperKitMessage {
   @async
@@ -71,5 +22,5 @@ abstract class WhisperKitMessage {
     int? storageLocation,
   );
   @async
-  String? transcribeFromFile(String filePath, DecodingOptionsMessage? options);
+  String? transcribeFromFile(String filePath, Map? options);
 }

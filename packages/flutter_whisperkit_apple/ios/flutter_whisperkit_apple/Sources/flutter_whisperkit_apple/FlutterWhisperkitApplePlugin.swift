@@ -143,8 +143,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
-  func transcribeFromFile(filePath: String?, options: DecodingOptionsMessage?, completion: @escaping (Result<String?, Error>) -> Void)
-  {
+  func transcribeFromFile(
+    filePath: String?, options: DecodingOptionsMessage?,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
     guard let filePath = filePath else {
       completion(
         .failure(
@@ -176,103 +178,100 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           }
         }.value
         print("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
-        
+
         var decodingOptions = DecodingOptions()
-        
+
         if let options = options {
           if let task = options.task, task == "translate" {
             decodingOptions.task = .translate
           } else {
             decodingOptions.task = .transcribe
           }
-          
+
           if let language = options.language {
             decodingOptions.language = language
           }
-          
+
           if let temperature = options.temperature {
             decodingOptions.temperature = temperature
           }
-          
+
           if let sampleLen = options.sampleLen {
             decodingOptions.sampleLen = sampleLen
           }
-          
+
           if let bestOf = options.bestOf {
             decodingOptions.bestOf = bestOf
           }
-          
-          if let beamSize = options.beamSize {
-            decodingOptions.beamSize = beamSize
-          }
-          
+
           if let patience = options.patience {
             decodingOptions.patience = patience
           }
-          
+
           if let lengthPenalty = options.lengthPenalty {
             decodingOptions.lengthPenalty = lengthPenalty
           }
-          
+
           if let suppressBlank = options.suppressBlank {
             decodingOptions.suppressBlank = suppressBlank
           }
-          
+
           if let suppressTokens = options.suppressTokens {
             decodingOptions.suppressTokens = suppressTokens
           }
-          
+
           if let withoutTimestamps = options.withoutTimestamps {
             decodingOptions.withoutTimestamps = withoutTimestamps
           }
-          
+
           if let maxInitialTimestamp = options.maxInitialTimestamp {
             decodingOptions.maxInitialTimestamp = maxInitialTimestamp
           }
-          
+
           if let wordTimestamps = options.wordTimestamps {
             decodingOptions.wordTimestamps = wordTimestamps
           }
-          
+
           if let prependPunctuations = options.prependPunctuations {
             decodingOptions.prependPunctuations = prependPunctuations
           }
-          
+
           if let appendPunctuations = options.appendPunctuations {
             decodingOptions.appendPunctuations = appendPunctuations
           }
-          
+
           if let logProbThreshold = options.logProbThreshold {
             decodingOptions.logProbThreshold = logProbThreshold
           }
-          
+
           if let noSpeechThreshold = options.noSpeechThreshold {
             decodingOptions.noSpeechThreshold = noSpeechThreshold
           }
-          
+
           if let compressionRatioThreshold = options.compressionRatioThreshold {
             decodingOptions.compressionRatioThreshold = compressionRatioThreshold
           }
-          
+
           if let conditionOnPreviousText = options.conditionOnPreviousText {
             decodingOptions.conditionOnPreviousText = conditionOnPreviousText
           }
-          
+
           if let prompt = options.prompt {
             decodingOptions.prompt = prompt
           }
         }
 
-        let transcription = try await whisperKit.transcribe(audioArray: audioFileSamples, decodeOptions: decodingOptions)
+        let transcription = try await whisperKit.transcribe(
+          audioArray: audioFileSamples, decodeOptions: decodingOptions)
 
         var transcriptionDict: [String: Any] = [:]
-        
+
         if let text = transcription?.text {
-            transcriptionDict["text"] = text
+          transcriptionDict["text"] = text
         }
-        
+
         if let language = transcription?.language {
-            transcriptionDict["language"] = language
+          transcriptionDict["language"] = language
         }
 
         if let segments = transcription?.segments {
@@ -288,38 +287,38 @@ private class WhisperKitApiImpl: WhisperKitMessage {
               "temperature": segment.temperature,
               "avgLogprob": segment.avgLogprob,
               "compressionRatio": segment.compressionRatio,
-              "noSpeechProb": segment.noSpeechProb
+              "noSpeechProb": segment.noSpeechProb,
             ]
 
             if let tokens = segment.tokens {
               segmentDict["tokens"] = tokens
             }
-            
+
             if let tokenLogProbs = segment.tokenLogProbs {
-                var logProbsArray: [Any] = []
-                for logProbs in tokenLogProbs {
-                    var logProbsDict: [String: Double] = [:]
-                    for (token, prob) in logProbs {
-                        logProbsDict[String(token)] = prob
-                    }
-                    logProbsArray.append(logProbsDict)
+              var logProbsArray: [Any] = []
+              for logProbs in tokenLogProbs {
+                var logProbsDict: [String: Double] = [:]
+                for (token, prob) in logProbs {
+                  logProbsDict[String(token)] = prob
                 }
-                segmentDict["tokenLogProbs"] = logProbsArray
+                logProbsArray.append(logProbsDict)
+              }
+              segmentDict["tokenLogProbs"] = logProbsArray
             }
-            
+
             if let words = segment.words {
-                var wordsArray: [[String: Any]] = []
-                for word in words {
-                    let wordDict: [String: Any] = [
-                        "word": word.word,
-                        "tokens": word.tokens,
-                        "start": word.start,
-                        "end": word.end,
-                        "probability": word.probability
-                    ]
-                    wordsArray.append(wordDict)
-                }
-                segmentDict["words"] = wordsArray
+              var wordsArray: [[String: Any]] = []
+              for word in words {
+                let wordDict: [String: Any] = [
+                  "word": word.word,
+                  "tokens": word.tokens,
+                  "start": word.start,
+                  "end": word.end,
+                  "probability": word.probability,
+                ]
+                wordsArray.append(wordDict)
+              }
+              segmentDict["words"] = wordsArray
             }
 
             segmentsArray.append(segmentDict)
@@ -363,12 +362,12 @@ private class WhisperKitApiImpl: WhisperKitMessage {
             "totalTimestampAlignmentRuns": timings.totalTimestampAlignmentRuns,
             "totalDecodingFallbacks": timings.totalDecodingFallbacks,
             "totalDecodingWindows": timings.totalDecodingWindows,
-            "fullPipeline": timings.fullPipeline
+            "fullPipeline": timings.fullPipeline,
           ]
         }
-        
+
         if let seekTime = transcription?.seekTime {
-            transcriptionDict["seekTime"] = seekTime
+          transcriptionDict["seekTime"] = seekTime
         }
 
         do {

@@ -143,18 +143,75 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
+  // private func decodeOptions(_ options: [AnyHashable?: Any?]?) -> DecodingOptions? {
+  //   guard let options = options else { return nil }
+
+  //   // Extract values with appropriate type casting
+  //   let verbose = options["verbose"] as? Bool ?? false
+  //   let taskValue = options["task"] as? Int ?? 0
+  //   let task = DecodingTask(rawValue: taskValue) ?? .transcribe
+  //   let language = options["language"] as? String
+  //   let temperature = options["temperature"] as? Double ?? 0.0
+  //   let temperatureIncrementOnFallback = options["temperatureIncrementOnFallback"] as? Double ?? 0.2
+  //   let temperatureFallbackCount = options["temperatureFallbackCount"] as? Int64 ?? 5
+  //   let sampleLength = options["sampleLength"] as? Int64 ?? 0
+  //   let topK = options["topK"] as? Int64 ?? 0
+  //   let usePrefillPrompt = options["usePrefillPrompt"] as? Bool ?? true
+  //   let usePrefillCache = options["usePrefillCache"] as? Bool ?? true
+  //   let detectLanguage = options["detectLanguage"] as? Bool ?? false
+  //   let skipSpecialTokens = options["skipSpecialTokens"] as? Bool ?? true
+  //   let withoutTimestamps = options["withoutTimestamps"] as? Bool ?? false
+  //   let wordTimestamps = options["wordTimestamps"] as? Bool ?? false
+  //   let maxInitialTimestamp = options["maxInitialTimestamp"] as? Double
+  //   let clipTimestamps = options["clipTimestamps"] as? [Double]
+  //   let promptTokens = options["promptTokens"] as? [Int64]
+  //   let prefixTokens = options["prefixTokens"] as? [Int64]
+  //   let suppressBlank = options["suppressBlank"] as? Bool ?? false
+  //   let supressTokens = options["supressTokens"] as? [Int64] ?? []
+  //   let compressionRatioThreshold = options["compressionRatioThreshold"] as? Double
+  //   let logProbThreshold = options["logProbThreshold"] as? Double
+  //   let firstTokenLogProbThreshold = options["firstTokenLogProbThreshold"] as? Double
+  //   let noSpeechThreshold = options["noSpeechThreshold"] as? Double
+  //   let concurrentWorkerCount = options["concurrentWorkerCount"] as? Int64 ?? 2
+
+  //   let chunkingStrategyValue = options["chunkingStrategy"] as? Int
+  //   let chunkingStrategy: ChunkingStrategy? =
+  //     chunkingStrategyValue != nil ? ChunkingStrategy(rawValue: chunkingStrategyValue!) : nil
+
+  //   return DecodingOptions(
+  //     verbose: verbose,
+  //     task: task,
+  //     language: language,
+  //     temperature: temperature,
+  //     temperatureIncrementOnFallback: temperatureIncrementOnFallback,
+  //     temperatureFallbackCount: temperatureFallbackCount,
+  //     sampleLength: sampleLength,
+  //     topK: topK,
+  //     usePrefillPrompt: usePrefillPrompt,
+  //     usePrefillCache: usePrefillCache,
+  //     detectLanguage: detectLanguage,
+  //     skipSpecialTokens: skipSpecialTokens,
+  //     withoutTimestamps: withoutTimestamps,
+  //     wordTimestamps: wordTimestamps,
+  //     maxInitialTimestamp: maxInitialTimestamp,
+  //     clipTimestamps: clipTimestamps,
+  //     promptTokens: promptTokens,
+  //     prefixTokens: prefixTokens,
+  //     suppressBlank: suppressBlank,
+  //     supressTokens: supressTokens,
+  //     compressionRatioThreshold: compressionRatioThreshold,
+  //     logProbThreshold: logProbThreshold,
+  //     firstTokenLogProbThreshold: firstTokenLogProbThreshold,
+  //     noSpeechThreshold: noSpeechThreshold,
+  //     concurrentWorkerCount: concurrentWorkerCount,
+  //     chunkingStrategy: chunkingStrategy
+  //   )
+  // }
+
   func transcribeFromFile(
-    filePath: String?, options: DecodingOptionsMessage?, completion: @escaping (Result<String?, Error>) -> Void
+    filePath: String, options: [AnyHashable?: Any?]?,
+    completion: @escaping (Result<String?, Error>) -> Void
   ) {
-    guard let filePath = filePath else {
-      completion(
-        .failure(
-          NSError(
-            domain: "WhisperKitError", code: 2001,
-            userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
-      return
-    }
-    
     Task {
       do {
         // Check if file exists and is readable
@@ -183,90 +240,14 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         }.value
         Logging.debug("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
 
-        var decodingOptions = DecodingOptions()
-        
-        if let options = options {
-          if let task = options.task, task == "translate" {
-            decodingOptions.task = .translate
-          } else {
-            decodingOptions.task = .transcribe
-          }
-          
-          if let language = options.language {
-            decodingOptions.language = language
-          }
-          
-          if let temperature = options.temperature {
-            decodingOptions.temperature = Float(temperature)
-          }
-          
-          if let sampleLen = options.sampleLen {
-            decodingOptions.sampleLength = Int(sampleLen)
-          }
-          
-          if let bestOf = options.bestOf {
-            decodingOptions.temperatureFallbackCount = Int(bestOf)
-          }
-          
-          if let beamSize = options.beamSize {
-            decodingOptions.beamSize = Int(beamSize)
-          }
-          
-          if let patience = options.patience {
-            decodingOptions.patience = Float(patience)
-          }
-          
-          if let withoutTimestamps = options.withoutTimestamps {
-            decodingOptions.withoutTimestamps = withoutTimestamps
-          }
-          
-          if let wordTimestamps = options.wordTimestamps {
-            decodingOptions.wordTimestamps = wordTimestamps
-          }
-          
-          if let logProbThreshold = options.logProbThreshold {
-            decodingOptions.logProbThreshold = Float(logProbThreshold)
-          }
-          
-          if let noSpeechThreshold = options.noSpeechThreshold {
-            decodingOptions.noSpeechThreshold = Float(noSpeechThreshold)
-          }
-          
-          if let compressionRatioThreshold = options.compressionRatioThreshold {
-            decodingOptions.compressionRatioThreshold = Float(compressionRatioThreshold)
-          }
-          
-          if let prompt = options.prompt {
-            decodingOptions.prompt = prompt
-          }
-          
-          if let chunkingStrategy = options.chunkingStrategy {
-            if chunkingStrategy == "none" {
-              decodingOptions.chunkingStrategy = .none
-            } else if chunkingStrategy == "vad" {
-              decodingOptions.chunkingStrategy = .vad
-            } else if chunkingStrategy == "length" {
-              decodingOptions.chunkingStrategy = .length
-            }
-          }
-        }
-
-        let transcriptionResults = try await whisperKit?.transcribe(
-          audioArray: audioFileSamples,
-          decodeOptions: decodingOptions
+        // TODO: options -> DecodingOptions に変換するfunction作成する
+        let transcription: TranscriptionResult? = try await transcribeAudioSamples(
+          audioFileSamples,
+          options: nil,
+          //  options: options,
         )
-        
-        let transcription = mergeTranscriptionResults(transcriptionResults ?? [])
 
         var transcriptionDict: [String: Any] = [:]
-        
-        if let text = transcription?.text {
-            transcriptionDict["text"] = text
-        }
-        
-        if let language = transcription?.language {
-            transcriptionDict["language"] = language
-        }
 
         if let segments: [TranscriptionSegment] = transcription?.segments {
           var segmentsArray: [[String: Any]] = []
@@ -345,10 +326,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
             "fullPipeline": timings.fullPipeline,
           ]
         }
-        
-        if let seekTime = transcription?.seekTime {
-            transcriptionDict["seekTime"] = seekTime
-        }
 
         do {
           let jsonData = try JSONSerialization.data(withJSONObject: transcriptionDict, options: [])
@@ -375,7 +352,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
-  func transcribeAudioSamples(_ samples: [Float]) async throws -> TranscriptionResult? {
+  func transcribeAudioSamples(_ samples: [Float], options: DecodingOptions?) async throws
+    -> TranscriptionResult?
+  {
     guard let whisperKit = whisperKit else { return nil }
     var selectedLanguage: String = "japanese"
     let languageCode = Constants.languages[selectedLanguage, default: Constants.defaultLanguageCode]

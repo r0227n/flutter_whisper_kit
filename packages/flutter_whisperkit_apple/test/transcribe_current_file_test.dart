@@ -25,7 +25,10 @@ class MockFlutterWhisperkitApplePlatform
   ) => Future.value('Model loaded');
 
   @override
-  Future<String?> transcribeFromFile(String? filePath, Map<String, dynamic>? options) {
+  Future<String?> transcribeFromFile(
+    String? filePath,
+    Map<String, dynamic>? options,
+  ) {
     if (filePath == null || filePath.isEmpty) {
       return Future.value(null);
     }
@@ -105,7 +108,7 @@ void main() {
       isA<String>(),
     );
   });
-  
+
   test('transcribeFromFile with DecodingOptions returns JSON string', () async {
     FlutterWhisperkitApple flutterWhisperkitApplePlugin =
         FlutterWhisperkitApple();
@@ -118,13 +121,19 @@ void main() {
       temperature: 0.7,
       wordTimestamps: true,
     );
-    
+
     expect(
-      await flutterWhisperkitApplePlugin.transcribeFromFile('test.wav', options: options),
+      await flutterWhisperkitApplePlugin.transcribeFromFile(
+        'test.wav',
+        options: options,
+      ),
       isNotNull,
     );
     expect(
-      await flutterWhisperkitApplePlugin.transcribeFromFile('test.wav', options: options),
+      await flutterWhisperkitApplePlugin.transcribeFromFile(
+        'test.wav',
+        options: options,
+      ),
       isA<String>(),
     );
   });
@@ -152,7 +161,7 @@ void main() {
       expect(result.language, 'en');
     },
   );
-  
+
   test(
     'transcribeFromFileAndParse with DecodingOptions returns parsed TranscriptionResult',
     () async {
@@ -167,7 +176,7 @@ void main() {
         temperature: 0.7,
         wordTimestamps: true,
       );
-      
+
       final result = await flutterWhisperkitApplePlugin
           .transcribeFromFileAndParse('test.wav', options: options);
 
@@ -193,7 +202,7 @@ void main() {
 
     expect(await flutterWhisperkitApplePlugin.transcribeFromFile(''), isNull);
   });
-  
+
   test('createDecodingOptionsMap creates correct map', () {
     final options = FlutterWhisperkitApple.createDecodingOptionsMap(
       task: 'transcribe',
@@ -201,7 +210,6 @@ void main() {
       temperature: 0.7,
       sampleLen: 100,
       bestOf: 5,
-      beamSize: 5,
       patience: 1.0,
       lengthPenalty: 1.0,
       suppressBlank: true,
@@ -218,14 +226,13 @@ void main() {
       prompt: 'prompt',
       chunkingStrategy: 'fixed',
     );
-    
+
     expect(options, isA<Map<String, dynamic>>());
     expect(options['task'], 'transcribe');
     expect(options['language'], 'en');
     expect(options['temperature'], 0.7);
     expect(options['sampleLen'], 100);
     expect(options['bestOf'], 5);
-    expect(options['beamSize'], 5);
     expect(options['patience'], 1.0);
     expect(options['lengthPenalty'], 1.0);
     expect(options['suppressBlank'], true);

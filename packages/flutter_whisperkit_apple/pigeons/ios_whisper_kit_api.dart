@@ -8,53 +8,97 @@ import 'package:pigeon/pigeon.dart';
     dartPackageName: 'flutter_whisperkit_apple',
   ),
 )
+enum DecodingTask { transcribe, translate }
+
+enum ChunkingStrategy { none, vad }
 
 class DecodingOptionsMessage {
-  String? task;
-  String? language;
-  double? temperature;
-  int? sampleLen;
-  int? bestOf;
-  int? beamSize;
-  double? patience;
-  double? lengthPenalty;
-  bool? suppressBlank;
-  bool? suppressTokens;
-  bool? withoutTimestamps;
-  double? maxInitialTimestamp;
-  bool? wordTimestamps;
-  String? prependPunctuations;
-  String? appendPunctuations;
-  double? logProbThreshold;
-  double? noSpeechThreshold;
-  double? compressionRatioThreshold;
-  String? conditionOnPreviousText;
-  String? prompt;
-  String? chunkingStrategy;
-
-  DecodingOptionsMessage({
+  const DecodingOptionsMessage(
+    this.verbose,
     this.task,
     this.language,
     this.temperature,
-    this.sampleLen,
-    this.bestOf,
-    this.beamSize,
-    this.patience,
-    this.lengthPenalty,
-    this.suppressBlank,
-    this.suppressTokens,
+    this.temperatureIncrementOnFallback,
+    this.temperatureFallbackCount,
+    this.sampleLength,
+    this.topK,
+    this.usePrefillPrompt,
+    this.usePrefillCache,
+    this.detectLanguage,
+    this.skipSpecialTokens,
     this.withoutTimestamps,
-    this.maxInitialTimestamp,
     this.wordTimestamps,
-    this.prependPunctuations,
-    this.appendPunctuations,
-    this.logProbThreshold,
-    this.noSpeechThreshold,
+    this.maxInitialTimestamp,
+    this.clipTimestamps,
+    this.promptTokens,
+    this.prefixTokens,
+    this.suppressBlank,
+    this.supressTokens,
     this.compressionRatioThreshold,
-    this.conditionOnPreviousText,
-    this.prompt,
+    this.logProbThreshold,
+    this.firstTokenLogProbThreshold,
+    this.noSpeechThreshold,
+    this.concurrentWorkerCount,
     this.chunkingStrategy,
-  });
+  );
+
+  final bool verbose;
+  final DecodingTask task;
+  final String? language;
+  final double temperature;
+  final double temperatureIncrementOnFallback;
+  final int temperatureFallbackCount;
+  final int sampleLength;
+  final int topK;
+  final bool usePrefillPrompt;
+  final bool usePrefillCache;
+  final bool detectLanguage;
+  final bool skipSpecialTokens;
+  final bool withoutTimestamps;
+  final bool wordTimestamps;
+  final double? maxInitialTimestamp;
+  final List<double>? clipTimestamps;
+  final List<int>? promptTokens;
+  final List<int>? prefixTokens;
+  final bool suppressBlank;
+  final List<int> supressTokens;
+  final double? compressionRatioThreshold;
+  final double? logProbThreshold;
+  final double? firstTokenLogProbThreshold;
+  final double? noSpeechThreshold;
+  final int concurrentWorkerCount;
+  final ChunkingStrategy? chunkingStrategy;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'verbose': verbose,
+      'task': task,
+      'language': language,
+      'temperature': temperature,
+      'temperatureIncrementOnFallback': temperatureIncrementOnFallback,
+      'temperatureFallbackCount': temperatureFallbackCount,
+      'sampleLength': sampleLength,
+      'topK': topK,
+      'usePrefillPrompt': usePrefillPrompt,
+      'usePrefillCache': usePrefillCache,
+      'detectLanguage': detectLanguage,
+      'skipSpecialTokens': skipSpecialTokens,
+      'withoutTimestamps': withoutTimestamps,
+      'wordTimestamps': wordTimestamps,
+      'maxInitialTimestamp': maxInitialTimestamp,
+      'clipTimestamps': clipTimestamps,
+      'promptTokens': promptTokens,
+      'prefixTokens': prefixTokens,
+      'suppressBlank': suppressBlank,
+      'supressTokens': supressTokens,
+      'compressionRatioThreshold': compressionRatioThreshold,
+      'logProbThreshold': logProbThreshold,
+      'firstTokenLogProbThreshold': firstTokenLogProbThreshold,
+      'noSpeechThreshold': noSpeechThreshold,
+      'concurrentWorkerCount': concurrentWorkerCount,
+      'chunkingStrategy': chunkingStrategy,
+    };
+  }
 }
 
 @HostApi()

@@ -64,195 +64,11 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
   return value as! T?
 }
 
-func deepEqualsWhisperKitMessage(_ lhs: Any?, _ rhs: Any?) -> Bool {
-  let cleanLhs = nilOrValue(lhs) as Any?
-  let cleanRhs = nilOrValue(rhs) as Any?
-  switch (cleanLhs, cleanRhs) {
-  case (nil, nil):
-    return true
-
-  case (nil, _), (_, nil):
-    return false
-
-  case is (Void, Void):
-    return true
-
-  case let (cleanLhsHashable, cleanRhsHashable) as (AnyHashable, AnyHashable):
-    return cleanLhsHashable == cleanRhsHashable
-
-  case let (cleanLhsArray, cleanRhsArray) as ([Any?], [Any?]):
-    guard cleanLhsArray.count == cleanRhsArray.count else { return false }
-    for (index, element) in cleanLhsArray.enumerated() {
-      if !deepEqualsWhisperKitMessage(element, cleanRhsArray[index]) {
-        return false
-      }
-    }
-    return true
-
-  case let (cleanLhsDictionary, cleanRhsDictionary) as ([AnyHashable: Any?], [AnyHashable: Any?]):
-    guard cleanLhsDictionary.count == cleanRhsDictionary.count else { return false }
-    for (key, cleanLhsValue) in cleanLhsDictionary {
-      guard cleanRhsDictionary.index(forKey: key) != nil else { return false }
-      if !deepEqualsWhisperKitMessage(cleanLhsValue, cleanRhsDictionary[key]!) {
-        return false
-      }
-    }
-    return true
-
-  default:
-    // Any other type shouldn't be able to be used with pigeon. File an issue if you find this to be untrue.
-    return false
-  }
-}
-
-func deepHashWhisperKitMessage(value: Any?, hasher: inout Hasher) {
-  if let valueList = value as? [AnyHashable] {
-     for item in valueList { deepHashWhisperKitMessage(value: item, hasher: &hasher) }
-     return
-  }
-
-  if let valueDict = value as? [AnyHashable: AnyHashable] {
-    for key in valueDict.keys { 
-      hasher.combine(key)
-      deepHashWhisperKitMessage(value: valueDict[key]!, hasher: &hasher)
-    }
-    return
-  }
-
-  if let hashableValue = value as? AnyHashable {
-    hasher.combine(hashableValue.hashValue)
-  }
-
-  return hasher.combine(String(describing: value))
-}
-
-    
-
-/// Generated class from Pigeon that represents data sent in messages.
-struct DecodingOptionsMessage: Hashable {
-  var task: String? = nil
-  var language: String? = nil
-  var temperature: Double? = nil
-  var sampleLen: Int64? = nil
-  var bestOf: Int64? = nil
-  var beamSize: Int64? = nil
-  var patience: Double? = nil
-  var lengthPenalty: Double? = nil
-  var suppressBlank: Bool? = nil
-  var suppressTokens: Bool? = nil
-  var withoutTimestamps: Bool? = nil
-  var maxInitialTimestamp: Double? = nil
-  var wordTimestamps: Bool? = nil
-  var prependPunctuations: String? = nil
-  var appendPunctuations: String? = nil
-  var logProbThreshold: Double? = nil
-  var noSpeechThreshold: Double? = nil
-  var compressionRatioThreshold: Double? = nil
-  var conditionOnPreviousText: String? = nil
-  var prompt: String? = nil
-  var chunkingStrategy: String? = nil
-
-
-  // swift-format-ignore: AlwaysUseLowerCamelCase
-  static func fromList(_ pigeonVar_list: [Any?]) -> DecodingOptionsMessage? {
-    let task: String? = nilOrValue(pigeonVar_list[0])
-    let language: String? = nilOrValue(pigeonVar_list[1])
-    let temperature: Double? = nilOrValue(pigeonVar_list[2])
-    let sampleLen: Int64? = nilOrValue(pigeonVar_list[3])
-    let bestOf: Int64? = nilOrValue(pigeonVar_list[4])
-    let beamSize: Int64? = nilOrValue(pigeonVar_list[5])
-    let patience: Double? = nilOrValue(pigeonVar_list[6])
-    let lengthPenalty: Double? = nilOrValue(pigeonVar_list[7])
-    let suppressBlank: Bool? = nilOrValue(pigeonVar_list[8])
-    let suppressTokens: Bool? = nilOrValue(pigeonVar_list[9])
-    let withoutTimestamps: Bool? = nilOrValue(pigeonVar_list[10])
-    let maxInitialTimestamp: Double? = nilOrValue(pigeonVar_list[11])
-    let wordTimestamps: Bool? = nilOrValue(pigeonVar_list[12])
-    let prependPunctuations: String? = nilOrValue(pigeonVar_list[13])
-    let appendPunctuations: String? = nilOrValue(pigeonVar_list[14])
-    let logProbThreshold: Double? = nilOrValue(pigeonVar_list[15])
-    let noSpeechThreshold: Double? = nilOrValue(pigeonVar_list[16])
-    let compressionRatioThreshold: Double? = nilOrValue(pigeonVar_list[17])
-    let conditionOnPreviousText: String? = nilOrValue(pigeonVar_list[18])
-    let prompt: String? = nilOrValue(pigeonVar_list[19])
-    let chunkingStrategy: String? = nilOrValue(pigeonVar_list[20])
-
-    return DecodingOptionsMessage(
-      task: task,
-      language: language,
-      temperature: temperature,
-      sampleLen: sampleLen,
-      bestOf: bestOf,
-      beamSize: beamSize,
-      patience: patience,
-      lengthPenalty: lengthPenalty,
-      suppressBlank: suppressBlank,
-      suppressTokens: suppressTokens,
-      withoutTimestamps: withoutTimestamps,
-      maxInitialTimestamp: maxInitialTimestamp,
-      wordTimestamps: wordTimestamps,
-      prependPunctuations: prependPunctuations,
-      appendPunctuations: appendPunctuations,
-      logProbThreshold: logProbThreshold,
-      noSpeechThreshold: noSpeechThreshold,
-      compressionRatioThreshold: compressionRatioThreshold,
-      conditionOnPreviousText: conditionOnPreviousText,
-      prompt: prompt,
-      chunkingStrategy: chunkingStrategy
-    )
-  }
-  func toList() -> [Any?] {
-    return [
-      task,
-      language,
-      temperature,
-      sampleLen,
-      bestOf,
-      beamSize,
-      patience,
-      lengthPenalty,
-      suppressBlank,
-      suppressTokens,
-      withoutTimestamps,
-      maxInitialTimestamp,
-      wordTimestamps,
-      prependPunctuations,
-      appendPunctuations,
-      logProbThreshold,
-      noSpeechThreshold,
-      compressionRatioThreshold,
-      conditionOnPreviousText,
-      prompt,
-      chunkingStrategy,
-    ]
-  }
-  static func == (lhs: DecodingOptionsMessage, rhs: DecodingOptionsMessage) -> Bool {
-    return deepEqualsWhisperKitMessage(lhs.toList(), rhs.toList())  }
-  func hash(into hasher: inout Hasher) {
-    deepHashWhisperKitMessage(value: toList(), hasher: &hasher)
-  }
-}
 
 private class WhisperKitMessagePigeonCodecReader: FlutterStandardReader {
-  override func readValue(ofType type: UInt8) -> Any? {
-    switch type {
-    case 129:
-      return DecodingOptionsMessage.fromList(self.readValue() as! [Any?])
-    default:
-      return super.readValue(ofType: type)
-    }
-  }
 }
 
 private class WhisperKitMessagePigeonCodecWriter: FlutterStandardWriter {
-  override func writeValue(_ value: Any) {
-    if let value = value as? DecodingOptionsMessage {
-      super.writeByte(129)
-      super.writeValue(value.toList())
-    } else {
-      super.writeValue(value)
-    }
-  }
 }
 
 private class WhisperKitMessagePigeonCodecReaderWriter: FlutterStandardReaderWriter {
@@ -275,7 +91,7 @@ protocol WhisperKitMessage {
   func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void)
   func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void)
   func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void)
-  func transcribeFromFile(filePath: String, options: DecodingOptionsMessage?, completion: @escaping (Result<String?, Error>) -> Void)
+  func transcribeFromFile(filePath: String, options: [AnyHashable?: Any?]?, completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -342,7 +158,7 @@ class WhisperKitMessageSetup {
       transcribeFromFileChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let filePathArg = args[0] as! String
-        let optionsArg: DecodingOptionsMessage? = nilOrValue(args[1])
+        let optionsArg: [AnyHashable?: Any?]? = nilOrValue(args[1])
         api.transcribeFromFile(filePath: filePathArg, options: optionsArg) { result in
           switch result {
           case .success(let res):
