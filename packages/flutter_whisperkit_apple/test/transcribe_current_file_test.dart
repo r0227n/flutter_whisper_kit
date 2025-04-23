@@ -13,19 +13,23 @@ class MockFlutterWhisperkitApplePlatform
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<String?> createWhisperKit(String? model, String? modelRepo) => 
+  Future<String?> createWhisperKit(String? model, String? modelRepo) =>
       Future.value('WhisperKit created');
-  
+
   @override
-  Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation) => 
-      Future.value('Model loaded');
-  
+  Future<String?> loadModel(
+    String? variant,
+    String? modelRepo,
+    bool? redownload,
+    int? storageLocation,
+  ) => Future.value('Model loaded');
+
   @override
-  Future<String?> transcribeCurrentFile(String? filePath) {
+  Future<String?> transcribeFromFile(String? filePath) {
     if (filePath == null) {
       return Future.value(null);
     }
-    
+
     // Mock JSON response for a successful transcription
     const mockJson = '''
     {
@@ -54,49 +58,69 @@ class MockFlutterWhisperkitApplePlatform
       }
     }
     ''';
-    
+
     return Future.value(mockJson);
   }
 }
 
 void main() {
-  final FlutterWhisperkitApplePlatform initialPlatform = FlutterWhisperkitApplePlatform.instance;
-  
+  final FlutterWhisperkitApplePlatform initialPlatform =
+      FlutterWhisperkitApplePlatform.instance;
+
   test('$MethodChannelFlutterWhisperkitApple is the default instance', () {
-    expect(initialPlatform, isInstanceOf<MethodChannelFlutterWhisperkitApple>());
+    expect(
+      initialPlatform,
+      isInstanceOf<MethodChannelFlutterWhisperkitApple>(),
+    );
   });
-  
-  test('transcribeCurrentFile returns JSON string', () async {
-    FlutterWhisperkitApple flutterWhisperkitApplePlugin = FlutterWhisperkitApple();
-    MockFlutterWhisperkitApplePlatform fakePlatform = MockFlutterWhisperkitApplePlatform();
+
+  test('transcribeFromFile returns JSON string', () async {
+    FlutterWhisperkitApple flutterWhisperkitApplePlugin =
+        FlutterWhisperkitApple();
+    MockFlutterWhisperkitApplePlatform fakePlatform =
+        MockFlutterWhisperkitApplePlatform();
     FlutterWhisperkitApplePlatform.instance = fakePlatform;
-    
-    expect(await flutterWhisperkitApplePlugin.transcribeCurrentFile('test.wav'), isNotNull);
-    expect(await flutterWhisperkitApplePlugin.transcribeCurrentFile('test.wav'), isA<String>());
+
+    expect(
+      await flutterWhisperkitApplePlugin.transcribeFromFile('test.wav'),
+      isNotNull,
+    );
+    expect(
+      await flutterWhisperkitApplePlugin.transcribeFromFile('test.wav'),
+      isA<String>(),
+    );
   });
-  
-  test('transcribeCurrentFileAndParse returns parsed TranscriptionResult', () async {
-    FlutterWhisperkitApple flutterWhisperkitApplePlugin = FlutterWhisperkitApple();
-    MockFlutterWhisperkitApplePlatform fakePlatform = MockFlutterWhisperkitApplePlatform();
+
+  test(
+    'transcribeFromFileAndParse returns parsed TranscriptionResult',
+    () async {
+      FlutterWhisperkitApple flutterWhisperkitApplePlugin =
+          FlutterWhisperkitApple();
+      MockFlutterWhisperkitApplePlatform fakePlatform =
+          MockFlutterWhisperkitApplePlatform();
+      FlutterWhisperkitApplePlatform.instance = fakePlatform;
+
+      final result = await flutterWhisperkitApplePlugin
+          .transcribeFromFileAndParse('test.wav');
+
+      expect(result, isNotNull);
+      expect(result, isA<TranscriptionResult>());
+      expect(result!.segments.length, 2);
+      expect(result.segments[0].text, 'Hello world.');
+      expect(result.segments[1].text, 'This is a test.');
+      expect(result.timings, isNotNull);
+      expect(result.timings!.totalElapsed, 1.0);
+      expect(result.text, 'Hello world. This is a test.');
+    },
+  );
+
+  test('transcribeFromFile with null path returns null', () async {
+    FlutterWhisperkitApple flutterWhisperkitApplePlugin =
+        FlutterWhisperkitApple();
+    MockFlutterWhisperkitApplePlatform fakePlatform =
+        MockFlutterWhisperkitApplePlatform();
     FlutterWhisperkitApplePlatform.instance = fakePlatform;
-    
-    final result = await flutterWhisperkitApplePlugin.transcribeCurrentFileAndParse('test.wav');
-    
-    expect(result, isNotNull);
-    expect(result, isA<TranscriptionResult>());
-    expect(result!.segments.length, 2);
-    expect(result.segments[0].text, 'Hello world.');
-    expect(result.segments[1].text, 'This is a test.');
-    expect(result.timings, isNotNull);
-    expect(result.timings!.totalElapsed, 1.0);
-    expect(result.text, 'Hello world. This is a test.');
-  });
-  
-  test('transcribeCurrentFile with null path returns null', () async {
-    FlutterWhisperkitApple flutterWhisperkitApplePlugin = FlutterWhisperkitApple();
-    MockFlutterWhisperkitApplePlatform fakePlatform = MockFlutterWhisperkitApplePlatform();
-    FlutterWhisperkitApplePlatform.instance = fakePlatform;
-    
-    expect(await flutterWhisperkitApplePlugin.transcribeCurrentFile(null), isNull);
+
+    expect(await flutterWhisperkitApplePlugin.transcribeFromFile(null), isNull);
   });
 }

@@ -31,12 +31,17 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
   Future<String?> createWhisperKit(String? model, String? modelRepo) {
     throw UnimplementedError('createWhisperKit() has not been implemented.');
   }
-  
-  Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation) {
+
+  Future<String?> loadModel(
+    String? variant,
+    String? modelRepo,
+    bool? redownload,
+    int? storageLocation,
+  ) {
     throw UnimplementedError('loadModel() has not been implemented.');
   }
-  
-  Future<String?> transcribeCurrentFile(String? filePath) {
-    throw UnimplementedError('transcribeCurrentFile() has not been implemented.');
+
+  Future<String?> transcribeFromFile(String? filePath) {
+    throw UnimplementedError('transcribeFromFile() has not been implemented.');
   }
 }

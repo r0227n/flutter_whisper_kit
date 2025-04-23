@@ -1,115 +1,140 @@
 import Flutter
+import Foundation
 import UIKit
 import WhisperKit
-import Foundation
 
 enum ModelStorageLocation: Int64 {
-    case packageDirectory = 0
-    case userFolder = 1
+  case packageDirectory = 0
+  case userFolder = 1
 }
 
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
-  
+
   func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void) {
     completion(.success("iOS " + UIDevice.current.systemVersion))
   }
-  
-  func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void) {
+
+  func createWhisperKit(
+    model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void
+  ) {
     Task {
-        do {
-          whisperKit = try await WhisperKit()
-     
-          completion(.success("WhisperKit instance created successfully: \(model ?? "default") \(modelRepo ?? "default")"))
-        } catch {
-          completion(.failure(error))
-        }
+      do {
+        whisperKit = try await WhisperKit()
+
+        completion(
+          .success(
+            "WhisperKit instance created successfully: \(model ?? "default") \(modelRepo ?? "default")"
+          ))
+      } catch {
+        completion(.failure(error))
       }
+    }
   }
-  
-  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void) {
+
+  func loadModel(
+    variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
     guard let variant = variant else {
-      completion(.failure(NSError(domain: "WhisperKitError", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Model variant is required"])))
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 1001,
+            userInfo: [NSLocalizedDescriptionKey: "Model variant is required"])))
       return
     }
-    
-    if let storageLocation = storageLocation, let location = ModelStorageLocation(rawValue: storageLocation) {
+
+    if let storageLocation = storageLocation,
+      let location = ModelStorageLocation(rawValue: storageLocation)
+    {
       modelStorageLocation = location
     }
-    
+
     Task {
       do {
         let modelDirURL = getModelFolderPath()
-        
+
         do {
           if !FileManager.default.fileExists(atPath: modelDirURL.path) {
-            try FileManager.default.createDirectory(at: modelDirURL, withIntermediateDirectories: true, attributes: nil)
+            try FileManager.default.createDirectory(
+              at: modelDirURL, withIntermediateDirectories: true, attributes: nil)
           }
-          
+
           let testFile = modelDirURL.appendingPathComponent("test_write_permission.txt")
           try "test".write(to: testFile, atomically: true, encoding: .utf8)
           try FileManager.default.removeItem(at: testFile)
         } catch {
-          throw NSError(domain: "WhisperKitError", code: 1004, userInfo: [
-            NSLocalizedDescriptionKey: "Cannot write to model directory: \(error.localizedDescription)"
-          ])
+          throw NSError(
+            domain: "WhisperKitError", code: 1004,
+            userInfo: [
+              NSLocalizedDescriptionKey:
+                "Cannot write to model directory: \(error.localizedDescription)"
+            ])
         }
-        
+
         if whisperKit == nil {
           let config = WhisperKitConfig(
-              verbose: true,
-              logLevel: .debug,
-              prewarm: false,
-              load: false,
-              download: false
+            verbose: true,
+            logLevel: .debug,
+            prewarm: false,
+            load: false,
+            download: false
           )
           whisperKit = try await WhisperKit(config)
         }
-        
+
         guard let whisperKit = whisperKit else {
-          throw NSError(domain: "WhisperKitError", code: 1002, userInfo: [
+          throw NSError(
+            domain: "WhisperKitError", code: 1002,
+            userInfo: [
               NSLocalizedDescriptionKey: "Failed to initialize WhisperKit"
-          ])
+            ])
         }
-        
+
         var modelFolder: URL?
         let localModels = await getLocalModels()
-        
+
         if localModels.contains(variant) && !(redownload ?? false) {
           modelFolder = modelDirURL.appendingPathComponent(variant)
         } else {
           let downloadDestination = modelDirURL.appendingPathComponent(variant)
-          
+
           if !FileManager.default.fileExists(atPath: downloadDestination.path) {
-            try FileManager.default.createDirectory(at: downloadDestination, withIntermediateDirectories: true, attributes: nil)
+            try FileManager.default.createDirectory(
+              at: downloadDestination, withIntermediateDirectories: true, attributes: nil)
           }
-          
+
           do {
             modelFolder = try await WhisperKit.download(
-                variant: variant,
-                from: modelRepo ?? "argmaxinc/whisperkit-coreml"
+              variant: variant,
+              from: modelRepo ?? "argmaxinc/whisperkit-coreml"
             )
           } catch {
             print("Download error: \(error.localizedDescription)")
-            throw NSError(domain: "WhisperKitError", code: 1005, userInfo: [
+            throw NSError(
+              domain: "WhisperKitError", code: 1005,
+              userInfo: [
                 NSLocalizedDescriptionKey: "Failed to download model: \(error.localizedDescription)"
-            ])
+              ])
           }
         }
-        
+
         if let folder = modelFolder {
           whisperKit.modelFolder = folder
-          
+
           try await whisperKit.prewarmModels()
-          
+
           try await whisperKit.loadModels()
-          
+
           completion(.success("Model \(variant) loaded successfully"))
         } else {
-          throw NSError(domain: "WhisperKitError", code: 1003, userInfo: [
+          throw NSError(
+            domain: "WhisperKitError", code: 1003,
+            userInfo: [
               NSLocalizedDescriptionKey: "Failed to get model folder"
-          ])
+            ])
         }
       } catch {
         print("LoadModel error: \(error.localizedDescription)")
@@ -117,18 +142,30 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       }
     }
   }
-  
-  func transcribeCurrentFile(filePath: String?, completion: @escaping (Result<String?, Error>) -> Void) {
+
+  func transcribeFromFile(filePath: String?, completion: @escaping (Result<String?, Error>) -> Void)
+  {
     guard let filePath = filePath else {
-      completion(.failure(NSError(domain: "WhisperKitError", code: 2001, userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 2001,
+            userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
       return
     }
-    
+
     guard let whisperKit = whisperKit else {
-      completion(.failure(NSError(domain: "WhisperKitError", code: 2002, userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])))
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 2002,
+            userInfo: [
+              NSLocalizedDescriptionKey:
+                "WhisperKit instance not initialized. Call loadModel first."
+            ])))
       return
     }
-    
+
     Task {
       do {
         print("Loading audio file: \(filePath)")
@@ -139,31 +176,31 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           }
         }.value
         print("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
-        
+
         let transcription = try await whisperKit.transcribe(audioArray: audioFileSamples)
-        
+
         var transcriptionDict: [String: Any] = [:]
-        
+
         if let segments = transcription?.segments {
           var segmentsArray: [[String: Any]] = []
-          
+
           for segment in segments {
             var segmentDict: [String: Any] = [
               "text": segment.text,
               "start": segment.start,
-              "end": segment.end
+              "end": segment.end,
             ]
-            
+
             if let tokens = segment.tokens {
               segmentDict["tokens"] = tokens
             }
-            
+
             segmentsArray.append(segmentDict)
           }
-          
+
           transcriptionDict["segments"] = segmentsArray
         }
-        
+
         if let timings = transcription?.timings {
           transcriptionDict["timings"] = [
             "audioFile": timings.audioFile,
@@ -174,49 +211,60 @@ private class WhisperKitApiImpl: WhisperKitMessage {
             "totalElapsed": timings.totalElapsed,
             "tokensPerSecond": timings.tokensPerSecond,
             "realTimeFactor": timings.realTimeFactor,
-            "speedFactor": timings.speedFactor
+            "speedFactor": timings.speedFactor,
           ]
         }
-        
+
         do {
           let jsonData = try JSONSerialization.data(withJSONObject: transcriptionDict, options: [])
           if let jsonString = String(data: jsonData, encoding: .utf8) {
             completion(.success(jsonString))
           } else {
-            throw NSError(domain: "WhisperKitError", code: 2004, userInfo: [NSLocalizedDescriptionKey: "Failed to create JSON string from transcription result"])
+            throw NSError(
+              domain: "WhisperKitError", code: 2004,
+              userInfo: [
+                NSLocalizedDescriptionKey: "Failed to create JSON string from transcription result"
+              ])
           }
         } catch {
-          throw NSError(domain: "WhisperKitError", code: 2003, userInfo: [NSLocalizedDescriptionKey: "Failed to serialize transcription result: \(error.localizedDescription)"])
+          throw NSError(
+            domain: "WhisperKitError", code: 2003,
+            userInfo: [
+              NSLocalizedDescriptionKey:
+                "Failed to serialize transcription result: \(error.localizedDescription)"
+            ])
         }
       } catch {
-        print("TranscribeCurrentFile error: \(error.localizedDescription)")
+        print("transcribeFromFile error: \(error.localizedDescription)")
         completion(.failure(error))
       }
     }
   }
-  
+
   private func getModelFolderPath() -> URL {
     switch modelStorageLocation {
     case .packageDirectory:
-      if let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+      if let appSupport = FileManager.default.urls(
+        for: .applicationSupportDirectory, in: .userDomainMask
+      ).first {
         return appSupport.appendingPathComponent("WhisperKitModels")
       }
       return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
-        
+
     case .userFolder:
       let documents = getDocumentsDirectory()
       return documents.appendingPathComponent("WhisperKitModels")
     }
   }
-    
+
   private func getDocumentsDirectory() -> URL {
     FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
   }
-    
+
   private func getLocalModels() async -> [String] {
     let modelPath = getModelFolderPath()
     var localModels: [String] = []
-      
+
     do {
       if FileManager.default.fileExists(atPath: modelPath.path) {
         let contents = try FileManager.default.contentsOfDirectory(atPath: modelPath.path)
@@ -225,7 +273,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     } catch {
       print("Error checking local models: \(error.localizedDescription)")
     }
-      
+
     return WhisperKit.formatModelFiles(localModels)
   }
 }
@@ -233,6 +281,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     // Pigeonで生成されたSetupコードを呼び出す
-      WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger(), api: WhisperKitApiImpl())
+    WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger(), api: WhisperKitApiImpl())
   }
 }

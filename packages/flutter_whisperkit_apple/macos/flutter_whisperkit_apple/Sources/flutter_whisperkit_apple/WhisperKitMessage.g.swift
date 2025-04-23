@@ -64,7 +64,6 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
   return value as! T?
 }
 
-
 private class WhisperKitMessagePigeonCodecReader: FlutterStandardReader {
 }
 
@@ -82,25 +81,34 @@ private class WhisperKitMessagePigeonCodecReaderWriter: FlutterStandardReaderWri
 }
 
 class WhisperKitMessagePigeonCodec: FlutterStandardMessageCodec, @unchecked Sendable {
-  static let shared = WhisperKitMessagePigeonCodec(readerWriter: WhisperKitMessagePigeonCodecReaderWriter())
+  static let shared = WhisperKitMessagePigeonCodec(
+    readerWriter: WhisperKitMessagePigeonCodecReaderWriter())
 }
-
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WhisperKitMessage {
   func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void)
-  func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void)
-  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void)
-  func transcribeCurrentFile(filePath: String?, completion: @escaping (Result<String?, Error>) -> Void)
+  func createWhisperKit(
+    model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void)
+  func loadModel(
+    variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
+    completion: @escaping (Result<String?, Error>) -> Void)
+  func transcribeFromFile(filePath: String?, completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
 class WhisperKitMessageSetup {
   static var codec: FlutterStandardMessageCodec { WhisperKitMessagePigeonCodec.shared }
   /// Sets up an instance of `WhisperKitMessage` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: WhisperKitMessage?, messageChannelSuffix: String = "") {
+  static func setUp(
+    binaryMessenger: FlutterBinaryMessenger, api: WhisperKitMessage?,
+    messageChannelSuffix: String = ""
+  ) {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.getPlatformVersion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let getPlatformVersionChannel = FlutterBasicMessageChannel(
+      name:
+        "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.getPlatformVersion\(channelSuffix)",
+      binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       getPlatformVersionChannel.setMessageHandler { _, reply in
         api.getPlatformVersion { result in
@@ -115,7 +123,10 @@ class WhisperKitMessageSetup {
     } else {
       getPlatformVersionChannel.setMessageHandler(nil)
     }
-    let createWhisperKitChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.createWhisperKit\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let createWhisperKitChannel = FlutterBasicMessageChannel(
+      name:
+        "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.createWhisperKit\(channelSuffix)",
+      binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       createWhisperKitChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -133,7 +144,10 @@ class WhisperKitMessageSetup {
     } else {
       createWhisperKitChannel.setMessageHandler(nil)
     }
-    let loadModelChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.loadModel\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let loadModelChannel = FlutterBasicMessageChannel(
+      name:
+        "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.loadModel\(channelSuffix)",
+      binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       loadModelChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -141,7 +155,10 @@ class WhisperKitMessageSetup {
         let modelRepoArg: String? = nilOrValue(args[1])
         let redownloadArg: Bool? = nilOrValue(args[2])
         let storageLocationArg: Int64? = nilOrValue(args[3])
-        api.loadModel(variant: variantArg, modelRepo: modelRepoArg, redownload: redownloadArg, storageLocation: storageLocationArg) { result in
+        api.loadModel(
+          variant: variantArg, modelRepo: modelRepoArg, redownload: redownloadArg,
+          storageLocation: storageLocationArg
+        ) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -153,12 +170,15 @@ class WhisperKitMessageSetup {
     } else {
       loadModelChannel.setMessageHandler(nil)
     }
-    let transcribeCurrentFileChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeCurrentFile\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let transcribeFromFileChannel = FlutterBasicMessageChannel(
+      name:
+        "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeFromFile\(channelSuffix)",
+      binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      transcribeCurrentFileChannel.setMessageHandler { message, reply in
+      transcribeFromFileChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let filePathArg: String? = nilOrValue(args[0])
-        api.transcribeCurrentFile(filePath: filePathArg) { result in
+        api.transcribeFromFile(filePath: filePathArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -168,7 +188,7 @@ class WhisperKitMessageSetup {
         }
       }
     } else {
-      transcribeCurrentFileChannel.setMessageHandler(nil)
+      transcribeFromFileChannel.setMessageHandler(nil)
     }
   }
 }

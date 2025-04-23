@@ -10,7 +10,7 @@ class MethodChannelFlutterWhisperkitApple
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('flutter_whisperkit_apple');
-  
+
   /// The Pigeon-generated API for WhisperKit
   final _whisperKitMessage = WhisperKitMessage();
 
@@ -28,21 +28,31 @@ class MethodChannelFlutterWhisperkitApple
       throw e;
     }
   }
-  
+
   @override
-  Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation) async {
+  Future<String?> loadModel(
+    String? variant,
+    String? modelRepo,
+    bool? redownload,
+    int? storageLocation,
+  ) async {
     try {
-      return _whisperKitMessage.loadModel(variant, modelRepo, redownload, storageLocation);
+      return _whisperKitMessage.loadModel(
+        variant,
+        modelRepo,
+        redownload,
+        storageLocation,
+      );
     } on PlatformException catch (e) {
       debugPrint('Error loading model: ${e.message}');
       throw e;
     }
   }
-  
+
   @override
-  Future<String?> transcribeCurrentFile(String? filePath) async {
+  Future<String?> transcribeFromFile(String? filePath) async {
     try {
-      return _whisperKitMessage.transcribeCurrentFile(filePath);
+      return _whisperKitMessage.transcribeFromFile(filePath);
     } on PlatformException catch (e) {
       debugPrint('Error transcribing file: ${e.message}');
       throw e;

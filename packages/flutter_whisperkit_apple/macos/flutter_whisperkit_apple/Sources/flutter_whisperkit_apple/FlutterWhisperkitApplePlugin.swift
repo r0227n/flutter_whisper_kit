@@ -143,7 +143,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
-  func transcribeCurrentFile(
+  func transcribeFromFile(
     filePath: String?, completion: @escaping (Result<String?, Error>) -> Void
   ) {
     Task {
