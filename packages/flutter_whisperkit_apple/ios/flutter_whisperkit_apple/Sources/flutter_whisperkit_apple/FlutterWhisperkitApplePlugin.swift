@@ -143,7 +143,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
-  func transcribeFromFile(filePath: String?, completion: @escaping (Result<String?, Error>) -> Void)
+  func transcribeFromFile(filePath: String?, options: DecodingOptionsMessage?, completion: @escaping (Result<String?, Error>) -> Void)
   {
     guard let filePath = filePath else {
       completion(
@@ -176,23 +176,150 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           }
         }.value
         print("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
+        
+        var decodingOptions = DecodingOptions()
+        
+        if let options = options {
+          if let task = options.task, task == "translate" {
+            decodingOptions.task = .translate
+          } else {
+            decodingOptions.task = .transcribe
+          }
+          
+          if let language = options.language {
+            decodingOptions.language = language
+          }
+          
+          if let temperature = options.temperature {
+            decodingOptions.temperature = temperature
+          }
+          
+          if let sampleLen = options.sampleLen {
+            decodingOptions.sampleLen = sampleLen
+          }
+          
+          if let bestOf = options.bestOf {
+            decodingOptions.bestOf = bestOf
+          }
+          
+          if let beamSize = options.beamSize {
+            decodingOptions.beamSize = beamSize
+          }
+          
+          if let patience = options.patience {
+            decodingOptions.patience = patience
+          }
+          
+          if let lengthPenalty = options.lengthPenalty {
+            decodingOptions.lengthPenalty = lengthPenalty
+          }
+          
+          if let suppressBlank = options.suppressBlank {
+            decodingOptions.suppressBlank = suppressBlank
+          }
+          
+          if let suppressTokens = options.suppressTokens {
+            decodingOptions.suppressTokens = suppressTokens
+          }
+          
+          if let withoutTimestamps = options.withoutTimestamps {
+            decodingOptions.withoutTimestamps = withoutTimestamps
+          }
+          
+          if let maxInitialTimestamp = options.maxInitialTimestamp {
+            decodingOptions.maxInitialTimestamp = maxInitialTimestamp
+          }
+          
+          if let wordTimestamps = options.wordTimestamps {
+            decodingOptions.wordTimestamps = wordTimestamps
+          }
+          
+          if let prependPunctuations = options.prependPunctuations {
+            decodingOptions.prependPunctuations = prependPunctuations
+          }
+          
+          if let appendPunctuations = options.appendPunctuations {
+            decodingOptions.appendPunctuations = appendPunctuations
+          }
+          
+          if let logProbThreshold = options.logProbThreshold {
+            decodingOptions.logProbThreshold = logProbThreshold
+          }
+          
+          if let noSpeechThreshold = options.noSpeechThreshold {
+            decodingOptions.noSpeechThreshold = noSpeechThreshold
+          }
+          
+          if let compressionRatioThreshold = options.compressionRatioThreshold {
+            decodingOptions.compressionRatioThreshold = compressionRatioThreshold
+          }
+          
+          if let conditionOnPreviousText = options.conditionOnPreviousText {
+            decodingOptions.conditionOnPreviousText = conditionOnPreviousText
+          }
+          
+          if let prompt = options.prompt {
+            decodingOptions.prompt = prompt
+          }
+        }
 
-        let transcription = try await whisperKit.transcribe(audioArray: audioFileSamples)
+        let transcription = try await whisperKit.transcribe(audioArray: audioFileSamples, decodeOptions: decodingOptions)
 
         var transcriptionDict: [String: Any] = [:]
+        
+        if let text = transcription?.text {
+            transcriptionDict["text"] = text
+        }
+        
+        if let language = transcription?.language {
+            transcriptionDict["language"] = language
+        }
 
         if let segments = transcription?.segments {
           var segmentsArray: [[String: Any]] = []
 
           for segment in segments {
             var segmentDict: [String: Any] = [
+              "id": segment.id,
+              "seek": segment.seek,
               "text": segment.text,
               "start": segment.start,
               "end": segment.end,
+              "temperature": segment.temperature,
+              "avgLogprob": segment.avgLogprob,
+              "compressionRatio": segment.compressionRatio,
+              "noSpeechProb": segment.noSpeechProb
             ]
 
             if let tokens = segment.tokens {
               segmentDict["tokens"] = tokens
+            }
+            
+            if let tokenLogProbs = segment.tokenLogProbs {
+                var logProbsArray: [Any] = []
+                for logProbs in tokenLogProbs {
+                    var logProbsDict: [String: Double] = [:]
+                    for (token, prob) in logProbs {
+                        logProbsDict[String(token)] = prob
+                    }
+                    logProbsArray.append(logProbsDict)
+                }
+                segmentDict["tokenLogProbs"] = logProbsArray
+            }
+            
+            if let words = segment.words {
+                var wordsArray: [[String: Any]] = []
+                for word in words {
+                    let wordDict: [String: Any] = [
+                        "word": word.word,
+                        "tokens": word.tokens,
+                        "start": word.start,
+                        "end": word.end,
+                        "probability": word.probability
+                    ]
+                    wordsArray.append(wordDict)
+                }
+                segmentDict["words"] = wordsArray
             }
 
             segmentsArray.append(segmentDict)
@@ -203,16 +330,45 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
         if let timings = transcription?.timings {
           transcriptionDict["timings"] = [
-            "audioFile": timings.audioFile,
-            "featureExtraction": timings.featureExtraction,
-            "model": timings.model,
-            "firstToken": timings.firstToken,
+            "pipelineStart": timings.pipelineStart,
+            "firstTokenTime": timings.firstTokenTime,
+            "inputAudioSeconds": timings.inputAudioSeconds,
+            "modelLoading": timings.modelLoading,
+            "prewarmLoadTime": timings.prewarmLoadTime,
+            "encoderLoadTime": timings.encoderLoadTime,
+            "decoderLoadTime": timings.decoderLoadTime,
+            "encoderSpecializationTime": timings.encoderSpecializationTime,
+            "decoderSpecializationTime": timings.decoderSpecializationTime,
+            "tokenizerLoadTime": timings.tokenizerLoadTime,
+            "audioLoading": timings.audioLoading,
+            "audioProcessing": timings.audioProcessing,
+            "logmels": timings.logmels,
+            "encoding": timings.encoding,
+            "prefill": timings.prefill,
+            "decodingInit": timings.decodingInit,
             "decodingLoop": timings.decodingLoop,
-            "totalElapsed": timings.totalElapsed,
-            "tokensPerSecond": timings.tokensPerSecond,
-            "realTimeFactor": timings.realTimeFactor,
-            "speedFactor": timings.speedFactor,
+            "decodingPredictions": timings.decodingPredictions,
+            "decodingFiltering": timings.decodingFiltering,
+            "decodingSampling": timings.decodingSampling,
+            "decodingFallback": timings.decodingFallback,
+            "decodingWindowing": timings.decodingWindowing,
+            "decodingKvCaching": timings.decodingKvCaching,
+            "decodingWordTimestamps": timings.decodingWordTimestamps,
+            "decodingNonPrediction": timings.decodingNonPrediction,
+            "totalAudioProcessingRuns": timings.totalAudioProcessingRuns,
+            "totalLogmelRuns": timings.totalLogmelRuns,
+            "totalEncodingRuns": timings.totalEncodingRuns,
+            "totalDecodingLoops": timings.totalDecodingLoops,
+            "totalKVUpdateRuns": timings.totalKVUpdateRuns,
+            "totalTimestampAlignmentRuns": timings.totalTimestampAlignmentRuns,
+            "totalDecodingFallbacks": timings.totalDecodingFallbacks,
+            "totalDecodingWindows": timings.totalDecodingWindows,
+            "fullPipeline": timings.fullPipeline
           ]
+        }
+        
+        if let seekTime = transcription?.seekTime {
+            transcriptionDict["seekTime"] = seekTime
         }
 
         do {

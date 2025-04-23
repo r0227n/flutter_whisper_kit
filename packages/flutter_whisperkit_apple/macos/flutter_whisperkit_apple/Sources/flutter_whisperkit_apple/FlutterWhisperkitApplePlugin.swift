@@ -144,8 +144,17 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   }
 
   func transcribeFromFile(
-    filePath: String, completion: @escaping (Result<String?, Error>) -> Void
+    filePath: String?, options: DecodingOptionsMessage?, completion: @escaping (Result<String?, Error>) -> Void
   ) {
+    guard let filePath = filePath else {
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 2001,
+            userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
+      return
+    }
+    
     Task {
       do {
         // Check if file exists and is readable
@@ -174,9 +183,90 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         }.value
         Logging.debug("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
 
-        let transcription: TranscriptionResult? = try await transcribeAudioSamples(audioFileSamples)
+        var decodingOptions = DecodingOptions()
+        
+        if let options = options {
+          if let task = options.task, task == "translate" {
+            decodingOptions.task = .translate
+          } else {
+            decodingOptions.task = .transcribe
+          }
+          
+          if let language = options.language {
+            decodingOptions.language = language
+          }
+          
+          if let temperature = options.temperature {
+            decodingOptions.temperature = Float(temperature)
+          }
+          
+          if let sampleLen = options.sampleLen {
+            decodingOptions.sampleLength = Int(sampleLen)
+          }
+          
+          if let bestOf = options.bestOf {
+            decodingOptions.temperatureFallbackCount = Int(bestOf)
+          }
+          
+          if let beamSize = options.beamSize {
+            decodingOptions.beamSize = Int(beamSize)
+          }
+          
+          if let patience = options.patience {
+            decodingOptions.patience = Float(patience)
+          }
+          
+          if let withoutTimestamps = options.withoutTimestamps {
+            decodingOptions.withoutTimestamps = withoutTimestamps
+          }
+          
+          if let wordTimestamps = options.wordTimestamps {
+            decodingOptions.wordTimestamps = wordTimestamps
+          }
+          
+          if let logProbThreshold = options.logProbThreshold {
+            decodingOptions.logProbThreshold = Float(logProbThreshold)
+          }
+          
+          if let noSpeechThreshold = options.noSpeechThreshold {
+            decodingOptions.noSpeechThreshold = Float(noSpeechThreshold)
+          }
+          
+          if let compressionRatioThreshold = options.compressionRatioThreshold {
+            decodingOptions.compressionRatioThreshold = Float(compressionRatioThreshold)
+          }
+          
+          if let prompt = options.prompt {
+            decodingOptions.prompt = prompt
+          }
+          
+          if let chunkingStrategy = options.chunkingStrategy {
+            if chunkingStrategy == "none" {
+              decodingOptions.chunkingStrategy = .none
+            } else if chunkingStrategy == "vad" {
+              decodingOptions.chunkingStrategy = .vad
+            } else if chunkingStrategy == "length" {
+              decodingOptions.chunkingStrategy = .length
+            }
+          }
+        }
+
+        let transcriptionResults = try await whisperKit?.transcribe(
+          audioArray: audioFileSamples,
+          decodeOptions: decodingOptions
+        )
+        
+        let transcription = mergeTranscriptionResults(transcriptionResults ?? [])
 
         var transcriptionDict: [String: Any] = [:]
+        
+        if let text = transcription?.text {
+            transcriptionDict["text"] = text
+        }
+        
+        if let language = transcription?.language {
+            transcriptionDict["language"] = language
+        }
 
         if let segments: [TranscriptionSegment] = transcription?.segments {
           var segmentsArray: [[String: Any]] = []
@@ -254,6 +344,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
             "totalDecodingWindows": timings.totalDecodingWindows,
             "fullPipeline": timings.fullPipeline,
           ]
+        }
+        
+        if let seekTime = transcription?.seekTime {
+            transcriptionDict["seekTime"] = seekTime
         }
 
         do {
