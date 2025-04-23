@@ -91,7 +91,7 @@ protocol WhisperKitMessage {
   func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void)
   func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void)
   func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void)
-  func transcribeFromFile(filePath: String, options: [AnyHashable?: Any?]?, completion: @escaping (Result<String?, Error>) -> Void)
+  func transcribeFromFile(filePath: String, options: [String: Any?]?, completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -158,7 +158,7 @@ class WhisperKitMessageSetup {
       transcribeFromFileChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let filePathArg = args[0] as! String
-        let optionsArg: [AnyHashable?: Any?]? = nilOrValue(args[1])
+        let optionsArg: [String: Any?]? = nilOrValue(args[1])
         api.transcribeFromFile(filePath: filePathArg, options: optionsArg) { result in
           switch result {
           case .success(let res):
