@@ -48,7 +48,7 @@ class FlutterWhisperkitApple {
   /// [filePath] - The path to the audio file to transcribe.
   ///
   /// Returns a JSON string containing the transcription result with segments and timing information.
-  Future<String?> transcribeFromFile(String? filePath) {
+  Future<String?> transcribeFromFile(String filePath) {
     return FlutterWhisperkitApplePlatform.instance.transcribeFromFile(filePath);
   }
 
@@ -58,7 +58,7 @@ class FlutterWhisperkitApple {
   ///
   /// Returns a [TranscriptionResult] object containing the transcription segments and timing information.
   Future<TranscriptionResult?> transcribeFromFileAndParse(
-    String? filePath,
+    String filePath,
   ) async {
     final jsonString = await transcribeFromFile(filePath);
     if (jsonString == null) return null;

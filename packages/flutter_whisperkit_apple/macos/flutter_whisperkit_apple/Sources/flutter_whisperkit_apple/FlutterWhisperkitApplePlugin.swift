@@ -144,16 +144,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   }
 
   func transcribeFromFile(
-    filePath: String?, completion: @escaping (Result<String?, Error>) -> Void
+    filePath: String, completion: @escaping (Result<String?, Error>) -> Void
   ) {
     Task {
       do {
-        guard let filePath = filePath else {
-          throw NSError(
-            domain: "WhisperKitError", code: 2001,
-            userInfo: [NSLocalizedDescriptionKey: "File path is required"])
-        }
-
         // Check if file exists and is readable
         guard FileManager.default.fileExists(atPath: filePath) else {
           throw NSError(

@@ -22,5 +22,5 @@ abstract class WhisperKitMessage {
     int? storageLocation,
   );
   @async
-  String? transcribeFromFile(String? filePath);
+  String? transcribeFromFile(String filePath);
 }

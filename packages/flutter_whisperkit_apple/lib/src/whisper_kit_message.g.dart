@@ -15,6 +15,7 @@ PlatformException _createConnectionError(String channelName) {
   );
 }
 
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -40,12 +41,9 @@ class WhisperKitMessage {
   /// Constructor for [WhisperKitMessage].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  WhisperKitMessage({
-    BinaryMessenger? binaryMessenger,
-    String messageChannelSuffix = '',
-  }) : pigeonVar_binaryMessenger = binaryMessenger,
-       pigeonVar_messageChannelSuffix =
-           messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  WhisperKitMessage({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+      : pigeonVar_binaryMessenger = binaryMessenger,
+        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -53,14 +51,12 @@ class WhisperKitMessage {
   final String pigeonVar_messageChannelSuffix;
 
   Future<String?> getPlatformVersion() async {
-    final String pigeonVar_channelName =
-        'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.getPlatformVersion$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel =
-        BasicMessageChannel<Object?>(
-          pigeonVar_channelName,
-          pigeonChannelCodec,
-          binaryMessenger: pigeonVar_binaryMessenger,
-        );
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.getPlatformVersion$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -78,17 +74,13 @@ class WhisperKitMessage {
   }
 
   Future<String?> createWhisperKit(String? model, String? modelRepo) async {
-    final String pigeonVar_channelName =
-        'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.createWhisperKit$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel =
-        BasicMessageChannel<Object?>(
-          pigeonVar_channelName,
-          pigeonChannelCodec,
-          binaryMessenger: pigeonVar_binaryMessenger,
-        );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[model, modelRepo],
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.createWhisperKit$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
     );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[model, modelRepo]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -104,23 +96,14 @@ class WhisperKitMessage {
     }
   }
 
-  Future<String?> loadModel(
-    String? variant,
-    String? modelRepo,
-    bool? redownload,
-    int? storageLocation,
-  ) async {
-    final String pigeonVar_channelName =
-        'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.loadModel$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel =
-        BasicMessageChannel<Object?>(
-          pigeonVar_channelName,
-          pigeonChannelCodec,
-          binaryMessenger: pigeonVar_binaryMessenger,
-        );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[variant, modelRepo, redownload, storageLocation],
+  Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.loadModel$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
     );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[variant, modelRepo, redownload, storageLocation]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -136,18 +119,14 @@ class WhisperKitMessage {
     }
   }
 
-  Future<String?> transcribeFromFile(String? filePath) async {
-    final String pigeonVar_channelName =
-        'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeFromFile$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel =
-        BasicMessageChannel<Object?>(
-          pigeonVar_channelName,
-          pigeonChannelCodec,
-          binaryMessenger: pigeonVar_binaryMessenger,
-        );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[filePath],
+  Future<String?> transcribeFromFile(String filePath) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeFromFile$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
     );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[filePath]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {

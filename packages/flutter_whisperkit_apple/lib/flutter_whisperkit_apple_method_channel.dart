@@ -50,7 +50,7 @@ class MethodChannelFlutterWhisperkitApple
   }
 
   @override
-  Future<String?> transcribeFromFile(String? filePath) async {
+  Future<String?> transcribeFromFile(String filePath) async {
     try {
       return _whisperKitMessage.transcribeFromFile(filePath);
     } on PlatformException catch (e) {
