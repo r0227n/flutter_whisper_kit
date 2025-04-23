@@ -1,10 +1,43 @@
 /// Represents the task to perform (transcribe or translate).
 enum DecodingTask { transcribe, translate }
 
+/// Represents the chunking strategy.
 enum ChunkingStrategy { none, vad }
 
 /// Represents options for the transcription process.
 class DecodingOptions {
+  const DecodingOptions({
+    this.verbose = false,
+    this.task = DecodingTask.transcribe,
+    this.language,
+    this.temperature = 0.0,
+    this.temperatureIncrementOnFallback = 0.2,
+    this.temperatureFallbackCount = 5,
+    this.sampleLength = 224,
+    this.topK = 5,
+    this.usePrefillPrompt = false,
+    this.usePrefillCache = false,
+    this.detectLanguage = false,
+    this.skipSpecialTokens = false,
+    this.withoutTimestamps = false,
+    this.wordTimestamps = false,
+    this.maxInitialTimestamp = 1.0,
+    this.clipTimestamps = const [],
+    this.promptTokens = const [],
+    this.prefixTokens = const [],
+    this.suppressBlank = false,
+    this.supressTokens = const [],
+    this.compressionRatioThreshold,
+    this.logProbThreshold = -1.0,
+    this.firstTokenLogProbThreshold = -1.5,
+    this.noSpeechThreshold = 0.6,
+    this.concurrentWorkerCount = 4,
+    this.chunkingStrategy = ChunkingStrategy.vad,
+  });
+
+  /// Whether to print verbose output.
+  final bool verbose;
+
   /// The task to perform (transcribe or translate).
   final DecodingTask task;
 
@@ -14,83 +47,76 @@ class DecodingOptions {
   /// The temperature to use for sampling.
   final double temperature;
 
+  /// The temperature increment on fallback.
+  final double temperatureIncrementOnFallback;
+
+  /// The number of temperature fallback count.
+  final int temperatureFallbackCount;
+
   /// The number of samples to consider for each token.
-  final int sampleLen;
+  final int sampleLength;
 
-  /// The best of n samples to consider.
-  final int bestOf;
+  /// The top k samples to consider.
+  final int topK;
 
-  /// The patience value for beam search.
-  final double patience;
+  /// Whether to use prefill prompt.
+  final bool usePrefillPrompt;
 
-  /// The length penalty for beam search.
-  final double lengthPenalty;
+  /// Whether to use prefill cache.
+  final bool usePrefillCache;
 
-  /// Whether to suppress blank tokens.
-  final bool suppressBlank;
+  /// Whether to detect language.
+  final bool detectLanguage;
 
-  /// Whether to suppress tokens that are not in the prompt.
-  final bool suppressTokens;
+  /// Whether to skip special tokens.
+  final bool skipSpecialTokens;
 
   /// Whether to add initial prompt.
   final bool withoutTimestamps;
 
-  /// The maximum initial timestamp.
-  final double maxInitialTimestamp;
-
   /// The word timestamps flag.
   final bool wordTimestamps;
 
-  /// The prepend punctuations.
-  final String prependPunctuations;
+  /// The maximum initial timestamp.
+  final double maxInitialTimestamp;
 
-  /// The append punctuations.
-  final String appendPunctuations;
+  /// The clip timestamps.
+  final List<double> clipTimestamps;
 
-  /// The log probability threshold.
-  final double? logProbThreshold;
+  /// The prompt tokens.
+  final List<int> promptTokens;
 
-  /// The no speech threshold.
-  final double? noSpeechThreshold;
+  /// The prefix tokens.
+  final List<int> prefixTokens;
+
+  /// Whether to suppress blank tokens.
+  final bool suppressBlank;
+
+  /// The suppress tokens.
+  final List<int> supressTokens;
 
   /// The compression ratio threshold.
   final double? compressionRatioThreshold;
 
-  /// The condition on previous text.
-  final String? conditionOnPreviousText;
+  /// The log probability threshold.
+  final double? logProbThreshold;
 
-  /// The prompt text.
-  final String? prompt;
+  /// The first token log probability threshold.
+  final double? firstTokenLogProbThreshold;
+
+  /// The no speech threshold.
+  final double? noSpeechThreshold;
+
+  /// The concurrent worker count.
+  final int concurrentWorkerCount;
 
   /// The chunking strategy.
   final ChunkingStrategy? chunkingStrategy;
 
-  DecodingOptions({
-    this.task = DecodingTask.transcribe,
-    this.language,
-    this.temperature = 0.0,
-    this.sampleLen = 224,
-    this.bestOf = 1,
-    this.patience = 1.0,
-    this.lengthPenalty = 1.0,
-    this.suppressBlank = false,
-    this.suppressTokens = false,
-    this.withoutTimestamps = false,
-    this.maxInitialTimestamp = 1.0,
-    this.wordTimestamps = false,
-    this.prependPunctuations = '"\'"¿([{-',
-    this.appendPunctuations = '"\'.。,，!！?？:：")]}、',
-    this.logProbThreshold,
-    this.noSpeechThreshold,
-    this.compressionRatioThreshold,
-    this.conditionOnPreviousText,
-    this.prompt,
-    this.chunkingStrategy,
-  });
-
   /// Creates a [DecodingOptions] from a JSON map.
   factory DecodingOptions.fromJson(Map<String, dynamic> json) {
     return DecodingOptions(
+      verbose: json['verbose'] as bool? ?? false,
       task:
           json['task'] == 'translate'
               ? DecodingTask.translate
@@ -100,40 +126,47 @@ class DecodingOptions {
           json['temperature'] != null
               ? (json['temperature'] as num).toDouble()
               : 0.0,
-      sampleLen: json['sampleLen'] as int? ?? 224,
-      bestOf: json['bestOf'] as int? ?? 1,
-      patience:
-          json['patience'] != null ? (json['patience'] as num).toDouble() : 1.0,
-      lengthPenalty:
-          json['lengthPenalty'] != null
-              ? (json['lengthPenalty'] as num).toDouble()
-              : 1.0,
-      suppressBlank: json['suppressBlank'] as bool? ?? false,
-      suppressTokens: json['suppressTokens'] as bool? ?? false,
+      temperatureIncrementOnFallback:
+          json['temperatureIncrementOnFallback'] != null
+              ? (json['temperatureIncrementOnFallback'] as num).toDouble()
+              : 0.2,
+      temperatureFallbackCount: json['temperatureFallbackCount'] as int? ?? 5,
+      sampleLength: json['sampleLength'] as int? ?? 224,
+      topK: json['topK'] as int? ?? 5,
+      usePrefillPrompt: json['usePrefillPrompt'] as bool? ?? false,
+      usePrefillCache: json['usePrefillCache'] as bool? ?? false,
+      detectLanguage: json['detectLanguage'] as bool? ?? false,
+      skipSpecialTokens: json['skipSpecialTokens'] as bool? ?? false,
       withoutTimestamps: json['withoutTimestamps'] as bool? ?? false,
+      wordTimestamps: json['wordTimestamps'] as bool? ?? false,
       maxInitialTimestamp:
           json['maxInitialTimestamp'] != null
               ? (json['maxInitialTimestamp'] as num).toDouble()
               : 1.0,
-      wordTimestamps: json['wordTimestamps'] as bool? ?? false,
-      prependPunctuations:
-          json['prependPunctuations'] as String? ?? '"\'"¿([{-',
-      appendPunctuations:
-          json['appendPunctuations'] as String? ?? '"\'.。,，!！?？:：")]}、',
+      clipTimestamps:
+          (json['clipTimestamps'] as List<dynamic>?)?.cast<double>() ?? [],
+      promptTokens: (json['promptTokens'] as List<dynamic>?)?.cast<int>() ?? [],
+      prefixTokens: (json['prefixTokens'] as List<dynamic>?)?.cast<int>() ?? [],
+      suppressBlank: json['suppressBlank'] as bool? ?? false,
+      supressTokens:
+          (json['supressTokens'] as List<dynamic>?)?.cast<int>() ?? [],
+      compressionRatioThreshold:
+          json['compressionRatioThreshold'] != null
+              ? (json['compressionRatioThreshold'] as num).toDouble()
+              : null,
       logProbThreshold:
           json['logProbThreshold'] != null
               ? (json['logProbThreshold'] as num).toDouble()
+              : null,
+      firstTokenLogProbThreshold:
+          json['firstTokenLogProbThreshold'] != null
+              ? (json['firstTokenLogProbThreshold'] as num).toDouble()
               : null,
       noSpeechThreshold:
           json['noSpeechThreshold'] != null
               ? (json['noSpeechThreshold'] as num).toDouble()
               : null,
-      compressionRatioThreshold:
-          json['compressionRatioThreshold'] != null
-              ? (json['compressionRatioThreshold'] as num).toDouble()
-              : null,
-      conditionOnPreviousText: json['conditionOnPreviousText'] as String?,
-      prompt: json['prompt'] as String?,
+      concurrentWorkerCount: json['concurrentWorkerCount'] as int? ?? 4,
       chunkingStrategy:
           json['chunkingStrategy'] == 'vad'
               ? ChunkingStrategy.vad
@@ -144,28 +177,33 @@ class DecodingOptions {
   /// Converts this [DecodingOptions] to a JSON map.
   Map<String, dynamic> toJson() {
     return {
+      'verbose': verbose,
       'task': task == DecodingTask.translate ? 'translate' : 'transcribe',
-      if (language != null) 'language': language,
+      'language': language,
       'temperature': temperature,
-      'sampleLen': sampleLen,
-      'bestOf': bestOf,
-      'patience': patience,
-      'lengthPenalty': lengthPenalty,
-      'suppressBlank': suppressBlank,
-      'suppressTokens': suppressTokens,
+      'temperatureIncrementOnFallback': temperatureIncrementOnFallback,
+      'temperatureFallbackCount': temperatureFallbackCount,
+      'sampleLength': sampleLength,
+      'topK': topK,
+      'usePrefillPrompt': usePrefillPrompt,
+      'usePrefillCache': usePrefillCache,
+      'detectLanguage': detectLanguage,
+      'skipSpecialTokens': skipSpecialTokens,
       'withoutTimestamps': withoutTimestamps,
-      'maxInitialTimestamp': maxInitialTimestamp,
       'wordTimestamps': wordTimestamps,
-      'prependPunctuations': prependPunctuations,
-      'appendPunctuations': appendPunctuations,
-      if (logProbThreshold != null) 'logProbThreshold': logProbThreshold,
-      if (noSpeechThreshold != null) 'noSpeechThreshold': noSpeechThreshold,
-      if (compressionRatioThreshold != null)
-        'compressionRatioThreshold': compressionRatioThreshold,
-      if (conditionOnPreviousText != null)
-        'conditionOnPreviousText': conditionOnPreviousText,
-      if (prompt != null) 'prompt': prompt,
-      if (chunkingStrategy != null) 'chunkingStrategy': chunkingStrategy,
+      'maxInitialTimestamp': maxInitialTimestamp,
+      'clipTimestamps': clipTimestamps,
+      'promptTokens': promptTokens,
+      'prefixTokens': prefixTokens,
+      'suppressBlank': suppressBlank,
+      'supressTokens': supressTokens,
+      'compressionRatioThreshold': compressionRatioThreshold,
+      'logProbThreshold': logProbThreshold,
+      'firstTokenLogProbThreshold': firstTokenLogProbThreshold,
+      'noSpeechThreshold': noSpeechThreshold,
+      'concurrentWorkerCount': concurrentWorkerCount,
+      'chunkingStrategy':
+          chunkingStrategy == ChunkingStrategy.vad ? 'vad' : 'none',
     };
   }
 }
