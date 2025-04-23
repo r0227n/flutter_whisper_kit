@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
+import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
 import 'package:flutter_whisperkit_apple/src/models/transcription_result.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -26,10 +27,10 @@ class MockFlutterWhisperkitApplePlatform
 
   @override
   Future<String?> transcribeFromFile(
-    String? filePath,
-    Map<String, dynamic>? options,
+    String filePath,
+    DecodingOptions? options,
   ) {
-    if (filePath == null || filePath.isEmpty) {
+    if (filePath.isEmpty) {
       return Future.value(null);
     }
 
@@ -116,12 +117,12 @@ void main() {
         MockFlutterWhisperkitApplePlatform();
     FlutterWhisperkitApplePlatform.instance = fakePlatform;
 
-    final options = FlutterWhisperkitApple.createDecodingOptionsMap(
+    final options = DecodingOptions(
       language: 'en',
       temperature: 0.7,
       wordTimestamps: true,
     );
-
+    
     expect(
       await flutterWhisperkitApplePlugin.transcribeFromFile(
         'test.wav',
@@ -171,12 +172,12 @@ void main() {
           MockFlutterWhisperkitApplePlatform();
       FlutterWhisperkitApplePlatform.instance = fakePlatform;
 
-      final options = FlutterWhisperkitApple.createDecodingOptionsMap(
+      final options = DecodingOptions(
         language: 'en',
         temperature: 0.7,
         wordTimestamps: true,
       );
-
+      
       final result = await flutterWhisperkitApplePlugin
           .transcribeFromFileAndParse('test.wav', options: options);
 
@@ -203,9 +204,9 @@ void main() {
     expect(await flutterWhisperkitApplePlugin.transcribeFromFile(''), isNull);
   });
 
-  test('createDecodingOptionsMap creates correct map', () {
-    final options = FlutterWhisperkitApple.createDecodingOptionsMap(
-      task: 'transcribe',
+  test('DecodingOptions creates correct options object', () {
+    final options = DecodingOptions(
+      task: DecodingTask.transcribe,
       language: 'en',
       temperature: 0.7,
       sampleLen: 100,
@@ -224,29 +225,36 @@ void main() {
       compressionRatioThreshold: 2.4,
       conditionOnPreviousText: 'previous text',
       prompt: 'prompt',
-      chunkingStrategy: 'fixed',
+      chunkingStrategy: ChunkingStrategy.none,
     );
-
-    expect(options, isA<Map<String, dynamic>>());
-    expect(options['task'], 'transcribe');
-    expect(options['language'], 'en');
-    expect(options['temperature'], 0.7);
-    expect(options['sampleLen'], 100);
-    expect(options['bestOf'], 5);
-    expect(options['patience'], 1.0);
-    expect(options['lengthPenalty'], 1.0);
-    expect(options['suppressBlank'], true);
-    expect(options['suppressTokens'], true);
-    expect(options['withoutTimestamps'], false);
-    expect(options['maxInitialTimestamp'], 1.0);
-    expect(options['wordTimestamps'], true);
-    expect(options['prependPunctuations'], '.,?!');
-    expect(options['appendPunctuations'], '.,?!');
-    expect(options['logProbThreshold'], -1.0);
-    expect(options['noSpeechThreshold'], 0.6);
-    expect(options['compressionRatioThreshold'], 2.4);
-    expect(options['conditionOnPreviousText'], 'previous text');
-    expect(options['prompt'], 'prompt');
-    expect(options['chunkingStrategy'], 'fixed');
+    
+    expect(options, isA<DecodingOptions>());
+    expect(options.task, DecodingTask.transcribe);
+    expect(options.language, 'en');
+    expect(options.temperature, 0.7);
+    expect(options.sampleLen, 100);
+    expect(options.bestOf, 5);
+    expect(options.patience, 1.0);
+    expect(options.lengthPenalty, 1.0);
+    expect(options.suppressBlank, true);
+    expect(options.suppressTokens, true);
+    expect(options.withoutTimestamps, false);
+    expect(options.maxInitialTimestamp, 1.0);
+    expect(options.wordTimestamps, true);
+    expect(options.prependPunctuations, '.,?!');
+    expect(options.appendPunctuations, '.,?!');
+    expect(options.logProbThreshold, -1.0);
+    expect(options.noSpeechThreshold, 0.6);
+    expect(options.compressionRatioThreshold, 2.4);
+    expect(options.conditionOnPreviousText, 'previous text');
+    expect(options.prompt, 'prompt');
+    expect(options.chunkingStrategy, ChunkingStrategy.none);
+    
+    // Test toJson method
+    final json = options.toJson();
+    expect(json, isA<Map<String, dynamic>>());
+    expect(json['task'], 'transcribe');
+    expect(json['language'], 'en');
+    expect(json['temperature'], 0.7);
   });
 }

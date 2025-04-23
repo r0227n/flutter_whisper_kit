@@ -3,6 +3,7 @@ import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit_apple/model_loader.dart';
+import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockFlutterWhisperkitApplePlatform
@@ -24,7 +25,7 @@ class MockFlutterWhisperkitApplePlatform
   ) => Future.value('Model loaded successfully');
 
   @override
-  Future<String?> transcribeFromFile(String? filePath, Map<String, dynamic>? options) =>
+  Future<String?> transcribeFromFile(String filePath, DecodingOptions? options) =>
       Future.value('{"text":"Test transcription","segments":[{"text":"Test transcription"}],"language":"en","timings":{}}');
 }
 
