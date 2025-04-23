@@ -209,9 +209,29 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   // }
 
   func transcribeFromFile(
-    filePath: String, options: [AnyHashable?: Any?]?,
-    completion: @escaping (Result<String?, Error>) -> Void
+    filePath: String?, options: [AnyHashable?: Any]?, completion: @escaping (Result<String?, Error>) -> Void
   ) {
+    guard let filePath = filePath else {
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 2001,
+            userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
+      return
+    }
+    
+    guard let whisperKit = whisperKit else {
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 2002,
+            userInfo: [
+              NSLocalizedDescriptionKey:
+                "WhisperKit instance not initialized. Call loadModel first."
+            ])))
+      return
+    }
+    
     Task {
       do {
         // Check if file exists and is readable
@@ -240,16 +260,161 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         }.value
         Logging.debug("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
 
-        // TODO: options -> DecodingOptions に変換するfunction作成する
-        let transcription: TranscriptionResult? = try await transcribeAudioSamples(
-          audioFileSamples,
-          options: nil,
-          //  options: options,
+        var decodingOptions = DecodingOptions()
+        
+        if let options = options {
+          // Check if options contains a DecodingOptions property
+          if let decodingOptionsDict = options["decodingOptions"] as? [String: Any] {
+            // Convert the dictionary to DecodingOptions
+            if let task = decodingOptionsDict["task"] as? String {
+              if task == "translate" {
+                decodingOptions.task = .translate
+              } else {
+                decodingOptions.task = .transcribe
+              }
+            }
+            
+            if let language = decodingOptionsDict["language"] as? String {
+              decodingOptions.language = language
+            }
+            
+            if let temperature = decodingOptionsDict["temperature"] as? Double {
+              decodingOptions.temperature = Float(temperature)
+            }
+            
+            if let sampleLen = decodingOptionsDict["sampleLen"] as? Int {
+              decodingOptions.sampleLength = Int(sampleLen)
+            }
+            
+            if let bestOf = decodingOptionsDict["bestOf"] as? Int {
+              decodingOptions.temperatureFallbackCount = Int(bestOf)
+            }
+            
+            if let beamSize = decodingOptionsDict["beamSize"] as? Int {
+              decodingOptions.beamSize = Int(beamSize)
+            }
+            
+            if let patience = decodingOptionsDict["patience"] as? Double {
+              decodingOptions.patience = Float(patience)
+            }
+            
+            if let withoutTimestamps = decodingOptionsDict["withoutTimestamps"] as? Bool {
+              decodingOptions.withoutTimestamps = withoutTimestamps
+            }
+            
+            if let wordTimestamps = decodingOptionsDict["wordTimestamps"] as? Bool {
+              decodingOptions.wordTimestamps = wordTimestamps
+            }
+            
+            if let logProbThreshold = decodingOptionsDict["logProbThreshold"] as? Double {
+              decodingOptions.logProbThreshold = Float(logProbThreshold)
+            }
+            
+            if let noSpeechThreshold = decodingOptionsDict["noSpeechThreshold"] as? Double {
+              decodingOptions.noSpeechThreshold = Float(noSpeechThreshold)
+            }
+            
+            if let compressionRatioThreshold = decodingOptionsDict["compressionRatioThreshold"] as? Double {
+              decodingOptions.compressionRatioThreshold = Float(compressionRatioThreshold)
+            }
+            
+            if let prompt = decodingOptionsDict["prompt"] as? String {
+              decodingOptions.prompt = prompt
+            }
+            
+            if let chunkingStrategy = decodingOptionsDict["chunkingStrategy"] as? String {
+              if chunkingStrategy == "none" {
+                decodingOptions.chunkingStrategy = .none
+              } else if chunkingStrategy == "vad" {
+                decodingOptions.chunkingStrategy = .vad
+              } else if chunkingStrategy == "length" {
+                decodingOptions.chunkingStrategy = .length
+              }
+            }
+          } else {
+            for (key, value) in options {
+              if let key = key as? String {
+                switch key {
+                case "task":
+                  if let task = value as? String, task == "translate" {
+                    decodingOptions.task = .translate
+                  } else {
+                    decodingOptions.task = .transcribe
+                  }
+                case "language":
+                  if let language = value as? String {
+                    decodingOptions.language = language
+                  }
+                case "temperature":
+                  if let temperature = value as? Double {
+                    decodingOptions.temperature = Float(temperature)
+                  }
+                case "sampleLen":
+                  if let sampleLen = value as? Int {
+                    decodingOptions.sampleLength = Int(sampleLen)
+                  }
+                case "bestOf":
+                  if let bestOf = value as? Int {
+                    decodingOptions.temperatureFallbackCount = Int(bestOf)
+                  }
+                case "beamSize":
+                  if let beamSize = value as? Int {
+                    decodingOptions.beamSize = Int(beamSize)
+                  }
+                case "patience":
+                  if let patience = value as? Double {
+                    decodingOptions.patience = Float(patience)
+                  }
+                case "withoutTimestamps":
+                  if let withoutTimestamps = value as? Bool {
+                    decodingOptions.withoutTimestamps = withoutTimestamps
+                  }
+                case "wordTimestamps":
+                  if let wordTimestamps = value as? Bool {
+                    decodingOptions.wordTimestamps = wordTimestamps
+                  }
+                case "logProbThreshold":
+                  if let logProbThreshold = value as? Double {
+                    decodingOptions.logProbThreshold = Float(logProbThreshold)
+                  }
+                case "noSpeechThreshold":
+                  if let noSpeechThreshold = value as? Double {
+                    decodingOptions.noSpeechThreshold = Float(noSpeechThreshold)
+                  }
+                case "compressionRatioThreshold":
+                  if let compressionRatioThreshold = value as? Double {
+                    decodingOptions.compressionRatioThreshold = Float(compressionRatioThreshold)
+                  }
+                case "prompt":
+                  if let prompt = value as? String {
+                    decodingOptions.prompt = prompt
+                  }
+                case "chunkingStrategy":
+                  if let chunkingStrategy = value as? String {
+                    if chunkingStrategy == "none" {
+                      decodingOptions.chunkingStrategy = .none
+                    } else if chunkingStrategy == "vad" {
+                      decodingOptions.chunkingStrategy = .vad
+                    } else if chunkingStrategy == "length" {
+                      decodingOptions.chunkingStrategy = .length
+                    }
+                  }
+                default:
+                  break
+                }
+              }
+            }
+          }
+        }
+
+        let transcriptionResults = try await whisperKit.transcribe(
+          audioArray: audioFileSamples,
+          decodeOptions: decodingOptions
         )
 
         var transcriptionDict: [String: Any] = [:]
 
-        if let segments: [TranscriptionSegment] = transcription?.segments {
+        if let segments: [TranscriptionSegment] = transcriptionResults.segments {
           var segmentsArray: [[String: Any]] = []
 
           for segment in segments {
@@ -288,7 +453,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           transcriptionDict["segments"] = segmentsArray
         }
 
-        if let timings: TranscriptionTimings = transcription?.timings {
+        if let timings: TranscriptionTimings = transcriptionResults.timings {
           transcriptionDict["timings"] = [
             "pipelineStart": timings.pipelineStart,
             "firstTokenTime": timings.firstTokenTime,
@@ -507,6 +672,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     // Pigeonで生成されたSetupコードを呼び出す
-    WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger, api: WhisperKitApiImpl())
+    WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger(), api: WhisperKitApiImpl())
   }
 }

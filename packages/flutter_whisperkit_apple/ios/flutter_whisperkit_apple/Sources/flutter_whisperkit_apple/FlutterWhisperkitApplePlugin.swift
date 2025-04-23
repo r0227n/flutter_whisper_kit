@@ -143,10 +143,8 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
-  func transcribeFromFile(
-    filePath: String?, options: DecodingOptionsMessage?,
-    completion: @escaping (Result<String?, Error>) -> Void
-  ) {
+  func transcribeFromFile(filePath: String?, options: [AnyHashable?: Any]?, completion: @escaping (Result<String?, Error>) -> Void)
+  {
     guard let filePath = filePath else {
       completion(
         .failure(
@@ -155,7 +153,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
             userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
       return
     }
-
+    
     guard let whisperKit = whisperKit else {
       completion(
         .failure(
@@ -167,7 +165,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
             ])))
       return
     }
-
+    
     Task {
       do {
         print("Loading audio file: \(filePath)")
@@ -182,82 +180,181 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         var decodingOptions = DecodingOptions()
 
         if let options = options {
-          if let task = options.task, task == "translate" {
-            decodingOptions.task = .translate
+          if let decodingOptionsDict = options["decodingOptions"] as? [String: Any] {
+            if let task = decodingOptionsDict["task"] as? String {
+              if task == "translate" {
+                decodingOptions.task = .translate
+              } else {
+                decodingOptions.task = .transcribe
+              }
+            }
+            
+            if let language = decodingOptionsDict["language"] as? String {
+              decodingOptions.language = language
+            }
+            
+            if let temperature = decodingOptionsDict["temperature"] as? Double {
+              decodingOptions.temperature = temperature
+            }
+            
+            if let sampleLen = decodingOptionsDict["sampleLen"] as? Int {
+              decodingOptions.sampleLen = sampleLen
+            }
+            
+            if let bestOf = decodingOptionsDict["bestOf"] as? Int {
+              decodingOptions.bestOf = bestOf
+            }
+            
+            if let beamSize = decodingOptionsDict["beamSize"] as? Int {
+              decodingOptions.beamSize = beamSize
+            }
+            
+            if let patience = decodingOptionsDict["patience"] as? Double {
+              decodingOptions.patience = patience
+            }
+            
+            if let lengthPenalty = decodingOptionsDict["lengthPenalty"] as? Double {
+              decodingOptions.lengthPenalty = lengthPenalty
+            }
+            
+            if let suppressBlank = decodingOptionsDict["suppressBlank"] as? Bool {
+              decodingOptions.suppressBlank = suppressBlank
+            }
+            
+            if let suppressTokens = decodingOptionsDict["suppressTokens"] as? Bool {
+              decodingOptions.suppressTokens = suppressTokens
+            }
+            
+            if let withoutTimestamps = decodingOptionsDict["withoutTimestamps"] as? Bool {
+              decodingOptions.withoutTimestamps = withoutTimestamps
+            }
+            
+            if let maxInitialTimestamp = decodingOptionsDict["maxInitialTimestamp"] as? Double {
+              decodingOptions.maxInitialTimestamp = maxInitialTimestamp
+            }
+            
+            if let wordTimestamps = decodingOptionsDict["wordTimestamps"] as? Bool {
+              decodingOptions.wordTimestamps = wordTimestamps
+            }
+            
+            if let prependPunctuations = decodingOptionsDict["prependPunctuations"] as? String {
+              decodingOptions.prependPunctuations = prependPunctuations
+            }
+            
+            if let appendPunctuations = decodingOptionsDict["appendPunctuations"] as? String {
+              decodingOptions.appendPunctuations = appendPunctuations
+            }
+            
+            if let logProbThreshold = decodingOptionsDict["logProbThreshold"] as? Double {
+              decodingOptions.logProbThreshold = logProbThreshold
+            }
+            
+            if let noSpeechThreshold = decodingOptionsDict["noSpeechThreshold"] as? Double {
+              decodingOptions.noSpeechThreshold = noSpeechThreshold
+            }
+            
+            if let compressionRatioThreshold = decodingOptionsDict["compressionRatioThreshold"] as? Double {
+              decodingOptions.compressionRatioThreshold = compressionRatioThreshold
+            }
+            
+            if let conditionOnPreviousText = decodingOptionsDict["conditionOnPreviousText"] as? String {
+              decodingOptions.conditionOnPreviousText = conditionOnPreviousText
+            }
+            
+            if let prompt = decodingOptionsDict["prompt"] as? String {
+              decodingOptions.prompt = prompt
+            }
           } else {
-            decodingOptions.task = .transcribe
-          }
-
-          if let language = options.language {
-            decodingOptions.language = language
-          }
-
-          if let temperature = options.temperature {
-            decodingOptions.temperature = temperature
-          }
-
-          if let sampleLen = options.sampleLen {
-            decodingOptions.sampleLen = sampleLen
-          }
-
-          if let bestOf = options.bestOf {
-            decodingOptions.bestOf = bestOf
-          }
-
-          if let patience = options.patience {
-            decodingOptions.patience = patience
-          }
-
-          if let lengthPenalty = options.lengthPenalty {
-            decodingOptions.lengthPenalty = lengthPenalty
-          }
-
-          if let suppressBlank = options.suppressBlank {
-            decodingOptions.suppressBlank = suppressBlank
-          }
-
-          if let suppressTokens = options.suppressTokens {
-            decodingOptions.suppressTokens = suppressTokens
-          }
-
-          if let withoutTimestamps = options.withoutTimestamps {
-            decodingOptions.withoutTimestamps = withoutTimestamps
-          }
-
-          if let maxInitialTimestamp = options.maxInitialTimestamp {
-            decodingOptions.maxInitialTimestamp = maxInitialTimestamp
-          }
-
-          if let wordTimestamps = options.wordTimestamps {
-            decodingOptions.wordTimestamps = wordTimestamps
-          }
-
-          if let prependPunctuations = options.prependPunctuations {
-            decodingOptions.prependPunctuations = prependPunctuations
-          }
-
-          if let appendPunctuations = options.appendPunctuations {
-            decodingOptions.appendPunctuations = appendPunctuations
-          }
-
-          if let logProbThreshold = options.logProbThreshold {
-            decodingOptions.logProbThreshold = logProbThreshold
-          }
-
-          if let noSpeechThreshold = options.noSpeechThreshold {
-            decodingOptions.noSpeechThreshold = noSpeechThreshold
-          }
-
-          if let compressionRatioThreshold = options.compressionRatioThreshold {
-            decodingOptions.compressionRatioThreshold = compressionRatioThreshold
-          }
-
-          if let conditionOnPreviousText = options.conditionOnPreviousText {
-            decodingOptions.conditionOnPreviousText = conditionOnPreviousText
-          }
-
-          if let prompt = options.prompt {
-            decodingOptions.prompt = prompt
+            for (key, value) in options {
+              if let key = key as? String {
+                switch key {
+                case "task":
+                  if let task = value as? String, task == "translate" {
+                    decodingOptions.task = .translate
+                  } else {
+                    decodingOptions.task = .transcribe
+                  }
+                case "language":
+                  if let language = value as? String {
+                    decodingOptions.language = language
+                  }
+                case "temperature":
+                  if let temperature = value as? Double {
+                    decodingOptions.temperature = temperature
+                  }
+                case "sampleLen":
+                  if let sampleLen = value as? Int {
+                    decodingOptions.sampleLen = sampleLen
+                  }
+                case "bestOf":
+                  if let bestOf = value as? Int {
+                    decodingOptions.bestOf = bestOf
+                  }
+                case "beamSize":
+                  if let beamSize = value as? Int {
+                    decodingOptions.beamSize = beamSize
+                  }
+                case "patience":
+                  if let patience = value as? Double {
+                    decodingOptions.patience = patience
+                  }
+                case "lengthPenalty":
+                  if let lengthPenalty = value as? Double {
+                    decodingOptions.lengthPenalty = lengthPenalty
+                  }
+                case "suppressBlank":
+                  if let suppressBlank = value as? Bool {
+                    decodingOptions.suppressBlank = suppressBlank
+                  }
+                case "suppressTokens":
+                  if let suppressTokens = value as? Bool {
+                    decodingOptions.suppressTokens = suppressTokens
+                  }
+                case "withoutTimestamps":
+                  if let withoutTimestamps = value as? Bool {
+                    decodingOptions.withoutTimestamps = withoutTimestamps
+                  }
+                case "maxInitialTimestamp":
+                  if let maxInitialTimestamp = value as? Double {
+                    decodingOptions.maxInitialTimestamp = maxInitialTimestamp
+                  }
+                case "wordTimestamps":
+                  if let wordTimestamps = value as? Bool {
+                    decodingOptions.wordTimestamps = wordTimestamps
+                  }
+                case "prependPunctuations":
+                  if let prependPunctuations = value as? String {
+                    decodingOptions.prependPunctuations = prependPunctuations
+                  }
+                case "appendPunctuations":
+                  if let appendPunctuations = value as? String {
+                    decodingOptions.appendPunctuations = appendPunctuations
+                  }
+                case "logProbThreshold":
+                  if let logProbThreshold = value as? Double {
+                    decodingOptions.logProbThreshold = logProbThreshold
+                  }
+                case "noSpeechThreshold":
+                  if let noSpeechThreshold = value as? Double {
+                    decodingOptions.noSpeechThreshold = noSpeechThreshold
+                  }
+                case "compressionRatioThreshold":
+                  if let compressionRatioThreshold = value as? Double {
+                    decodingOptions.compressionRatioThreshold = compressionRatioThreshold
+                  }
+                case "conditionOnPreviousText":
+                  if let conditionOnPreviousText = value as? String {
+                    decodingOptions.conditionOnPreviousText = conditionOnPreviousText
+                  }
+                case "prompt":
+                  if let prompt = value as? String {
+                    decodingOptions.prompt = prompt
+                  }
+                default:
+                  break
+                }
+              }
+            }
           }
         }
 
