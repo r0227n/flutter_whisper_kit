@@ -24,8 +24,8 @@ class MockFlutterWhisperkitApplePlatform
   ) => Future.value('Model loaded successfully');
 
   @override
-  Future<String?> transcribeFromFile(String? filePath) =>
-      Future.value('{"segments":[{"text":"Test transcription"}]}');
+  Future<String?> transcribeFromFile(String? filePath, Map<String, dynamic>? options) =>
+      Future.value('{"text":"Test transcription","segments":[{"text":"Test transcription"}],"language":"en","timings":{}}');
 }
 
 void main() {

@@ -41,7 +41,7 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
     throw UnimplementedError('loadModel() has not been implemented.');
   }
 
-  Future<String?> transcribeFromFile(String filePath) {
+  Future<String?> transcribeFromFile(String? filePath, Map<String, dynamic>? options) {
     throw UnimplementedError('transcribeFromFile() has not been implemented.');
   }
 }

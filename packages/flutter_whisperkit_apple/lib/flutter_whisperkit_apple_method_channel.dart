@@ -50,9 +50,37 @@ class MethodChannelFlutterWhisperkitApple
   }
 
   @override
-  Future<String?> transcribeFromFile(String filePath) async {
+  Future<String?> transcribeFromFile(String? filePath, Map<String, dynamic>? options) async {
     try {
-      return _whisperKitMessage.transcribeFromFile(filePath);
+      DecodingOptionsMessage? optionsMessage;
+      
+      if (options != null) {
+        optionsMessage = DecodingOptionsMessage(
+          task: options['task'] as String?,
+          language: options['language'] as String?,
+          temperature: options['temperature'] as double?,
+          sampleLen: options['sampleLen'] as int?,
+          bestOf: options['bestOf'] as int?,
+          beamSize: options['beamSize'] as int?,
+          patience: options['patience'] as double?,
+          lengthPenalty: options['lengthPenalty'] as double?,
+          suppressBlank: options['suppressBlank'] as bool?,
+          suppressTokens: options['suppressTokens'] as bool?,
+          withoutTimestamps: options['withoutTimestamps'] as bool?,
+          maxInitialTimestamp: options['maxInitialTimestamp'] as double?,
+          wordTimestamps: options['wordTimestamps'] as bool?,
+          prependPunctuations: options['prependPunctuations'] as String?,
+          appendPunctuations: options['appendPunctuations'] as String?,
+          logProbThreshold: options['logProbThreshold'] as double?,
+          noSpeechThreshold: options['noSpeechThreshold'] as double?,
+          compressionRatioThreshold: options['compressionRatioThreshold'] as double?,
+          conditionOnPreviousText: options['conditionOnPreviousText'] as String?,
+          prompt: options['prompt'] as String?,
+          chunkingStrategy: options['chunkingStrategy'] as String?,
+        );
+      }
+      
+      return _whisperKitMessage.transcribeFromFile(filePath ?? '', optionsMessage);
     } on PlatformException catch (e) {
       debugPrint('Error transcribing file: ${e.message}');
       throw e;
