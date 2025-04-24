@@ -121,8 +121,6 @@ class FlutterWhisperkitApple {
   Future<String?> stopRecording({bool loop = true}) {
     return FlutterWhisperkitApplePlatform.instance.stopRecording(loop);
   }
-
-  // transcribeCurrentBuffer removed - now private in Swift only
   
   /// Stream of real-time transcription results.
   ///

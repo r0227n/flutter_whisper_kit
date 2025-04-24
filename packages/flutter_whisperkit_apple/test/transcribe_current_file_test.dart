@@ -87,8 +87,6 @@ class MockFlutterWhisperkitApplePlatform
   @override
   Future<String?> stopRecording(bool loop) =>
       Future.value('Recording stopped');
-      
-  // transcribeCurrentBuffer removed - now private in Swift only
   
   @override
   Stream<String> get transcriptionStream => 

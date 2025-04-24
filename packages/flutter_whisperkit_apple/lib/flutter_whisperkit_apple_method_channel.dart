@@ -112,6 +112,4 @@ class MethodChannelFlutterWhisperkitApple
       throw e;
     }
   }
-
-  // transcribeCurrentBuffer removed - now private in Swift only
 }

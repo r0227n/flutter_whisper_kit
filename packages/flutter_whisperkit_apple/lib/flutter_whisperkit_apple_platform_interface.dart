@@ -63,8 +63,6 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
   Future<String?> stopRecording(bool loop) {
     throw UnimplementedError('stopRecording() has not been implemented.');
   }
-
-  // transcribeCurrentBuffer removed - now private in Swift only
   
   /// Stream of real-time transcription results.
   ///
