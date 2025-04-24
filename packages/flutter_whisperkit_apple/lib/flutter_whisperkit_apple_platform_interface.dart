@@ -2,6 +2,8 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_whisperkit_apple_method_channel.dart';
 
+import 'src/models/decoding_options.dart';
+
 abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
   /// Constructs a FlutterWhisperkitApplePlatform.
   FlutterWhisperkitApplePlatform() : super(token: _token);
@@ -31,8 +33,17 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
   Future<String?> createWhisperKit(String? model, String? modelRepo) {
     throw UnimplementedError('createWhisperKit() has not been implemented.');
   }
-  
-  Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation) {
+
+  Future<String?> loadModel(
+    String? variant,
+    String? modelRepo,
+    bool? redownload,
+    int? storageLocation,
+  ) {
     throw UnimplementedError('loadModel() has not been implemented.');
+  }
+
+  Future<String?> transcribeFromFile(String filePath, DecodingOptions options) {
+    throw UnimplementedError('transcribeFromFile() has not been implemented.');
   }
 }

@@ -64,6 +64,8 @@ To run this example app, you need to configure the following settings:
      <true/>
      <key>com.apple.security.files.user-selected.read-write</key>
      <true/>
+     <key>com.apple.security.app-sandbox</key>
+	  <false/>
      ```
 
 ## Running the Example
