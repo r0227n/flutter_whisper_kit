@@ -4,7 +4,7 @@ import 'flutter_whisperkit_apple.dart';
 enum ModelStorageLocation {
   /// Store models in the application's package directory.
   packageDirectory,
-  
+
   /// Store models in a user-accessible folder.
   userFolder,
 }
@@ -13,9 +13,9 @@ enum ModelStorageLocation {
 class WhisperKitModelLoader {
   /// Creates a new WhisperKitModelLoader instance.
   WhisperKitModelLoader() : _plugin = FlutterWhisperkitApple();
-  
+
   final FlutterWhisperkitApple _plugin;
-  
+
   /// Loads a WhisperKit model.
   ///
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
@@ -28,7 +28,8 @@ class WhisperKitModelLoader {
     String modelRepo = 'argmaxinc/whisperkit-coreml',
     bool redownload = false,
     Function(double progress)? onProgress,
-    ModelStorageLocation storageLocation = ModelStorageLocation.packageDirectory,
+    ModelStorageLocation storageLocation =
+        ModelStorageLocation.packageDirectory,
   }) async {
     return _plugin.loadModel(
       variant,
@@ -37,7 +38,7 @@ class WhisperKitModelLoader {
       storageLocation: storageLocation.index,
     );
   }
-  
+
   /// Sets the storage location for WhisperKit models.
   ///
   /// [location] - The storage location to use.
@@ -45,9 +46,9 @@ class WhisperKitModelLoader {
     // This is stored for future loadModel calls
     _storageLocation = location;
   }
-  
+
   ModelStorageLocation _storageLocation = ModelStorageLocation.packageDirectory;
-  
+
   /// Gets the current storage location for WhisperKit models.
   ModelStorageLocation get storageLocation => _storageLocation;
 }
