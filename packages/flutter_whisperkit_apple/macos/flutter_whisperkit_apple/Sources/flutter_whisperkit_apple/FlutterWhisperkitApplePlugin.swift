@@ -520,7 +520,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     return TranscriptionResult(
       text: mergedText,
       segments: mergedSegments,
-      language: results[0].language
+      language: results[0].language,
+      timings: results[0].timings,
+      seekTime: results[0].seekTime
     )
   }
 }
