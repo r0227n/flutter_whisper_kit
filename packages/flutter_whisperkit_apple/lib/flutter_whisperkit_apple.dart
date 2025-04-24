@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
-import 'package:flutter_whisperkit_apple/src/whisper_kit_message.g.dart';
 
 import 'flutter_whisperkit_apple_platform_interface.dart';
 import 'src/models/transcription_result.dart';
@@ -51,13 +50,35 @@ class FlutterWhisperkitApple {
   /// [options] - Optional decoding options to customize the transcription process.
   ///
   /// Returns a JSON string containing the transcription result with segments and timing information.
-  Future<String?> transcribeFromFile(
+  Future<TranscriptionResult> transcribeFromFile(
     String filePath, {
-    DecodingOptions? options,
-  }) {
-    return FlutterWhisperkitApplePlatform.instance.transcribeFromFile(
-      filePath,
-      options,
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      detectLanguage: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: true,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
+  }) async {
+    final result = await FlutterWhisperkitApplePlatform.instance
+        .transcribeFromFile(filePath, options);
+
+    if (result == null) {
+      throw Exception('Failed to execute transcription: result is null');
+    }
+
+    return TranscriptionResult.fromJson(
+      jsonDecode(result) as Map<String, dynamic>,
     );
   }
 
@@ -69,15 +90,29 @@ class FlutterWhisperkitApple {
   /// Returns a [TranscriptionResult] object containing the transcription segments and timing information.
   Future<TranscriptionResult?> transcribeFromFileAndParse(
     String filePath, {
-    DecodingOptions? options,
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      detectLanguage: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: true,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
   }) async {
     final jsonString = await transcribeFromFile(filePath, options: options);
     if (jsonString == null) return null;
 
     try {
-      final Map<String, dynamic> json =
-          jsonDecode(jsonString) as Map<String, dynamic>;
-      return TranscriptionResult.fromJson(json);
+      return jsonString;
     } catch (e) {
       debugPrint('Error parsing transcription result: $e');
       rethrow;

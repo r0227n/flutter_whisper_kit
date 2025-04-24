@@ -53,10 +53,10 @@ class MethodChannelFlutterWhisperkitApple
   @override
   Future<String?> transcribeFromFile(
     String filePath,
-    DecodingOptions? options,
+    DecodingOptions options,
   ) async {
     try {
-      return _whisperKitMessage.transcribeFromFile(filePath, options?.toJson());
+      return _whisperKitMessage.transcribeFromFile(filePath, options.toJson());
     } on PlatformException catch (e) {
       debugPrint('Error transcribing file: ${e.message}');
       throw e;

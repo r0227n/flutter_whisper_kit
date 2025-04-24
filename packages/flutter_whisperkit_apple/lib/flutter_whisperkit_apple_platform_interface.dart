@@ -1,4 +1,3 @@
-import 'package:flutter_whisperkit_apple/src/whisper_kit_message.g.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_whisperkit_apple_method_channel.dart';
@@ -44,10 +43,7 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
     throw UnimplementedError('loadModel() has not been implemented.');
   }
 
-  Future<String?> transcribeFromFile(
-    String filePath,
-    DecodingOptions? options,
-  ) {
+  Future<String?> transcribeFromFile(String filePath, DecodingOptions options) {
     throw UnimplementedError('transcribeFromFile() has not been implemented.');
   }
 }

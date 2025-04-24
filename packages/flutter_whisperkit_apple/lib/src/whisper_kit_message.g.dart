@@ -119,7 +119,7 @@ class WhisperKitMessage {
     }
   }
 
-  Future<String?> transcribeFromFile(String filePath, Map<String, Object?>? options) async {
+  Future<String?> transcribeFromFile(String filePath, Map<String, Object?> options) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeFromFile$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
