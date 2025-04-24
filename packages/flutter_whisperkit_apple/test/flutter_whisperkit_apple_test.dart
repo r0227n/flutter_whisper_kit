@@ -27,6 +27,18 @@ class MockFlutterWhisperkitApplePlatform
   @override
   Future<String?> transcribeFromFile(String filePath, DecodingOptions? options) =>
       Future.value('{"text":"Test transcription","segments":[{"text":"Test transcription"}],"language":"en","timings":{}}');
+      
+  @override
+  Future<String?> startRecording(DecodingOptions options, bool loop) =>
+      Future.value('Recording started');
+      
+  @override
+  Future<String?> stopRecording(bool loop) =>
+      Future.value('Recording stopped');
+      
+  @override
+  Future<String?> transcribeCurrentBuffer(DecodingOptions options) =>
+      Future.value('{"text":"Test transcription","segments":[{"text":"Test transcription"}],"language":"en","timings":{}}');
 }
 
 void main() {

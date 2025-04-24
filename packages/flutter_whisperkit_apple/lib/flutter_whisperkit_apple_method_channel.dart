@@ -62,4 +62,34 @@ class MethodChannelFlutterWhisperkitApple
       throw e;
     }
   }
+
+  @override
+  Future<String?> startRecording(DecodingOptions options, bool loop) async {
+    try {
+      return _whisperKitMessage.startRecording(options.toJson(), loop);
+    } on PlatformException catch (e) {
+      debugPrint('Error starting recording: ${e.message}');
+      throw e;
+    }
+  }
+
+  @override
+  Future<String?> stopRecording(bool loop) async {
+    try {
+      return _whisperKitMessage.stopRecording(loop);
+    } on PlatformException catch (e) {
+      debugPrint('Error stopping recording: ${e.message}');
+      throw e;
+    }
+  }
+
+  @override
+  Future<String?> transcribeCurrentBuffer(DecodingOptions options) async {
+    try {
+      return _whisperKitMessage.transcribeCurrentBuffer(options.toJson());
+    } on PlatformException catch (e) {
+      debugPrint('Error transcribing current buffer: ${e.message}');
+      throw e;
+    }
+  }
 }

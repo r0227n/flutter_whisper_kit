@@ -92,6 +92,9 @@ protocol WhisperKitMessage {
   func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void)
   func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void)
   func transcribeFromFile(filePath: String, options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
+  func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
+  func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
+  func transcribeCurrentBuffer(options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -170,6 +173,58 @@ class WhisperKitMessageSetup {
       }
     } else {
       transcribeFromFileChannel.setMessageHandler(nil)
+    }
+    let startRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.startRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startRecordingChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let optionsArg = args[0] as! [String: Any?]
+        let loopArg = args[1] as! Bool
+        api.startRecording(options: optionsArg, loop: loopArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startRecordingChannel.setMessageHandler(nil)
+    }
+    let stopRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.stopRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      stopRecordingChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let loopArg = args[0] as! Bool
+        api.stopRecording(loop: loopArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      stopRecordingChannel.setMessageHandler(nil)
+    }
+    let transcribeCurrentBufferChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeCurrentBuffer\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      transcribeCurrentBufferChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let optionsArg = args[0] as! [String: Any?]
+        api.transcribeCurrentBuffer(options: optionsArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      transcribeCurrentBufferChannel.setMessageHandler(nil)
     }
   }
 }

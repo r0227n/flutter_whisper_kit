@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
+import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockFlutterWhisperkitApplePlatform
@@ -26,6 +26,18 @@ class MockFlutterWhisperkitApplePlatform
   @override
   Future<String?> transcribeFromFile(String filePath, DecodingOptions? options) =>
       Future.value('{"text":"Test transcription","segments":[],"language":"en","timings":{}}');
+      
+  @override
+  Future<String?> startRecording(DecodingOptions options, bool loop) =>
+      Future.value('Recording started');
+      
+  @override
+  Future<String?> stopRecording(bool loop) =>
+      Future.value('Recording stopped');
+      
+  @override
+  Future<String?> transcribeCurrentBuffer(DecodingOptions options) =>
+      Future.value('{"text":"Test transcription","segments":[],"language":"en","timings":{}}');
 }
 
 void main() {
@@ -35,7 +47,6 @@ void main() {
     MockFlutterWhisperkitApplePlatform fakePlatform = MockFlutterWhisperkitApplePlatform();
     FlutterWhisperkitApplePlatform.instance = fakePlatform;
     
-    MethodChannelFlutterWhisperkitApple platform = MethodChannelFlutterWhisperkitApple();
-    expect(await platform.getPlatformVersion(), '42');
+    expect(await FlutterWhisperkitApplePlatform.instance.getPlatformVersion(), '42');
   });
 }

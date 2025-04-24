@@ -11,6 +11,8 @@ enum ModelStorageLocation: Int64 {
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
+  private var isRecording: Bool = false
+  private var transcriptionTask: Task<Void, Never>?
 
   func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void) {
     completion(.success("macOS " + ProcessInfo.processInfo.operatingSystemVersionString))
@@ -377,6 +379,187 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
 
     return WhisperKit.formatModelFiles(localModels)
+  }
+  
+  func startRecording(
+    options: [String: Any?], loop: Bool,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    guard let whisperKit = whisperKit else {
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [
+              NSLocalizedDescriptionKey:
+                "WhisperKit instance not initialized. Call loadModel first."
+            ])))
+      return
+    }
+    
+    if whisperKit.audioProcessor == nil {
+      whisperKit.audioProcessor = AudioProcessor()
+    }
+    
+    Task(priority: .userInitiated) {
+      do {
+        guard await AudioProcessor.requestRecordPermission() else {
+          throw NSError(
+            domain: "WhisperKitError", code: 3002,
+            userInfo: [NSLocalizedDescriptionKey: "Microphone access was not granted."])
+        }
+        
+        var deviceId: DeviceID?
+        
+        try whisperKit.audioProcessor.startRecordingLive(inputDeviceID: deviceId) { _ in
+        }
+        
+        isRecording = true
+        
+        if loop {
+          self.startRealtimeLoop(options: options)
+        }
+        
+        completion(.success("Recording started successfully"))
+      } catch {
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  func stopRecording(
+    loop: Bool, completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    guard let whisperKit = whisperKit else {
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [
+              NSLocalizedDescriptionKey:
+                "WhisperKit instance not initialized. Call loadModel first."
+            ])))
+      return
+    }
+    
+    isRecording = false
+    stopRealtimeTranscription()
+    whisperKit.audioProcessor.stopRecording()
+    
+    if !loop {
+      Task {
+        do {
+          _ = try await transcribeCurrentBufferInternal(options: [:])
+          completion(.success("Recording stopped and transcription completed"))
+        } catch {
+          completion(.failure(error))
+        }
+      }
+    } else {
+      completion(.success("Recording stopped"))
+    }
+  }
+  
+  func transcribeCurrentBuffer(
+    options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        let result = try await transcribeCurrentBufferInternal(options: options)
+        
+        guard let result = result else {
+          throw NSError(
+            domain: "WhisperKitError", code: 3004,
+            userInfo: [NSLocalizedDescriptionKey: "Transcription result is nil"])
+        }
+        
+        let resultDict = result.toJson()
+        
+        do {
+          let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
+          guard let jsonString = String(data: jsonData, encoding: .utf8) else {
+            throw NSError(
+              domain: "WhisperKitError", code: 3005,
+              userInfo: [
+                NSLocalizedDescriptionKey: "Failed to create JSON string from transcription result"
+              ])
+          }
+          completion(.success(jsonString))
+        } catch {
+          throw NSError(
+            domain: "WhisperKitError", code: 3006,
+            userInfo: [
+              NSLocalizedDescriptionKey:
+                "Failed to serialize transcription result: \(error.localizedDescription)"
+            ])
+        }
+      } catch {
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  private func startRealtimeLoop(options: [String: Any?]) {
+    transcriptionTask = Task {
+      while isRecording && !Task.isCancelled {
+        do {
+          _ = try await transcribeCurrentBufferInternal(options: options)
+          try await Task.sleep(nanoseconds: 300_000_000) // 300ms delay between transcriptions
+        } catch {
+          print("Realtime transcription error: \(error.localizedDescription)")
+          try? await Task.sleep(nanoseconds: 1_000_000_000) // 1s delay on error
+        }
+      }
+    }
+  }
+  
+  private func stopRealtimeTranscription() {
+    transcriptionTask?.cancel()
+    transcriptionTask = nil
+  }
+  
+  private func transcribeCurrentBufferInternal(options: [String: Any?]) async throws -> TranscriptionResult? {
+    guard let whisperKit = whisperKit else { return nil }
+    
+    let currentBuffer = whisperKit.audioProcessor.audioSamples
+    
+    let bufferSeconds = Float(currentBuffer.count) / Float(WhisperKit.sampleRate)
+    guard bufferSeconds > 1.0 else {
+      throw NSError(
+        domain: "WhisperKitError", code: 3003,
+        userInfo: [NSLocalizedDescriptionKey: "Not enough audio data for transcription"])
+    }
+    
+    let decodingOptions = try DecodingOptions.fromJson(options)
+    
+    let transcriptionResults: [TranscriptionResult] = try await whisperKit.transcribe(
+      audioArray: Array(currentBuffer),
+      decodeOptions: decodingOptions
+    )
+    
+    return mergeTranscriptionResults(transcriptionResults)
+  }
+  
+  private func mergeTranscriptionResults(_ results: [TranscriptionResult]) -> TranscriptionResult? {
+    guard !results.isEmpty else { return nil }
+    
+    if results.count == 1 {
+      return results[0]
+    }
+    
+    var mergedText = ""
+    var mergedSegments: [TranscriptionSegment] = []
+    
+    for result in results {
+      mergedText += result.text
+      mergedSegments.append(contentsOf: result.segments)
+    }
+    
+    return TranscriptionResult(
+      text: mergedText,
+      segments: mergedSegments,
+      language: results[0].language
+    )
   }
 }
 

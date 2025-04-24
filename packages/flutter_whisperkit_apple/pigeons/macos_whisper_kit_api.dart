@@ -23,4 +23,10 @@ abstract class WhisperKitMessage {
   );
   @async
   String? transcribeFromFile(String filePath, Map<String, Object?> options);
+  @async
+  String? startRecording(Map<String, Object?> options, bool loop);
+  @async
+  String? stopRecording(bool loop);
+  @async
+  String? transcribeCurrentBuffer(Map<String, Object?> options);
 }
