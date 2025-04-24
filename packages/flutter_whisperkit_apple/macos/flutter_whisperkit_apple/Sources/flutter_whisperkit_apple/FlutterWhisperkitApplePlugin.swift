@@ -15,7 +15,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
   private var isRecording: Bool = false
   private var transcriptionTask: Task<Void, Never>?
-  private static var transcriptionStreamHandler: TranscriptionStreamHandler?
+  public static var transcriptionStreamHandler: TranscriptionStreamHandler?
 
   func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void) {
     completion(.success("macOS " + ProcessInfo.processInfo.operatingSystemVersionString))
