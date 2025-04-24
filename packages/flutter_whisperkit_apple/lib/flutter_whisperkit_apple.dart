@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
 import 'flutter_whisperkit_apple_platform_interface.dart';
@@ -122,4 +123,23 @@ class FlutterWhisperkitApple {
   }
 
   // transcribeCurrentBuffer removed - now private in Swift only
+  
+  /// Stream of real-time transcription results.
+  ///
+  /// This stream emits String values containing the transcribed text as it becomes available.
+  /// The stream will emit an empty string when recording stops.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final subscription = flutterWhisperkitApple.transcriptionStream.listen((text) {
+  ///   setState(() {
+  ///     _transcriptionText = text;
+  ///   });
+  /// });
+  ///
+  /// // Don't forget to cancel the subscription when done
+  /// subscription.cancel();
+  /// ```
+  Stream<String> get transcriptionStream => 
+      FlutterWhisperkitApplePlatform.instance.transcriptionStream;
 }

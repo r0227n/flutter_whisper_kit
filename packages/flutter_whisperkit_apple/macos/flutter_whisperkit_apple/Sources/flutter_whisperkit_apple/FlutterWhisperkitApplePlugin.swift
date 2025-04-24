@@ -8,11 +8,14 @@ enum ModelStorageLocation: Int64 {
   case userFolder = 1
 }
 
+private let transcriptionStreamChannelName = "flutter_whisperkit_apple/transcription_stream"
+
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
   private var isRecording: Bool = false
   private var transcriptionTask: Task<Void, Never>?
+  private static var transcriptionStreamHandler: TranscriptionStreamHandler?
 
   func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void) {
     completion(.success("macOS " + ProcessInfo.processInfo.operatingSystemVersionString))
@@ -463,14 +466,29 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   
   private func startRealtimeLoop(options: [String: Any?]) {
     transcriptionTask = Task {
+      var lastTranscribedText = ""
+      
       while isRecording && !Task.isCancelled {
         do {
-          _ = try await transcribeCurrentBufferInternal(options: options)
+          if let result = try await transcribeCurrentBufferInternal(options: options) {
+            if result.text != lastTranscribedText {
+              lastTranscribedText = result.text
+              
+              if let streamHandler = WhisperKitApiImpl.transcriptionStreamHandler as? TranscriptionStreamHandler {
+                streamHandler.sendTranscription(result.text)
+              }
+            }
+          }
+          
           try await Task.sleep(nanoseconds: 300_000_000) // 300ms delay between transcriptions
         } catch {
           print("Realtime transcription error: \(error.localizedDescription)")
           try? await Task.sleep(nanoseconds: 1_000_000_000) // 1s delay on error
         }
+      }
+      
+      if let streamHandler = WhisperKitApiImpl.transcriptionStreamHandler as? TranscriptionStreamHandler {
+        streamHandler.sendTranscription("")
       }
     }
   }
@@ -527,9 +545,35 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   }
 }
 
+private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
+  private var eventSink: FlutterEventSink?
+  
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    eventSink = events
+    return nil
+  }
+  
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    eventSink = nil
+    return nil
+  }
+  
+  func sendTranscription(_ text: String) {
+    if let eventSink = eventSink {
+      DispatchQueue.main.async {
+        eventSink(text)
+      }
+    }
+  }
+}
+
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    // Pigeonで生成されたSetupコードを呼び出す
     WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger, api: WhisperKitApiImpl())
+    
+    let streamHandler = TranscriptionStreamHandler()
+    WhisperKitApiImpl.transcriptionStreamHandler = streamHandler
+    let channel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: registrar.messenger)
+    channel.setStreamHandler(streamHandler)
   }
 }

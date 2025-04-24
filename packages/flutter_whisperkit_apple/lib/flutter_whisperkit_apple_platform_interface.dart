@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_whisperkit_apple_method_channel.dart';
@@ -63,4 +65,12 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
   }
 
   // transcribeCurrentBuffer removed - now private in Swift only
+  
+  /// Stream of real-time transcription results.
+  ///
+  /// This stream emits String values containing the transcribed text as it becomes available.
+  /// The stream will emit an empty string when recording stops.
+  Stream<String> get transcriptionStream {
+    throw UnimplementedError('transcriptionStream has not been implemented.');
+  }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
@@ -12,8 +14,36 @@ class MethodChannelFlutterWhisperkitApple
   @visibleForTesting
   final methodChannel = const MethodChannel('flutter_whisperkit_apple');
 
+  /// The event channel for streaming transcription results
+  @visibleForTesting
+  final EventChannel transcriptionStreamChannel = 
+      const EventChannel('flutter_whisperkit_apple/transcription_stream');
+  
+  /// Stream controller for transcription results
+  final StreamController<String> _transcriptionStreamController = 
+      StreamController<String>.broadcast();
+  
+  /// Stream of transcription results
+  @override
+  Stream<String> get transcriptionStream => _transcriptionStreamController.stream;
+
   /// The Pigeon-generated API for WhisperKit
   final _whisperKitMessage = WhisperKitMessage();
+  
+  /// Constructor that sets up the event channel listener
+  MethodChannelFlutterWhisperkitApple() {
+    // Listen to the event channel and forward events to the stream controller
+    transcriptionStreamChannel.receiveBroadcastStream().listen(
+      (dynamic event) {
+        if (event is String) {
+          _transcriptionStreamController.add(event);
+        }
+      },
+      onError: (dynamic error) {
+        _transcriptionStreamController.addError(error);
+      },
+    );
+  }
 
   @override
   Future<String?> getPlatformVersion() async {

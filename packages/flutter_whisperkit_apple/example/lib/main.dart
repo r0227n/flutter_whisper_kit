@@ -25,6 +25,7 @@ class _MyAppState extends State<MyApp> {
   bool _isModelLoaded = false;
   bool _isRecording = false;
   String _realtimeTranscription = '';
+  StreamSubscription<String>? _transcriptionSubscription;
 
   // Use the proper plugin class instead of the generated message class
   final _flutterWhisperkitApple = FlutterWhisperkitApple();
@@ -42,6 +43,13 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPlatformState();
+  }
+  
+  @override
+  void dispose() {
+    // Cancel the transcription subscription when the widget is disposed
+    _transcriptionSubscription?.cancel();
+    super.dispose();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -93,6 +101,11 @@ class _MyAppState extends State<MyApp> {
       // Stop recording
       try {
         final result = await _flutterWhisperkitApple.stopRecording(loop: true);
+        
+        // Cancel the transcription stream subscription
+        _transcriptionSubscription?.cancel();
+        _transcriptionSubscription = null;
+        
         setState(() {
           _isRecording = false;
           _modelStatus = 'Recording stopped: $result';
@@ -115,9 +128,24 @@ class _MyAppState extends State<MyApp> {
           ),
           loop: true, // Use loop mode for continuous transcription in Swift
         );
+        
+        // Subscribe to the transcription stream
+        _transcriptionSubscription = _flutterWhisperkitApple.transcriptionStream.listen(
+          (transcription) {
+            setState(() {
+              if (transcription.isNotEmpty) {
+                _realtimeTranscription = transcription;
+              }
+            });
+          },
+          onError: (error) {
+            print('Transcription stream error: $error');
+          },
+        );
+        
         setState(() {
           _isRecording = true;
-          _realtimeTranscription = 'Recording started. Transcription happens in real-time on the Swift side.';
+          _realtimeTranscription = 'Listening... Speak now.';
           _modelStatus = 'Recording started: $result';
         });
       } catch (e) {

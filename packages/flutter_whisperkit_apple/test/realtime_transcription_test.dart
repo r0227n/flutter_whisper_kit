@@ -33,9 +33,15 @@ class MockFlutterWhisperkitApplePlatform
       Future.value('Recording stopped');
   
   // transcribeCurrentBuffer removed - now private in Swift only
+  
+  @override
+  Stream<String> get transcriptionStream => 
+      Stream<String>.fromIterable(['Test transcription']);
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
   final FlutterWhisperkitApplePlatform initialPlatform =
       FlutterWhisperkitApplePlatform.instance;
   
