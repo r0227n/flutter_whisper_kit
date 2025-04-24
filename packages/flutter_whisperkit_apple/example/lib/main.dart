@@ -92,9 +92,10 @@ class _MyAppState extends State<MyApp> {
     if (_isRecording) {
       // Stop recording
       try {
-        await _flutterWhisperkitApple.stopRecording(loop: false);
+        final result = await _flutterWhisperkitApple.stopRecording(loop: true);
         setState(() {
           _isRecording = false;
+          _modelStatus = 'Recording stopped: $result';
         });
       } catch (e) {
         setState(() {
@@ -104,7 +105,7 @@ class _MyAppState extends State<MyApp> {
     } else {
       // Start recording
       try {
-        await _flutterWhisperkitApple.startRecording(
+        final result = await _flutterWhisperkitApple.startRecording(
           options: const DecodingOptions(
             verbose: true,
             task: DecodingTask.transcribe,
@@ -112,39 +113,18 @@ class _MyAppState extends State<MyApp> {
             temperature: 0.0,
             wordTimestamps: true,
           ),
-          loop: false,
+          loop: true, // Use loop mode for continuous transcription in Swift
         );
         setState(() {
           _isRecording = true;
-          _realtimeTranscription = '';
+          _realtimeTranscription = 'Recording started. Transcription happens in real-time on the Swift side.';
+          _modelStatus = 'Recording started: $result';
         });
-        
-        // Start polling for transcription results
-        _startPollingTranscription();
       } catch (e) {
         setState(() {
           _modelStatus = 'Error starting recording: $e';
         });
       }
-    }
-  }
-  
-  // Poll for transcription results
-  void _startPollingTranscription() async {
-    if (!_isRecording) return;
-    
-    try {
-      final result = await _flutterWhisperkitApple.transcribeCurrentBuffer();
-      setState(() {
-        _realtimeTranscription = result.text;
-      });
-    } catch (e) {
-      print('Transcription error: $e');
-    }
-    
-    // Continue polling if still recording
-    if (_isRecording) {
-      Future.delayed(const Duration(milliseconds: 500), _startPollingTranscription);
     }
   }
 

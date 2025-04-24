@@ -36,9 +36,7 @@ class MockFlutterWhisperkitApplePlatform
   Future<String?> stopRecording(bool loop) =>
       Future.value('Recording stopped');
       
-  @override
-  Future<String?> transcribeCurrentBuffer(DecodingOptions options) =>
-      Future.value('{"text":"Test transcription","segments":[{"text":"Test transcription"}],"language":"en","timings":{}}');
+  // transcribeCurrentBuffer removed - now private in Swift only
 }
 
 void main() {

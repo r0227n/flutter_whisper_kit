@@ -83,13 +83,5 @@ class MethodChannelFlutterWhisperkitApple
     }
   }
 
-  @override
-  Future<String?> transcribeCurrentBuffer(DecodingOptions options) async {
-    try {
-      return _whisperKitMessage.transcribeCurrentBuffer(options.toJson());
-    } on PlatformException catch (e) {
-      debugPrint('Error transcribing current buffer: ${e.message}');
-      throw e;
-    }
-  }
+  // transcribeCurrentBuffer removed - now private in Swift only
 }

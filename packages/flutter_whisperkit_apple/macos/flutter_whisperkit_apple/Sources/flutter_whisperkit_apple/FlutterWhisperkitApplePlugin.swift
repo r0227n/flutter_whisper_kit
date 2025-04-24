@@ -460,44 +460,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
-  func transcribeCurrentBuffer(
-    options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void
-  ) {
-    Task {
-      do {
-        let result = try await transcribeCurrentBufferInternal(options: options)
-        
-        guard let result = result else {
-          throw NSError(
-            domain: "WhisperKitError", code: 3004,
-            userInfo: [NSLocalizedDescriptionKey: "Transcription result is nil"])
-        }
-        
-        let resultDict = result.toJson()
-        
-        do {
-          let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
-          guard let jsonString = String(data: jsonData, encoding: .utf8) else {
-            throw NSError(
-              domain: "WhisperKitError", code: 3005,
-              userInfo: [
-                NSLocalizedDescriptionKey: "Failed to create JSON string from transcription result"
-              ])
-          }
-          completion(.success(jsonString))
-        } catch {
-          throw NSError(
-            domain: "WhisperKitError", code: 3006,
-            userInfo: [
-              NSLocalizedDescriptionKey:
-                "Failed to serialize transcription result: \(error.localizedDescription)"
-            ])
-        }
-      } catch {
-        completion(.failure(error))
-      }
-    }
-  }
   
   private func startRealtimeLoop(options: [String: Any?]) {
     transcriptionTask = Task {

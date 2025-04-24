@@ -32,9 +32,7 @@ class MockFlutterWhisperkitApplePlatform
   Future<String?> stopRecording(bool loop) =>
       Future.value('Recording stopped');
   
-  @override
-  Future<String?> transcribeCurrentBuffer(DecodingOptions options) =>
-      Future.value('{"text":"Hello world","segments":[]}');
+  // transcribeCurrentBuffer removed - now private in Swift only
 }
 
 void main() {
@@ -63,13 +61,5 @@ void main() {
     expect(await plugin.stopRecording(), 'Recording stopped');
   });
   
-  test('transcribeCurrentBuffer test', () async {
-    final MockFlutterWhisperkitApplePlatform fakePlatform =
-        MockFlutterWhisperkitApplePlatform();
-    FlutterWhisperkitApplePlatform.instance = fakePlatform;
-    
-    final plugin = FlutterWhisperkitApple();
-    final result = await plugin.transcribeCurrentBuffer();
-    expect(result.text, 'Hello world');
-  });
+  // transcribeCurrentBuffer test removed - now private in Swift only
 }

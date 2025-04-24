@@ -83,7 +83,7 @@ class FlutterWhisperkitApple {
   ///
   /// [options] - Optional decoding options to customize the transcription process.
   /// [loop] - If true, continuously transcribes audio in a loop until stopped.
-  ///          If false, you must manually call [transcribeCurrentBuffer] to get results.
+  ///          If false, transcription happens when stopRecording is called.
   ///
   /// Returns a success message if recording starts successfully.
   Future<String?> startRecording({
@@ -121,38 +121,5 @@ class FlutterWhisperkitApple {
     return FlutterWhisperkitApplePlatform.instance.stopRecording(loop);
   }
 
-  /// Transcribes the current audio buffer that has been recorded.
-  ///
-  /// [options] - Optional decoding options to customize the transcription process.
-  ///
-  /// Returns a [TranscriptionResult] containing the transcription with segments and timing information.
-  Future<TranscriptionResult> transcribeCurrentBuffer({
-    DecodingOptions options = const DecodingOptions(
-      verbose: true,
-      task: DecodingTask.transcribe,
-      language: 'ja',
-      temperature: 0.0,
-      temperatureFallbackCount: 5,
-      sampleLength: 224,
-      usePrefillPrompt: true,
-      usePrefillCache: true,
-      skipSpecialTokens: true,
-      withoutTimestamps: false,
-      wordTimestamps: true,
-      clipTimestamps: [0.0],
-      concurrentWorkerCount: 4,
-      chunkingStrategy: ChunkingStrategy.vad,
-    ),
-  }) async {
-    final result = await FlutterWhisperkitApplePlatform.instance
-        .transcribeCurrentBuffer(options);
-    
-    if (result == null) {
-      throw Exception('Failed to execute transcription: result is null');
-    }
-    
-    return TranscriptionResult.fromJson(
-      jsonDecode(result) as Map<String, dynamic>,
-    );
-  }
+  // transcribeCurrentBuffer removed - now private in Swift only
 }

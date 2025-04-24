@@ -62,10 +62,5 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
     throw UnimplementedError('stopRecording() has not been implemented.');
   }
 
-  /// Transcribes the current audio buffer.
-  ///
-  /// [options] - Optional decoding options for the transcription.
-  Future<String?> transcribeCurrentBuffer(DecodingOptions options) {
-    throw UnimplementedError('transcribeCurrentBuffer() has not been implemented.');
-  }
+  // transcribeCurrentBuffer removed - now private in Swift only
 }

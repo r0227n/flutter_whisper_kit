@@ -94,7 +94,6 @@ protocol WhisperKitMessage {
   func transcribeFromFile(filePath: String, options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
   func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
-  func transcribeCurrentBuffer(options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -208,23 +207,6 @@ class WhisperKitMessageSetup {
       }
     } else {
       stopRecordingChannel.setMessageHandler(nil)
-    }
-    let transcribeCurrentBufferChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeCurrentBuffer\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      transcribeCurrentBufferChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let optionsArg = args[0] as! [String: Any?]
-        api.transcribeCurrentBuffer(options: optionsArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      transcribeCurrentBufferChannel.setMessageHandler(nil)
     }
   }
 }

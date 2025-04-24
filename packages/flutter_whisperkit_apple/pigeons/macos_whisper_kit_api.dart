@@ -27,6 +27,4 @@ abstract class WhisperKitMessage {
   String? startRecording(Map<String, Object?> options, bool loop);
   @async
   String? stopRecording(bool loop);
-  @async
-  String? transcribeCurrentBuffer(Map<String, Object?> options);
 }
