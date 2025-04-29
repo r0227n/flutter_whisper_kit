@@ -36,10 +36,10 @@ class FlutterWhisperkitApple extends FlutterWhisperkitPlatform {
     int? storageLocation,
   }) {
     return _methodChannel.loadModel(
-      variant,
-      modelRepo,
-      redownload,
-      storageLocation,
+      variant: variant,
+      modelRepo: modelRepo,
+      redownload: redownload,
+      storageLocation: storageLocation,
     );
   }
 
@@ -51,10 +51,29 @@ class FlutterWhisperkitApple extends FlutterWhisperkitPlatform {
   /// Returns a JSON string containing the transcription result with segments and timing information.
   @override
   Future<String?> transcribeFromFile(
-    String filePath,
-    DecodingOptions options,
-  ) async {
-    return _methodChannel.transcribeFromFile(filePath, options);
+    String filePath, {
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      detectLanguage: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: true,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
+  }) async {
+    return _methodChannel.transcribeFromFile(
+      filePath,
+      options: options,
+    );
   }
 
   /// Starts recording audio from the microphone for real-time transcription.
@@ -65,8 +84,29 @@ class FlutterWhisperkitApple extends FlutterWhisperkitPlatform {
   ///
   /// Returns a success message if recording starts successfully.
   @override
-  Future<String?> startRecording(DecodingOptions options, bool loop) {
-    return _methodChannel.startRecording(options, loop);
+  Future<String?> startRecording({
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: false,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
+    bool loop = true,
+  }) {
+    return _methodChannel.startRecording(
+      options: options,
+      loop: loop,
+    );
   }
 
   /// Stops recording audio and optionally triggers transcription.
@@ -76,8 +116,10 @@ class FlutterWhisperkitApple extends FlutterWhisperkitPlatform {
   /// Returns a success message when recording is stopped.
   /// If [loop] is false, also triggers transcription of the recorded audio.
   @override
-  Future<String?> stopRecording(bool loop) {
-    return _methodChannel.stopRecording(loop);
+  Future<String?> stopRecording({bool loop = true}) {
+    return _methodChannel.stopRecording(
+      loop: loop,
+    );
   }
 
   /// Stream of real-time transcription results.
