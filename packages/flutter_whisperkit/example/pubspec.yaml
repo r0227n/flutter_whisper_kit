@@ -5,13 +5,15 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 environment:
   sdk: ^3.7.2
 
+resolution: workspace
+
 dependencies:
   flutter:
     sdk: flutter
 
   flutter_whisperkit:
     path: ../
-.
+
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
