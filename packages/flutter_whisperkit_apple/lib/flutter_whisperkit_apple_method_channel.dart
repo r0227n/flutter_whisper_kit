@@ -55,52 +55,91 @@ class MethodChannelFlutterWhisperkitApple {
     );
   }
 
-  Future<String?> loadModel(
+  /// Handles platform exceptions and provides consistent error handling
+  T _handlePlatformException<T>(String methodName, T Function() action) {
+    try {
+      return action();
+    } on PlatformException catch (e) {
+      debugPrint('Error in $methodName: ${e.message}');
+      throw e;
+    } catch (e) {
+      debugPrint('Unexpected error in $methodName: $e');
+      rethrow;
+    }
+  }
+
+  /// Loads a WhisperKit model.
+  Future<String?> loadModel({
     String? variant,
     String? modelRepo,
     bool? redownload,
     int? storageLocation,
-  ) async {
-    try {
+  }) async {
+    return _handlePlatformException('loadModel', () {
       return _whisperKitMessage.loadModel(
         variant,
         modelRepo,
         redownload,
         storageLocation,
       );
-    } on PlatformException catch (e) {
-      debugPrint('Error loading model: ${e.message}');
-      throw e;
-    }
+    });
   }
 
+  /// Transcribes an audio file at the specified path.
   Future<String?> transcribeFromFile(
-    String filePath,
-    DecodingOptions options,
-  ) async {
-    try {
+    String filePath, {
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      detectLanguage: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: true,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
+  }) async {
+    return _handlePlatformException('transcribeFromFile', () {
       return _whisperKitMessage.transcribeFromFile(filePath, options.toJson());
-    } on PlatformException catch (e) {
-      debugPrint('Error transcribing file: ${e.message}');
-      throw e;
-    }
+    });
   }
 
-  Future<String?> startRecording(DecodingOptions options, bool loop) async {
-    try {
+  /// Starts recording audio from the microphone for real-time transcription.
+  Future<String?> startRecording({
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: false,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
+    bool loop = true,
+  }) async {
+    return _handlePlatformException('startRecording', () {
       return _whisperKitMessage.startRecording(options.toJson(), loop);
-    } on PlatformException catch (e) {
-      debugPrint('Error starting recording: ${e.message}');
-      throw e;
-    }
+    });
   }
 
-  Future<String?> stopRecording(bool loop) async {
-    try {
+  /// Stops recording audio and optionally triggers transcription.
+  Future<String?> stopRecording({bool loop = true}) async {
+    return _handlePlatformException('stopRecording', () {
       return _whisperKitMessage.stopRecording(loop);
-    } on PlatformException catch (e) {
-      debugPrint('Error stopping recording: ${e.message}');
-      throw e;
-    }
+    });
   }
 }
