@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 import 'flutter_whisperkit_apple_platform_interface.dart';
@@ -9,7 +10,15 @@ import 'flutter_whisperkit_apple_registrar.dart';
 /// The main entry point for the Flutter WhisperKit Apple plugin.
 class FlutterWhisperkitApple {
   /// Registers this implementation with the main platform interface.
-  static void registerWith() => FlutterWhisperkitAppleRegistrar.registerWith();
+  static void registerWith() {
+    // Call the native method channel to register
+    const MethodChannel('flutter_whisperkit_apple/register')
+        .invokeMethod<bool>('registerWith')
+        .then((_) {
+      // Register with the platform interface
+      FlutterWhisperkitAppleRegistrar.registerWith();
+    });
+  }
   
   /// Loads a WhisperKit model.
   ///
