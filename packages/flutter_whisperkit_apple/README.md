@@ -29,9 +29,6 @@ import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 // Create an instance of the plugin
 final flutterWhisperkitApple = FlutterWhisperkitApple();
 
-// Initialize WhisperKit
-await flutterWhisperkitApple.createWhisperKit('tiny-en', 'argmaxinc/whisperkit-coreml');
-
 // Load a model
 final result = await flutterWhisperkitApple.loadModel(
   'tiny-en',

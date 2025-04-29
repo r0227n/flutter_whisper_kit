@@ -12,23 +12,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
 
-  func createWhisperKit(
-    model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void
-  ) {
-    Task {
-      do {
-        whisperKit = try await WhisperKit()
-
-        completion(
-          .success(
-            "WhisperKit instance created successfully: \(model ?? "default") \(modelRepo ?? "default")"
-          ))
-      } catch {
-        completion(.failure(error))
-      }
-    }
-  }
-
   func loadModel(
     variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
     completion: @escaping (Result<String?, Error>) -> Void

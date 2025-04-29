@@ -48,16 +48,6 @@ class MethodChannelFlutterWhisperkitApple
   }
 
   @override
-  Future<String?> createWhisperKit(String? model, String? modelRepo) async {
-    try {
-      return _whisperKitMessage.createWhisperKit(model, modelRepo);
-    } on PlatformException catch (e) {
-      debugPrint('Error creating WhisperKit: ${e.message}');
-      throw e;
-    }
-  }
-
-  @override
   Future<String?> loadModel(
     String? variant,
     String? modelRepo,

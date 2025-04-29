@@ -6,17 +6,6 @@ import 'src/models/transcription_result.dart';
 
 /// The main entry point for the Flutter WhisperKit Apple plugin.
 class FlutterWhisperkitApple {
-  /// Creates a WhisperKit instance.
-  ///
-  /// [model] - The model name to use.
-  /// [modelRepo] - The repository to download the model from.
-  Future<String?> createWhisperKit(String? model, String? modelRepo) {
-    return FlutterWhisperkitApplePlatform.instance.createWhisperKit(
-      model,
-      modelRepo,
-    );
-  }
-
   /// Loads a WhisperKit model.
   ///
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').

@@ -11,8 +11,6 @@ import 'package:pigeon/pigeon.dart';
 @HostApi()
 abstract class WhisperKitMessage {
   @async
-  String? createWhisperKit(String? model, String? modelRepo);
-  @async
   String? loadModel(
     String? variant,
     String? modelRepo,

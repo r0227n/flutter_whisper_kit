@@ -28,10 +28,6 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> createWhisperKit(String? model, String? modelRepo) {
-    throw UnimplementedError('createWhisperKit() has not been implemented.');
-  }
-
   Future<String?> loadModel(
     String? variant,
     String? modelRepo,

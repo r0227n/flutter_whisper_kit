@@ -10,10 +10,6 @@ class MockFlutterWhisperkitApplePlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperkitApplePlatform {
   @override
-  Future<String?> createWhisperKit(String? model, String? modelRepo) =>
-      Future.value('WhisperKit created');
-
-  @override
   Future<String?> loadModel(
     String? variant,
     String? modelRepo,

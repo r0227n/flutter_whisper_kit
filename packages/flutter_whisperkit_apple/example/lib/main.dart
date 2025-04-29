@@ -45,26 +45,6 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  // Initialize WhisperKit
-  Future<void> _initializeWhisperKit() async {
-    try {
-      final result = await _flutterWhisperkitApple.createWhisperKit(
-        _selectedVariant,
-        'argmaxinc/whisperkit-coreml',
-      );
-
-      if (!mounted) return;
-
-      setState(() {
-        _modelStatus = 'WhisperKit initialized: $result';
-      });
-    } on PlatformException catch (e) {
-      setState(() {
-        _modelStatus = 'Error initializing WhisperKit: ${e.message}';
-      });
-    }
-  }
-
   // Start recording for real-time transcription
   Future<void> _toggleRecording() async {
     if (_isRecording) {
@@ -249,14 +229,6 @@ class _MyAppState extends State<MyApp> {
                   ),
                   const Text('User Folder'),
                 ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Initialize button
-              ElevatedButton(
-                onPressed: _initializeWhisperKit,
-                child: const Text('Initialize WhisperKit'),
               ),
 
               const SizedBox(height: 10),
