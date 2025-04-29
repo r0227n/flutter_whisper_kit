@@ -56,7 +56,7 @@ class FlutterWhisperkit {
   }) {
     return FlutterWhisperkitPlatform.instance.transcribeFromFile(
       filePath,
-      options,
+      options: options,
     );
   }
 
@@ -86,7 +86,10 @@ class FlutterWhisperkit {
     ),
     bool loop = true,
   }) {
-    return FlutterWhisperkitPlatform.instance.startRecording(options, loop);
+    return FlutterWhisperkitPlatform.instance.startRecording(
+      options: options,
+      loop: loop,
+    );
   }
 
   /// Stops recording audio and optionally triggers transcription.
@@ -96,7 +99,9 @@ class FlutterWhisperkit {
   /// Returns a success message when recording is stopped.
   /// If [loop] is false, also triggers transcription of the recorded audio.
   Future<String?> stopRecording({bool loop = true}) {
-    return FlutterWhisperkitPlatform.instance.stopRecording(loop);
+    return FlutterWhisperkitPlatform.instance.stopRecording(
+      loop: loop,
+    );
   }
 
   /// Stream of real-time transcription results.
