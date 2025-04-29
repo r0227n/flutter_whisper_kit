@@ -61,10 +61,13 @@ class MethodChannelFlutterWhisperkitApple {
       return action();
     } on PlatformException catch (e) {
       debugPrint('Error in $methodName: ${e.message}');
-      throw e;
+      throw WhisperKitError.fromPlatformException(e);
     } catch (e) {
       debugPrint('Unexpected error in $methodName: $e');
-      rethrow;
+      throw WhisperKitError(
+        code: WhisperKitErrorCode.unknown,
+        message: 'Unexpected error in $methodName: $e',
+      );
     }
   }
 

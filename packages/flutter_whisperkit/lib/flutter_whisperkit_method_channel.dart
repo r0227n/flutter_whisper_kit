@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'src/models.dart';
+import 'src/whisper_kit_error.dart';
 
 import 'flutter_whisperkit_platform_interface.dart';
 
@@ -48,6 +49,22 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     );
   }
 
+  /// Handles platform exceptions and provides consistent error handling
+  T _handlePlatformException<T>(String methodName, Future<T> Function() action) async {
+    try {
+      return await action();
+    } on PlatformException catch (e) {
+      debugPrint('Error in $methodName: ${e.message}');
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      debugPrint('Unexpected error in $methodName: $e');
+      throw WhisperKitError(
+        code: WhisperKitErrorCode.unknown,
+        message: 'Unexpected error in $methodName: $e',
+      );
+    }
+  }
+
   @override
   Future<String?> loadModel(
     String? variant, {
@@ -55,18 +72,15 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     bool? redownload,
     int? storageLocation,
   }) async {
-    try {
+    return _handlePlatformException('loadModel', () {
       final Map<String, dynamic> arguments = {
         'variant': variant,
         'modelRepo': modelRepo,
         'redownload': redownload,
         'storageLocation': storageLocation,
       };
-      return await methodChannel.invokeMethod<String>('loadModel', arguments);
-    } on PlatformException catch (e) {
-      debugPrint('Error loading model: ${e.message}');
-      rethrow;
-    }
+      return methodChannel.invokeMethod<String>('loadModel', arguments);
+    });
   }
 
   @override
@@ -90,16 +104,13 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
   }) async {
-    try {
+    return _handlePlatformException('transcribeFromFile', () {
       final Map<String, dynamic> arguments = {
         'filePath': filePath,
         'options': options.toJson(),
       };
-      return await methodChannel.invokeMethod<String>('transcribeFromFile', arguments);
-    } on PlatformException catch (e) {
-      debugPrint('Error transcribing file: ${e.message}');
-      rethrow;
-    }
+      return methodChannel.invokeMethod<String>('transcribeFromFile', arguments);
+    });
   }
 
   @override
@@ -122,26 +133,20 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     ),
     bool loop = true,
   }) async {
-    try {
+    return _handlePlatformException('startRecording', () {
       final Map<String, dynamic> arguments = {
         'options': options.toJson(),
         'loop': loop,
       };
-      return await methodChannel.invokeMethod<String>('startRecording', arguments);
-    } on PlatformException catch (e) {
-      debugPrint('Error starting recording: ${e.message}');
-      rethrow;
-    }
+      return methodChannel.invokeMethod<String>('startRecording', arguments);
+    });
   }
 
   @override
   Future<String?> stopRecording({bool loop = true}) async {
-    try {
-      return await methodChannel.invokeMethod<String>('stopRecording', {'loop': loop});
-    } on PlatformException catch (e) {
-      debugPrint('Error stopping recording: ${e.message}');
-      rethrow;
-    }
+    return _handlePlatformException('stopRecording', () {
+      return methodChannel.invokeMethod<String>('stopRecording', {'loop': loop});
+    });
   }
 
   @override
