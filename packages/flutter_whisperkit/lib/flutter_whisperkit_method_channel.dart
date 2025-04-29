@@ -61,6 +61,6 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   }
 
   @override
-  Stream<String> get transcriptionStream =>
+  Stream<TranscriptionResult> get transcriptionStream =>
       _whisperKitApple.transcriptionStream;
 }
