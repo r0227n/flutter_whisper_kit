@@ -4,8 +4,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'package:flutter_whisperkit_apple/model_loader.dart';
-import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
-import 'package:flutter_whisperkit_apple/src/models/transcription_result.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 
 void main() {
   runApp(const MyApp());

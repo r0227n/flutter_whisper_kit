@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 import 'flutter_whisperkit_apple_platform_interface.dart';
-import 'src/models/transcription_result.dart';
 
 /// The main entry point for the Flutter WhisperKit Apple plugin.
 class FlutterWhisperkitApple {

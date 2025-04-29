@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 
 import 'flutter_whisperkit_apple_method_channel.dart';
-
-import 'src/models/decoding_options.dart';
 
 abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
   /// Constructs a FlutterWhisperkitApplePlatform.

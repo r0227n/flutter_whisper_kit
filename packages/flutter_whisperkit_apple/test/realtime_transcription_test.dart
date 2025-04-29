@@ -2,8 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
-import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
-import 'package:flutter_whisperkit_apple/src/models/transcription_result.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 
 import 'test_utils/mocks.dart';
 
