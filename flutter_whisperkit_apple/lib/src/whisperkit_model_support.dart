@@ -47,10 +47,6 @@ class WhisperKitModelSupport {
     return version;
   }
 
-  /// Clears the cached configuration.
-  Future<void> clearCache() {
-    return _whisperkit.modelSupport.clearCache();
-  }
 
   /// Checks if the specified model is supported on the current device.
   Future<bool> isModelSupported(ModelSupportConfig config, String modelName) {

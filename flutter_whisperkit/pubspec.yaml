@@ -12,8 +12,6 @@ dependencies:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
   huggingface_client: ^1.6.2
-  path_provider: ^2.1.2
-  shared_preferences: ^2.2.2
   collection: ^1.18.0
 
 dev_dependencies:

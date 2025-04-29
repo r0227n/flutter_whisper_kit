@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:huggingface_client/huggingface_client.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/model_support_config.dart';
 
@@ -40,12 +38,6 @@ enum ModelSupportConfigError {
   /// Error occurred when accessing the Hugging Face API.
   huggingFaceApiError,
   
-  /// Error occurred when accessing the file system.
-  fileSystemError,
-  
-  /// Error occurred when accessing shared preferences.
-  preferencesError,
-  
   /// Unknown error occurred.
   unknownError,
 }
@@ -54,9 +46,6 @@ enum ModelSupportConfigError {
 class ModelSupportService {
   /// The Hugging Face client.
   final HuggingFaceClient _client;
-  
-  /// Cache key prefix for shared preferences.
-  static const String _cacheKeyPrefix = 'whisperkit_model_support_config_';
 
   /// Creates a new [ModelSupportService] instance.
   ModelSupportService({String? token}) 
@@ -68,7 +57,7 @@ class ModelSupportService {
   /// - [repo]: The repository to fetch the configuration from (default: "argmaxinc/whisperkit-coreml")
   /// - [configPath]: Path to the configuration file in the repository (default: "config.json")
   /// - [revision]: Optional branch or commit hash
-  /// - [forceRefresh]: Whether to force a refresh from the network (default: false)
+  /// - [forceRefresh]: Parameter kept for backward compatibility (no longer used)
   /// 
   /// Returns a [Future<Result<ModelSupportConfig>>] containing either the configuration or an error.
   Future<Result<ModelSupportConfig>> fetchModelSupportConfig({
@@ -78,14 +67,6 @@ class ModelSupportService {
     bool forceRefresh = false,
   }) async {
     try {
-      // Check cache first if not forcing refresh
-      if (!forceRefresh) {
-        final cachedConfig = await _getCachedConfig(repo, configPath, revision);
-        if (cachedConfig != null) {
-          return Result.success(cachedConfig);
-        }
-      }
-
       // Fetch from network
       final jsonString = await _client.getRepositoryFile(
         repo: repo,
@@ -96,9 +77,6 @@ class ModelSupportService {
       // Parse JSON
       final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
       final config = ModelSupportConfig.fromJson(jsonMap);
-
-      // Cache the result
-      await _cacheConfig(repo, configPath, revision, jsonString);
 
       return Result.success(config);
     } on HuggingFaceClientException catch (e) {
@@ -121,121 +99,6 @@ class ModelSupportService {
         ModelSupportConfigError.unknownError,
         'Unknown error: $e',
       );
-    }
-  }
-
-  /// Gets cached configuration from shared preferences or file system.
-  Future<ModelSupportConfig?> _getCachedConfig(
-    String repo,
-    String configPath,
-    String? revision,
-  ) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final cacheKey = _getCacheKey(repo, configPath, revision);
-      
-      // Check if cache exists
-      if (prefs.containsKey(cacheKey)) {
-        // Get cache timestamp
-        final timestamp = prefs.getInt('${cacheKey}_timestamp') ?? 0;
-        final now = DateTime.now().millisecondsSinceEpoch;
-        
-        // Check if cache is still valid (24 hours)
-        if (now - timestamp < 24 * 60 * 60 * 1000) {
-          // Get cached file path
-          final filePath = prefs.getString(cacheKey);
-          if (filePath != null) {
-            final file = File(filePath);
-            if (await file.exists()) {
-              final jsonString = await file.readAsString();
-              final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
-              return ModelSupportConfig.fromJson(jsonMap);
-            }
-          }
-        }
-      }
-      
-      return null;
-    } catch (e) {
-      // If there's an error reading the cache, return null to fetch from network
-      debugPrint('Error reading cache: $e');
-      return null;
-    }
-  }
-
-  /// Caches configuration to shared preferences and file system.
-  /// Does not cache locale-specific data as per requirements.
-  Future<void> _cacheConfig(
-    String repo,
-    String configPath,
-    String? revision,
-    String jsonString,
-  ) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final cacheKey = _getCacheKey(repo, configPath, revision);
-      
-      // Parse JSON to remove any locale-specific data before caching
-      final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
-      
-      // Remove any locale-specific data if present
-      // This is a placeholder - implement based on actual locale fields in your config
-      if (jsonMap.containsKey('locale')) {
-        jsonMap.remove('locale');
-      }
-      
-      // Convert back to string
-      final filteredJsonString = jsonEncode(jsonMap);
-      
-      // Save to file
-      final directory = await getApplicationSupportDirectory();
-      final file = File('${directory.path}/whisperkit_config_cache/$cacheKey.json');
-      
-      // Create directory if it doesn't exist
-      await file.parent.create(recursive: true);
-      
-      // Write to file
-      await file.writeAsString(filteredJsonString);
-      
-      // Save to shared preferences
-      await prefs.setString(cacheKey, file.path);
-      await prefs.setInt(
-        '${cacheKey}_timestamp',
-        DateTime.now().millisecondsSinceEpoch,
-      );
-    } catch (e) {
-      // If there's an error caching, just log it and continue
-      debugPrint('Error caching config: $e');
-    }
-  }
-
-  /// Gets cache key for the specified repository and configuration path.
-  String _getCacheKey(String repo, String configPath, String? revision) {
-    final revisionPart = revision != null ? '_$revision' : '';
-    return '$_cacheKeyPrefix${repo.replaceAll('/', '_')}_${configPath.replaceAll('/', '_')}$revisionPart';
-  }
-
-  /// Clears the cached configuration.
-  Future<void> clearCache() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final keys = prefs.getKeys();
-      
-      // Remove all keys related to model support config
-      for (final key in keys) {
-        if (key.startsWith(_cacheKeyPrefix)) {
-          await prefs.remove(key);
-        }
-      }
-      
-      // Remove cache files
-      final directory = await getApplicationSupportDirectory();
-      final cacheDir = Directory('${directory.path}/whisperkit_config_cache');
-      if (await cacheDir.exists()) {
-        await cacheDir.delete(recursive: true);
-      }
-    } catch (e) {
-      debugPrint('Error clearing cache: $e');
     }
   }
 
