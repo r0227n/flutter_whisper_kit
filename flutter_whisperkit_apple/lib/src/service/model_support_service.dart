@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:huggingface_client/huggingface_client.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/model_support_config.dart';
 
@@ -11,7 +9,6 @@ import '../model/model_support_config.dart';
 enum ModelSupportConfigError {
   networkError,
   parsingError,
-  fileSystemError,
   invalidConfiguration,
   unsupportedDevice,
   huggingFaceApiError,
@@ -46,15 +43,6 @@ class Result<T> {
 class ModelSupportService {
   /// The Hugging Face client for API communication.
   final HuggingFaceClient _client;
-  
-  /// Key for storing the cached configuration timestamp.
-  static const String _cacheTimestampKey = 'model_support_config_timestamp';
-  
-  /// Key for storing the cached configuration repository.
-  static const String _cacheRepoKey = 'model_support_config_repo';
-  
-  /// Default cache duration in milliseconds (24 hours).
-  static const int _defaultCacheDuration = 24 * 60 * 60 * 1000;
 
   /// Creates a new [ModelSupportService] instance.
   ModelSupportService({String? token}) 
@@ -65,7 +53,7 @@ class ModelSupportService {
   /// [repo] The repository to fetch the configuration from.
   /// [configPath] Path to the configuration file in the repository.
   /// [revision] Optional branch or commit hash.
-  /// [forceRefresh] Whether to force a refresh from the network.
+  /// [forceRefresh] Parameter kept for backward compatibility (no longer used).
   Future<Result<ModelSupportConfig>> fetchModelSupportConfig({
     String repo = "argmaxinc/whisperkit-coreml",
     String configPath = "config.json",
@@ -73,14 +61,6 @@ class ModelSupportService {
     bool forceRefresh = false,
   }) async {
     try {
-      // Check cache first if not forcing refresh
-      if (!forceRefresh) {
-        final cachedConfig = await _getCachedConfig(repo);
-        if (cachedConfig != null) {
-          return Result.success(cachedConfig);
-        }
-      }
-
       // Fetch from Hugging Face API
       final configResult = await _fetchConfigFile(
         repo: repo,
@@ -99,9 +79,6 @@ class ModelSupportService {
       try {
         final configJson = jsonDecode(configResult.data!) as Map<String, dynamic>;
         final config = ModelSupportConfig.fromJson(configJson);
-        
-        // Cache the configuration
-        await _cacheConfig(config, repo);
         
         return Result.success(config);
       } catch (e) {
@@ -137,84 +114,6 @@ class ModelSupportService {
         ModelSupportConfigError.huggingFaceApiError,
         'Failed to fetch config file: ${e.toString()}',
       );
-    }
-  }
-
-  /// Caches the configuration to local storage.
-  Future<void> _cacheConfig(ModelSupportConfig config, String repo) async {
-    try {
-      // Save to file system
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/model_support_config.json');
-      await file.writeAsString(jsonEncode(config.toJson()));
-      
-      // Save timestamp and repo in preferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_cacheTimestampKey, DateTime.now().millisecondsSinceEpoch);
-      await prefs.setString(_cacheRepoKey, repo);
-    } catch (e) {
-      // Silently fail on cache errors
-      print('Failed to cache configuration: ${e.toString()}');
-    }
-  }
-
-  /// Retrieves the cached configuration if available and not expired.
-  Future<ModelSupportConfig?> _getCachedConfig(String repo) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final timestamp = prefs.getInt(_cacheTimestampKey);
-      final cachedRepo = prefs.getString(_cacheRepoKey);
-      
-      // Check if cache is valid
-      if (timestamp == null || 
-          cachedRepo == null || 
-          cachedRepo != repo ||
-          _isCacheExpired(timestamp)) {
-        return null;
-      }
-      
-      // Read from file system
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/model_support_config.json');
-      
-      if (!await file.exists()) {
-        return null;
-      }
-      
-      final jsonString = await file.readAsString();
-      final configJson = jsonDecode(jsonString) as Map<String, dynamic>;
-      
-      return ModelSupportConfig.fromJson(configJson);
-    } catch (e) {
-      // Return null on any cache error
-      print('Failed to get cached configuration: ${e.toString()}');
-      return null;
-    }
-  }
-
-  /// Checks if the cache is expired based on timestamp.
-  bool _isCacheExpired(int timestamp) {
-    final now = DateTime.now().millisecondsSinceEpoch;
-    return now - timestamp > _defaultCacheDuration;
-  }
-
-  /// Clears the cached configuration.
-  Future<void> clearCache() async {
-    try {
-      // Clear preferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove(_cacheTimestampKey);
-      await prefs.remove(_cacheRepoKey);
-      
-      // Delete cache file
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/model_support_config.json');
-      
-      if (await file.exists()) {
-        await file.delete();
-      }
-    } catch (e) {
-      print('Failed to clear cache: ${e.toString()}');
     }
   }
 
