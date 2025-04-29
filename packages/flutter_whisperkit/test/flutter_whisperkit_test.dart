@@ -52,6 +52,8 @@ class MockFlutterWhisperkitPlatform
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
   final FlutterWhisperkitPlatform initialPlatform =
       FlutterWhisperkitPlatform.instance;
 
