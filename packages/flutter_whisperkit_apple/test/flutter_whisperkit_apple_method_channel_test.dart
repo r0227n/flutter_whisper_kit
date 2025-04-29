@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
@@ -36,6 +37,10 @@ void main() {
       // Assert
       expect(platform.methodChannel.name, 'flutter_whisperkit_apple');
       expect(platform.transcriptionStreamChannel.name, 'flutter_whisperkit_apple/transcription_stream');
+    });
+    
+    test('implements FlutterWhisperkitPlatform', () {
+      expect(platform, isA<FlutterWhisperkitPlatform>());
     });
   });
 }

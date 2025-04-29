@@ -1,20 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
+import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-/// Mock implementation of [FlutterWhisperkitApplePlatform] for testing.
-class MockFlutterWhisperkitApplePlatform
+/// Mock implementation of [FlutterWhisperkitPlatform] for testing.
+class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
-    implements FlutterWhisperkitApplePlatform {
+    implements FlutterWhisperkitPlatform {
   
   @override
   Future<String?> loadModel(
-    String? variant,
+    String? variant, {
     String? modelRepo,
     bool? redownload,
     int? storageLocation,
-  ) => Future.value('Model loaded');
+  }) => Future.value('Model loaded');
 
   @override
   Future<String?> transcribeFromFile(
@@ -111,8 +111,8 @@ class MockFlutterWhisperkitApplePlatform
 /// Sets up a mock platform for testing.
 /// 
 /// Returns the mock platform instance.
-MockFlutterWhisperkitApplePlatform setUpMockPlatform() {
-  final mockPlatform = MockFlutterWhisperkitApplePlatform();
-  FlutterWhisperkitApplePlatform.instance = mockPlatform;
+MockFlutterWhisperkitPlatform setUpMockPlatform() {
+  final mockPlatform = MockFlutterWhisperkitPlatform();
+  FlutterWhisperkitPlatform.instance = mockPlatform;
   return mockPlatform;
 }

@@ -1,10 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
-import 'flutter_whisperkit_apple_platform_interface.dart';
+
+import 'flutter_whisperkit_apple_method_channel.dart';
 
 /// The main entry point for the Flutter WhisperKit Apple plugin.
 class FlutterWhisperkitApple {
+  /// Registers this implementation with the platform interface.
+  static void registerWith() {
+    FlutterWhisperkitPlatform.instance = MethodChannelFlutterWhisperkitApple();
+  }
+
   /// Loads a WhisperKit model.
   ///
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
@@ -17,11 +24,11 @@ class FlutterWhisperkitApple {
     bool? redownload,
     int? storageLocation,
   }) {
-    return FlutterWhisperkitApplePlatform.instance.loadModel(
+    return FlutterWhisperkitPlatform.instance.loadModel(
       variant,
-      modelRepo,
-      redownload,
-      storageLocation,
+      modelRepo: modelRepo,
+      redownload: redownload,
+      storageLocation: storageLocation,
     );
   }
 
@@ -51,7 +58,7 @@ class FlutterWhisperkitApple {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
   }) async {
-    final result = await FlutterWhisperkitApplePlatform.instance
+    final result = await FlutterWhisperkitPlatform.instance
         .transcribeFromFile(filePath, options);
 
     if (result == null) {
@@ -89,10 +96,7 @@ class FlutterWhisperkitApple {
     ),
     bool loop = true,
   }) {
-    return FlutterWhisperkitApplePlatform.instance.startRecording(
-      options,
-      loop,
-    );
+    return FlutterWhisperkitPlatform.instance.startRecording(options, loop);
   }
 
   /// Stops recording audio and optionally triggers transcription.
@@ -102,7 +106,7 @@ class FlutterWhisperkitApple {
   /// Returns a success message when recording is stopped.
   /// If [loop] is false, also triggers transcription of the recorded audio.
   Future<String?> stopRecording({bool loop = true}) {
-    return FlutterWhisperkitApplePlatform.instance.stopRecording(loop);
+    return FlutterWhisperkitPlatform.instance.stopRecording(loop);
   }
 
   /// Stream of real-time transcription results.
@@ -124,5 +128,5 @@ class FlutterWhisperkitApple {
   /// subscription.cancel();
   /// ```
   Stream<TranscriptionResult> get transcriptionStream =>
-      FlutterWhisperkitApplePlatform.instance.transcriptionStream;
+      FlutterWhisperkitPlatform.instance.transcriptionStream;
 }

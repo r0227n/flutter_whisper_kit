@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit_apple/model_loader.dart';
 
@@ -10,16 +10,20 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('FlutterWhisperkitApple', () {
-    final FlutterWhisperkitApplePlatform initialPlatform = FlutterWhisperkitApplePlatform.instance;
+    // Register the Apple implementation before running tests
+    setUpAll(() {
+      FlutterWhisperkitApple.registerWith();
+    });
 
     test('platform interface uses method channel by default', () {
-      expect(initialPlatform, isInstanceOf<MethodChannelFlutterWhisperkitApple>());
+      final platform = FlutterWhisperkitPlatform.instance;
+      expect(platform, isInstanceOf<MethodChannelFlutterWhisperkitApple>());
     });
 
     test('loadModel returns success message', () async {
       // Arrange
       FlutterWhisperkitApple flutterWhisperkitApplePlugin = FlutterWhisperkitApple();
-      MockFlutterWhisperkitApplePlatform fakePlatform = setUpMockPlatform();
+      MockFlutterWhisperkitPlatform fakePlatform = setUpMockPlatform();
       
       // Act & Assert
       expect(
