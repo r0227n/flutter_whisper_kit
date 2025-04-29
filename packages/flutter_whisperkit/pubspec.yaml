@@ -2,6 +2,7 @@ name: flutter_whisperkit
 description: "A new Flutter plugin project."
 version: 0.0.1
 homepage:
+publish_to: none
 
 environment:
   sdk: ^3.7.2
@@ -11,6 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
+  flutter_whisperkit_apple:
+    path: ../flutter_whisperkit_apple
 
 dev_dependencies:
   flutter_test:
