@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
   bool _isRecording = false;
   bool _isModelLoaded = false;
   String _modelStatus = 'Model not loaded';
-  
+
   final _flutterWhisperkitPlugin = FlutterWhisperkit();
   StreamSubscription<String>? _transcriptionSubscription;
 
@@ -45,7 +45,8 @@ class _MyAppState extends State<MyApp> {
     // We also handle the message potentially returning null.
     try {
       platformVersion =
-          await _flutterWhisperkitPlugin.getPlatformVersion() ?? 'Unknown platform version';
+          await _flutterWhisperkitPlugin.getPlatformVersion() ??
+          'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -65,14 +66,14 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         _modelStatus = 'Loading model...';
       });
-      
+
       final result = await _flutterWhisperkitPlugin.loadModel(
-        'tiny',
+        'large-v3',
         modelRepo: 'argmaxinc/whisperkit-coreml',
-        redownload: false,
+        redownload: true,
         storageLocation: 0,
       );
-      
+
       setState(() {
         _isModelLoaded = true;
         _modelStatus = 'Model loaded: $result';
@@ -98,13 +99,15 @@ class _MyAppState extends State<MyApp> {
         _transcriptionSubscription?.cancel();
       } else {
         await _flutterWhisperkitPlugin.startRecording();
-        _transcriptionSubscription = _flutterWhisperkitPlugin.transcriptionStream.listen((text) {
-          setState(() {
-            _transcriptionText = text;
-          });
-        });
+        _transcriptionSubscription = _flutterWhisperkitPlugin
+            .transcriptionStream
+            .listen((text) {
+              setState(() {
+                _transcriptionText = text;
+              });
+            });
       }
-      
+
       setState(() {
         _isRecording = !_isRecording;
       });
@@ -119,9 +122,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Flutter WhisperKit Example'),
-        ),
+        appBar: AppBar(title: const Text('Flutter WhisperKit Example')),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -151,7 +152,9 @@ class _MyAppState extends State<MyApp> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _toggleRecording,
-                child: Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
+                child: Text(
+                  _isRecording ? 'Stop Recording' : 'Start Recording',
+                ),
               ),
             ],
           ),
