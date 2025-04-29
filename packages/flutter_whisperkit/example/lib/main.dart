@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter_whisperkit/flutter_whisperkit.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   String _modelStatus = 'Model not loaded';
 
   final _flutterWhisperkitPlugin = FlutterWhisperkit();
-  StreamSubscription<String>? _transcriptionSubscription;
+  StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
 
   @override
   void initState() {
@@ -75,9 +76,9 @@ class _MyAppState extends State<MyApp> {
         await _flutterWhisperkitPlugin.startRecording();
         _transcriptionSubscription = _flutterWhisperkitPlugin
             .transcriptionStream
-            .listen((text) {
+            .listen((result) {
               setState(() {
-                _transcriptionText = text;
+                _transcriptionText = result.text;
               });
             });
       }
