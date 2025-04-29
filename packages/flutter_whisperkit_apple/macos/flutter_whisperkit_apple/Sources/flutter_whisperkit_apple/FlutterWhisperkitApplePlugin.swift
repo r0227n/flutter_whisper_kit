@@ -17,10 +17,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   private var transcriptionTask: Task<Void, Never>?
   public static var transcriptionStreamHandler: TranscriptionStreamHandler?
 
-  func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void) {
-    completion(.success("macOS " + ProcessInfo.processInfo.operatingSystemVersionString))
-  }
-
   func createWhisperKit(
     model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void
   ) {

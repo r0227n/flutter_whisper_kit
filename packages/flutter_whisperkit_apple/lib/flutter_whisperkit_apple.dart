@@ -6,11 +6,6 @@ import 'src/models/transcription_result.dart';
 
 /// The main entry point for the Flutter WhisperKit Apple plugin.
 class FlutterWhisperkitApple {
-  /// Returns the platform version.
-  Future<String?> getPlatformVersion() {
-    return FlutterWhisperkitApplePlatform.instance.getPlatformVersion();
-  }
-
   /// Creates a WhisperKit instance.
   ///
   /// [model] - The model name to use.
@@ -121,7 +116,7 @@ class FlutterWhisperkitApple {
   Future<String?> stopRecording({bool loop = true}) {
     return FlutterWhisperkitApplePlatform.instance.stopRecording(loop);
   }
-  
+
   /// Stream of real-time transcription results.
   ///
   /// This stream emits String values containing the transcribed text as it becomes available.
@@ -138,6 +133,6 @@ class FlutterWhisperkitApple {
   /// // Don't forget to cancel the subscription when done
   /// subscription.cancel();
   /// ```
-  Stream<String> get transcriptionStream => 
+  Stream<String> get transcriptionStream =>
       FlutterWhisperkitApplePlatform.instance.transcriptionStream;
 }

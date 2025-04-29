@@ -16,20 +16,22 @@ class MethodChannelFlutterWhisperkitApple
 
   /// The event channel for streaming transcription results
   @visibleForTesting
-  final EventChannel transcriptionStreamChannel = 
-      const EventChannel('flutter_whisperkit_apple/transcription_stream');
-  
+  final EventChannel transcriptionStreamChannel = const EventChannel(
+    'flutter_whisperkit_apple/transcription_stream',
+  );
+
   /// Stream controller for transcription results
-  final StreamController<String> _transcriptionStreamController = 
+  final StreamController<String> _transcriptionStreamController =
       StreamController<String>.broadcast();
-  
+
   /// Stream of transcription results
   @override
-  Stream<String> get transcriptionStream => _transcriptionStreamController.stream;
+  Stream<String> get transcriptionStream =>
+      _transcriptionStreamController.stream;
 
   /// The Pigeon-generated API for WhisperKit
   final _whisperKitMessage = WhisperKitMessage();
-  
+
   /// Constructor that sets up the event channel listener
   MethodChannelFlutterWhisperkitApple() {
     // Listen to the event channel and forward events to the stream controller
@@ -43,11 +45,6 @@ class MethodChannelFlutterWhisperkitApple
         _transcriptionStreamController.addError(error);
       },
     );
-  }
-
-  @override
-  Future<String?> getPlatformVersion() async {
-    return _whisperKitMessage.getPlatformVersion();
   }
 
   @override

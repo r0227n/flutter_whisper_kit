@@ -28,10 +28,6 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
-
   Future<String?> createWhisperKit(String? model, String? modelRepo) {
     throw UnimplementedError('createWhisperKit() has not been implemented.');
   }
@@ -63,7 +59,7 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
   Future<String?> stopRecording(bool loop) {
     throw UnimplementedError('stopRecording() has not been implemented.');
   }
-  
+
   /// Stream of real-time transcription results.
   ///
   /// This stream emits String values containing the transcribed text as it becomes available.

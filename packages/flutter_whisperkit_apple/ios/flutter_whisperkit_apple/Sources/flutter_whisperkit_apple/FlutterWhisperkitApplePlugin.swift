@@ -12,10 +12,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
 
-  func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void) {
-    completion(.success("iOS " + UIDevice.current.systemVersion))
-  }
-
   func createWhisperKit(
     model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void
   ) {

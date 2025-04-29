@@ -10,9 +10,6 @@ class MockFlutterWhisperkitApplePlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperkitApplePlatform {
   @override
-  Future<String?> getPlatformVersion() => Future.value('42');
-
-  @override
   Future<String?> createWhisperKit(String? model, String? modelRepo) =>
       Future.value('WhisperKit created');
 
@@ -25,25 +22,28 @@ class MockFlutterWhisperkitApplePlatform
   ) => Future.value('Model loaded successfully');
 
   @override
-  Future<String?> transcribeFromFile(String filePath, DecodingOptions? options) =>
-      Future.value('{"text":"Test transcription","segments":[{"text":"Test transcription"}],"language":"en","timings":{}}');
-      
+  Future<String?> transcribeFromFile(
+    String filePath,
+    DecodingOptions? options,
+  ) => Future.value(
+    '{"text":"Test transcription","segments":[{"text":"Test transcription"}],"language":"en","timings":{}}',
+  );
+
   @override
   Future<String?> startRecording(DecodingOptions options, bool loop) =>
       Future.value('Recording started');
-      
+
   @override
-  Future<String?> stopRecording(bool loop) =>
-      Future.value('Recording stopped');
-  
+  Future<String?> stopRecording(bool loop) => Future.value('Recording stopped');
+
   @override
-  Stream<String> get transcriptionStream => 
+  Stream<String> get transcriptionStream =>
       Stream<String>.fromIterable(['Test transcription']);
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  
+
   final FlutterWhisperkitApplePlatform initialPlatform =
       FlutterWhisperkitApplePlatform.instance;
 
@@ -52,16 +52,6 @@ void main() {
       initialPlatform,
       isInstanceOf<MethodChannelFlutterWhisperkitApple>(),
     );
-  });
-
-  test('getPlatformVersion', () async {
-    FlutterWhisperkitApple flutterWhisperkitApplePlugin =
-        FlutterWhisperkitApple();
-    MockFlutterWhisperkitApplePlatform fakePlatform =
-        MockFlutterWhisperkitApplePlatform();
-    FlutterWhisperkitApplePlatform.instance = fakePlatform;
-
-    expect(await flutterWhisperkitApplePlugin.getPlatformVersion(), '42');
   });
 
   test('createWhisperKit', () async {
