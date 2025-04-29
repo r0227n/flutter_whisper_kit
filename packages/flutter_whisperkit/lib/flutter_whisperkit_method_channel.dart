@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'src/models.dart';
-import 'src/whisper_kit_error.dart';
 
 import 'flutter_whisperkit_platform_interface.dart';
 

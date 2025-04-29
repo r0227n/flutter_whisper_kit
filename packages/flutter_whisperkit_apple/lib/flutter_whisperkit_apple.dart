@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
