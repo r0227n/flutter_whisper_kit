@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisperkit/flutter_whisperkit.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_method_channel.dart';
 import 'package:flutter_whisperkit/src/models.dart';
