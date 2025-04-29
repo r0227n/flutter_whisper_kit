@@ -10,13 +10,6 @@ class MockFlutterWhisperkitApplePlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperkitApplePlatform {
   @override
-  Future<String?> getPlatformVersion() => Future.value('42');
-
-  @override
-  Future<String?> createWhisperKit(String? model, String? modelRepo) =>
-      Future.value('WhisperKit created');
-
-  @override
   Future<String?> loadModel(
     String? variant,
     String? modelRepo,
@@ -79,23 +72,22 @@ class MockFlutterWhisperkitApplePlatform
 
     return Future.value(mockJson);
   }
-  
+
   @override
   Future<String?> startRecording(DecodingOptions options, bool loop) =>
       Future.value('Recording started');
-      
+
   @override
-  Future<String?> stopRecording(bool loop) =>
-      Future.value('Recording stopped');
-  
+  Future<String?> stopRecording(bool loop) => Future.value('Recording stopped');
+
   @override
-  Stream<String> get transcriptionStream => 
+  Stream<String> get transcriptionStream =>
       Stream<String>.fromIterable(['Test transcription']);
 }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  
+
   final FlutterWhisperkitApplePlatform initialPlatform =
       FlutterWhisperkitApplePlatform.instance;
 

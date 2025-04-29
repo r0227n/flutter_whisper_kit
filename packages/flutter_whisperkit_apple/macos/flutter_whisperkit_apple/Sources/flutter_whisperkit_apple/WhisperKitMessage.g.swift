@@ -88,8 +88,6 @@ class WhisperKitMessagePigeonCodec: FlutterStandardMessageCodec, @unchecked Send
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WhisperKitMessage {
-  func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void)
-  func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void)
   func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void)
   func transcribeFromFile(filePath: String, options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
   func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
@@ -102,39 +100,6 @@ class WhisperKitMessageSetup {
   /// Sets up an instance of `WhisperKitMessage` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: WhisperKitMessage?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let getPlatformVersionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.getPlatformVersion\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      getPlatformVersionChannel.setMessageHandler { _, reply in
-        api.getPlatformVersion { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      getPlatformVersionChannel.setMessageHandler(nil)
-    }
-    let createWhisperKitChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.createWhisperKit\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      createWhisperKitChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let modelArg: String? = nilOrValue(args[0])
-        let modelRepoArg: String? = nilOrValue(args[1])
-        api.createWhisperKit(model: modelArg, modelRepo: modelRepoArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      createWhisperKitChannel.setMessageHandler(nil)
-    }
     let loadModelChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.loadModel\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       loadModelChannel.setMessageHandler { message, reply in

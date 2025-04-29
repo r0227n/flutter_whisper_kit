@@ -17,27 +17,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   private var transcriptionTask: Task<Void, Never>?
   public static var transcriptionStreamHandler: TranscriptionStreamHandler?
 
-  func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void) {
-    completion(.success("macOS " + ProcessInfo.processInfo.operatingSystemVersionString))
-  }
-
-  func createWhisperKit(
-    model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void
-  ) {
-    Task {
-      do {
-        whisperKit = try await WhisperKit()
-
-        completion(
-          .success(
-            "WhisperKit instance created successfully: \(model ?? "default") \(modelRepo ?? "default")"
-          ))
-      } catch {
-        completion(.failure(error))
-      }
-    }
-  }
-
   func loadModel(
     variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
     completion: @escaping (Result<String?, Error>) -> Void
@@ -72,7 +51,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           try FileManager.default.removeItem(at: testFile)
         } catch {
           throw NSError(
-            domain: "WhisperKitError", code: 1004,
+            domain: "WhisperKitError", code: 4001,
             userInfo: [
               NSLocalizedDescriptionKey:
                 "Cannot write to model directory: \(error.localizedDescription)"
@@ -156,7 +135,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       completion(
         .failure(
           NSError(
-            domain: "WhisperKitError", code: 2002,
+            domain: "WhisperKitError", code: 2001,
             userInfo: [
               NSLocalizedDescriptionKey:
                 "WhisperKit instance not initialized. Call loadModel first."
@@ -169,14 +148,14 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         // Check if file exists and is readable
         guard FileManager.default.fileExists(atPath: filePath) else {
           throw NSError(
-            domain: "WhisperKitError", code: 2005,
+            domain: "WhisperKitError", code: 4002,
             userInfo: [NSLocalizedDescriptionKey: "Audio file does not exist at path: \(filePath)"])
         }
 
         // Check file permissions
         guard FileManager.default.isReadableFile(atPath: filePath) else {
           throw NSError(
-            domain: "WhisperKitError", code: 2006,
+            domain: "WhisperKitError", code: 4003,
             userInfo: [
               NSLocalizedDescriptionKey: "No read permission for audio file at path: \(filePath)"
             ])
@@ -201,7 +180,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
         guard let transcription = transcription else {
           throw NSError(
-            domain: "WhisperKitError", code: 2007,
+            domain: "WhisperKitError", code: 2004,
             userInfo: [NSLocalizedDescriptionKey: "Transcription result is nil"])
         }
         let transcriptionDict = transcription.toJson()
@@ -210,7 +189,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           let jsonData = try JSONSerialization.data(withJSONObject: transcriptionDict, options: [])
           guard let jsonString = String(data: jsonData, encoding: .utf8) else {
             throw NSError(
-              domain: "WhisperKitError", code: 2004,
+              domain: "WhisperKitError", code: 2003,
               userInfo: [
                 NSLocalizedDescriptionKey: "Failed to create JSON string from transcription result"
               ])
@@ -218,7 +197,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           completion(.success(jsonString))
         } catch {
           throw NSError(
-            domain: "WhisperKitError", code: 2003,
+            domain: "WhisperKitError", code: 2002,
             userInfo: [
               NSLocalizedDescriptionKey:
                 "Failed to serialize transcription result: \(error.localizedDescription)"

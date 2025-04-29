@@ -12,27 +12,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
 
-  func getPlatformVersion(completion: @escaping (Result<String?, Error>) -> Void) {
-    completion(.success("iOS " + UIDevice.current.systemVersion))
-  }
-
-  func createWhisperKit(
-    model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void
-  ) {
-    Task {
-      do {
-        whisperKit = try await WhisperKit()
-
-        completion(
-          .success(
-            "WhisperKit instance created successfully: \(model ?? "default") \(modelRepo ?? "default")"
-          ))
-      } catch {
-        completion(.failure(error))
-      }
-    }
-  }
-
   func loadModel(
     variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
     completion: @escaping (Result<String?, Error>) -> Void
@@ -67,7 +46,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           try FileManager.default.removeItem(at: testFile)
         } catch {
           throw NSError(
-            domain: "WhisperKitError", code: 1004,
+            domain: "WhisperKitError", code: 4001,
             userInfo: [
               NSLocalizedDescriptionKey:
                 "Cannot write to model directory: \(error.localizedDescription)"
@@ -149,7 +128,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       completion(
         .failure(
           NSError(
-            domain: "WhisperKitError", code: 2001,
+            domain: "WhisperKitError", code: 5001,
             userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
       return
     }
@@ -158,7 +137,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       completion(
         .failure(
           NSError(
-            domain: "WhisperKitError", code: 2002,
+            domain: "WhisperKitError", code: 2001,
             userInfo: [
               NSLocalizedDescriptionKey:
                 "WhisperKit instance not initialized. Call loadModel first."
@@ -473,14 +452,14 @@ private class WhisperKitApiImpl: WhisperKitMessage {
             completion(.success(jsonString))
           } else {
             throw NSError(
-              domain: "WhisperKitError", code: 2004,
+              domain: "WhisperKitError", code: 2003,
               userInfo: [
                 NSLocalizedDescriptionKey: "Failed to create JSON string from transcription result"
               ])
           }
         } catch {
           throw NSError(
-            domain: "WhisperKitError", code: 2003,
+            domain: "WhisperKitError", code: 2002,
             userInfo: [
               NSLocalizedDescriptionKey:
                 "Failed to serialize transcription result: \(error.localizedDescription)"
