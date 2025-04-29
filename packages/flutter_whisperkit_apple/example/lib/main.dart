@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'package:flutter_whisperkit_apple/model_loader.dart';
-import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +24,11 @@ class _MyAppState extends State<MyApp> {
   bool _isModelLoaded = false;
   bool _isRecording = false;
   String _realtimeTranscription = '';
-  StreamSubscription<String>? _transcriptionSubscription;
+  // Add variables to store additional TranscriptionResult details
+  List<TranscriptionSegment> _segments = [];
+  String _language = '';
+  double _confidence = 0.0;
+  StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
 
   // Use the proper plugin class instead of the generated message class
   final _flutterWhisperkitApple = FlutterWhisperkitApple();
@@ -82,10 +86,14 @@ class _MyAppState extends State<MyApp> {
         // Subscribe to the transcription stream
         _transcriptionSubscription = _flutterWhisperkitApple.transcriptionStream
             .listen(
-              (transcription) {
+              (result) {
                 setState(() {
-                  if (transcription.isNotEmpty) {
-                    _realtimeTranscription = transcription;
+                  if (result.text.isNotEmpty) {
+                    _realtimeTranscription = result.text;
+                    _segments = result.segments;
+                    _language = result.language;
+                    _confidence = result.segments.isEmpty ? 0.0 : 
+                      result.segments.map((s) => s.avgLogprob).reduce((a, b) => a + b) / result.segments.length;
                   }
                 });
               },
@@ -318,11 +326,19 @@ class _MyAppState extends State<MyApp> {
                 ),
                 constraints: const BoxConstraints(minHeight: 100),
                 width: double.infinity,
-                child: Text(
-                  _realtimeTranscription.isEmpty
-                      ? 'Speak to see transcription here...'
-                      : _realtimeTranscription,
-                  style: const TextStyle(fontFamily: 'monospace'),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _realtimeTranscription.isEmpty
+                          ? 'Speak to see transcription here...'
+                          : _realtimeTranscription,
+                      style: const TextStyle(fontFamily: 'monospace'),
+                    ),
+                    if (_language.isNotEmpty) Text('Language: $_language'),
+                    if (_confidence != 0.0) Text('Confidence: ${_confidence.toStringAsFixed(2)}'),
+                    if (_segments.isNotEmpty) Text('Segments: ${_segments.length}'),
+                  ],
                 ),
               ),
             ],

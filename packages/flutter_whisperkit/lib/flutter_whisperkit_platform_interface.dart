@@ -52,7 +52,7 @@ abstract class FlutterWhisperkitPlatform extends PlatformInterface {
   }
 
   /// Stream of real-time transcription results.
-  Stream<String> get transcriptionStream {
+  Stream<TranscriptionResult> get transcriptionStream {
     throw UnimplementedError('transcriptionStream has not been implemented.');
   }
 }

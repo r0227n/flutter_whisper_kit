@@ -1,6 +1,7 @@
 name: flutter_whisperkit_apple
 description: "A new Flutter plugin project."
 version: 0.0.1
+publish_to: none
 homepage:
 
 environment:
@@ -14,6 +15,8 @@ dependencies:
     sdk: flutter
   pigeon: ^25.3.1
   plugin_platform_interface: ^2.0.2
+  flutter_whisperkit:
+    path: ../flutter_whisperkit
 
 dev_dependencies:
   flutter_test:

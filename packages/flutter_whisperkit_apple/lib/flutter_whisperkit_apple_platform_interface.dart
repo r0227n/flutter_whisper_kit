@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 
 import 'flutter_whisperkit_apple_method_channel.dart';
-
-import 'src/models/decoding_options.dart';
 
 abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
   /// Constructs a FlutterWhisperkitApplePlatform.
@@ -58,9 +57,9 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
 
   /// Stream of real-time transcription results.
   ///
-  /// This stream emits String values containing the transcribed text as it becomes available.
-  /// The stream will emit an empty string when recording stops.
-  Stream<String> get transcriptionStream {
+  /// This stream emits TranscriptionResult objects containing the full transcription data as it becomes available.
+  /// The stream will emit an empty result when recording stops.
+  Stream<TranscriptionResult> get transcriptionStream {
     throw UnimplementedError('transcriptionStream has not been implemented.');
   }
 }

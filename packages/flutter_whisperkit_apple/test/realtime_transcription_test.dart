@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
-import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 
 import 'test_utils/mocks.dart';
 
@@ -63,7 +63,9 @@ void main() {
       final stream = plugin.transcriptionStream;
       
       // Assert
-      expect(stream, emits('Test transcription'));
+      expect(stream, emitsThrough(predicate<TranscriptionResult>(
+        (result) => result.text == 'Test transcription' && result.language == 'en',
+      )));
     });
   });
 }

@@ -454,7 +454,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
               lastTranscribedText = result.text
               
               if let streamHandler = WhisperKitApiImpl.transcriptionStreamHandler as? TranscriptionStreamHandler {
-                streamHandler.sendTranscription(result.text)
+                streamHandler.sendTranscription(result)
               }
             }
           }
@@ -467,7 +467,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       }
       
       if let streamHandler = WhisperKitApiImpl.transcriptionStreamHandler as? TranscriptionStreamHandler {
-        streamHandler.sendTranscription("")
+        streamHandler.sendTranscription(nil)
       }
     }
   }
@@ -537,10 +537,26 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
     return nil
   }
   
-  func sendTranscription(_ text: String) {
+  func sendTranscription(_ result: TranscriptionResult?) {
     if let eventSink = eventSink {
       DispatchQueue.main.async {
-        eventSink(text)
+        if let result = result {
+          let resultDict = result.toJson()
+          do {
+            let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+              eventSink(jsonString)
+            } else {
+              print("Error: Failed to convert JSON data to string.")
+              eventSink(FlutterError(code: "JSON_CONVERSION_ERROR", message: "Failed to convert JSON data to string.", details: nil))
+            }
+          } catch {
+            print("Error: JSON serialization failed with error: \(error.localizedDescription)")
+            eventSink(FlutterError(code: "JSON_SERIALIZATION_ERROR", message: "JSON serialization failed.", details: error.localizedDescription))
+          }
+        } else {
+          eventSink("")
+        }
       }
     }
   }

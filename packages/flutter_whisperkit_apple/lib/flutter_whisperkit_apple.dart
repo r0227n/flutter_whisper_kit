@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 import 'flutter_whisperkit_apple_platform_interface.dart';
-import 'src/models/transcription_result.dart';
 
 /// The main entry point for the Flutter WhisperKit Apple plugin.
 class FlutterWhisperkitApple {
@@ -108,20 +107,22 @@ class FlutterWhisperkitApple {
 
   /// Stream of real-time transcription results.
   ///
-  /// This stream emits String values containing the transcribed text as it becomes available.
-  /// The stream will emit an empty string when recording stops.
+  /// This stream emits TranscriptionResult objects containing the full transcription data as it becomes available.
+  /// The stream will emit an empty result when recording stops.
   ///
   /// Example usage:
   /// ```dart
-  /// final subscription = flutterWhisperkitApple.transcriptionStream.listen((text) {
+  /// final subscription = flutterWhisperkitApple.transcriptionStream.listen((result) {
   ///   setState(() {
-  ///     _transcriptionText = text;
+  ///     _transcriptionText = result.text;
+  ///     _segments = result.segments;
+  ///     _language = result.language;
   ///   });
   /// });
   ///
   /// // Don't forget to cancel the subscription when done
   /// subscription.cancel();
   /// ```
-  Stream<String> get transcriptionStream =>
+  Stream<TranscriptionResult> get transcriptionStream =>
       FlutterWhisperkitApplePlatform.instance.transcriptionStream;
 }

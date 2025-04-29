@@ -507,20 +507,20 @@ class TranscriptionResult {
     return TranscriptionResult(
       text: json['text'] as String? ?? '',
       segments:
-          (json['segments'] as List)
-              .map(
+          (json['segments'] as List?)
+              ?.map(
                 (e) => TranscriptionSegment.fromJson(
                   Map<String, dynamic>.from(e as Map),
                 ),
               )
-              .toList(),
+              .toList() ?? [],
       language: json['language'] as String? ?? 'en',
       timings:
           json['timings'] != null
               ? TranscriptionTimings.fromJson(
-                Map<String, dynamic>.from(json['timings'] as Map),
-              )
-              : TranscriptionTimings(),
+                  Map<String, dynamic>.from(json['timings'] as Map),
+                )
+              : const TranscriptionTimings(),
       seekTime:
           json['seekTime'] != null
               ? (json['seekTime'] as num).toDouble()
@@ -532,7 +532,7 @@ class TranscriptionResult {
   Map<String, dynamic> toJson() {
     return {
       'text': text,
-      'segments': segments.map((e) => e.toJson()).toList(),
+      'segments': segments.map((s) => s.toJson()).toList(),
       'language': language,
       'timings': timings.toJson(),
       if (seekTime != null) 'seekTime': seekTime,
