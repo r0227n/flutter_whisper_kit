@@ -1,8 +1,14 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 import 'package:flutter_whisperkit_apple/src/whisper_kit_message.g.dart';
 
 /// A mock implementation of [WhisperKitMessage] for testing.
 class MockWhisperKitMessage implements WhisperKitMessage {
+  @override
+  final BinaryMessenger? pigeonVar_binaryMessenger = null;
+  
+  @override
+  final String pigeonVar_messageChannelSuffix = '';
   /// Mock implementation of loadModel
   @override
   Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation) async {
