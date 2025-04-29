@@ -71,9 +71,25 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
 
   @override
   Future<String?> transcribeFromFile(
-    String filePath,
-    DecodingOptions options,
-  ) async {
+    String filePath, {
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      detectLanguage: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: true,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
+  }) async {
     try {
       final Map<String, dynamic> arguments = {
         'filePath': filePath,
@@ -87,7 +103,25 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   }
 
   @override
-  Future<String?> startRecording(DecodingOptions options, bool loop) async {
+  Future<String?> startRecording({
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: false,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
+    bool loop = true,
+  }) async {
     try {
       final Map<String, dynamic> arguments = {
         'options': options.toJson(),
@@ -101,7 +135,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   }
 
   @override
-  Future<String?> stopRecording(bool loop) async {
+  Future<String?> stopRecording({bool loop = true}) async {
     try {
       return await methodChannel.invokeMethod<String>('stopRecording', {'loop': loop});
     } on PlatformException catch (e) {
