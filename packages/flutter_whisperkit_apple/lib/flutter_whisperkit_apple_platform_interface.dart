@@ -28,4 +28,24 @@ abstract class FlutterWhisperkitApplePlatform extends FlutterWhisperkitPlatform 
     PlatformInterface.verifyToken(instance, _token);
     _instance = instance;
   }
+  
+  @override
+  Future<String?> loadModel(
+    String? variant, {
+    String? modelRepo,
+    bool? redownload,
+    int? storageLocation,
+  });
+  
+  @override
+  Future<String?> transcribeFromFile(String filePath, DecodingOptions options);
+  
+  @override
+  Future<String?> startRecording(DecodingOptions options, bool loop);
+  
+  @override
+  Future<String?> stopRecording(bool loop);
+  
+  @override
+  Stream<TranscriptionResult> get transcriptionStream;
 }

@@ -60,11 +60,11 @@ class MethodChannelFlutterWhisperkitApple
 
   @override
   Future<String?> loadModel(
-    String? variant,
+    String? variant, {
     String? modelRepo,
     bool? redownload,
     int? storageLocation,
-  ) async {
+  }) async {
     try {
       return _whisperKitMessage.loadModel(
         variant,
@@ -79,10 +79,7 @@ class MethodChannelFlutterWhisperkitApple
   }
 
   @override
-  Future<String?> transcribeFromFile(
-    String filePath,
-    DecodingOptions options,
-  ) async {
+  Future<String?> transcribeFromFile(String filePath, DecodingOptions options) async {
     try {
       return _whisperKitMessage.transcribeFromFile(filePath, options.toJson());
     } on PlatformException catch (e) {

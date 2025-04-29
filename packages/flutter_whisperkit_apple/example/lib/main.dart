@@ -7,6 +7,8 @@ import 'package:flutter_whisperkit_apple/model_loader.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 void main() {
+  // Register the Apple implementation with the main platform interface
+  FlutterWhisperkitApple.registerWith();
   runApp(const MyApp());
 }
 

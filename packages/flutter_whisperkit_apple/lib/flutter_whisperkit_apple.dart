@@ -25,9 +25,9 @@ class FlutterWhisperkitApple {
   }) {
     return FlutterWhisperkitApplePlatform.instance.loadModel(
       variant,
-      modelRepo,
-      redownload,
-      storageLocation,
+      modelRepo: modelRepo,
+      redownload: redownload,
+      storageLocation: storageLocation,
     );
   }
 
