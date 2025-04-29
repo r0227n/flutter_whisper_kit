@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'src/models.dart';
 
 import 'flutter_whisperkit_platform_interface.dart';
@@ -14,8 +13,40 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('flutter_whisperkit');
 
-  /// The instance of flutter_whisperkit_apple that this method channel delegates to.
-  final _whisperKitApple = FlutterWhisperkitApple();
+  /// The event channel for streaming transcription results
+  @visibleForTesting
+  final EventChannel transcriptionStreamChannel = const EventChannel(
+    'flutter_whisperkit/transcription_stream',
+  );
+
+  /// Stream controller for transcription results
+  final StreamController<TranscriptionResult> _transcriptionStreamController =
+      StreamController<TranscriptionResult>.broadcast();
+
+  /// Constructor that sets up the event channel listener
+  MethodChannelFlutterWhisperkit() {
+    // Listen to the event channel and forward events to the stream controller
+    transcriptionStreamChannel.receiveBroadcastStream().listen(
+      (dynamic event) {
+        if (event is String) {
+          if (event.isEmpty) {
+            // Empty string means recording stopped
+            _transcriptionStreamController.add(const TranscriptionResult(
+              text: '', segments: [], language: '', timings: TranscriptionTimings()));
+          } else {
+            try {
+              _transcriptionStreamController.add(TranscriptionResult.fromJsonString(event));
+            } catch (e) {
+              _transcriptionStreamController.addError(Exception('Failed to parse transcription result: $e'));
+            }
+          }
+        }
+      },
+      onError: (dynamic error) {
+        _transcriptionStreamController.addError(error);
+      },
+    );
+  }
 
   @override
   Future<String?> loadModel(
@@ -23,13 +54,19 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     String? modelRepo,
     bool? redownload,
     int? storageLocation,
-  }) {
-    return _whisperKitApple.loadModel(
-      variant,
-      modelRepo: modelRepo,
-      redownload: redownload,
-      storageLocation: storageLocation,
-    );
+  }) async {
+    try {
+      final Map<String, dynamic> arguments = {
+        'variant': variant,
+        'modelRepo': modelRepo,
+        'redownload': redownload,
+        'storageLocation': storageLocation,
+      };
+      return await methodChannel.invokeMethod<String>('loadModel', arguments);
+    } on PlatformException catch (e) {
+      debugPrint('Error loading model: ${e.message}');
+      rethrow;
+    }
   }
 
   @override
@@ -38,29 +75,42 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     DecodingOptions options,
   ) async {
     try {
-      final result = await _whisperKitApple.transcribeFromFile(
-        filePath,
-        options: options,
-      );
-      // Convert the TranscriptionResult to a JSON string to pass through the platform interface
-      return jsonEncode(result.toJson());
-    } catch (e) {
-      debugPrint('Error transcribing file: $e');
+      final Map<String, dynamic> arguments = {
+        'filePath': filePath,
+        'options': options.toJson(),
+      };
+      return await methodChannel.invokeMethod<String>('transcribeFromFile', arguments);
+    } on PlatformException catch (e) {
+      debugPrint('Error transcribing file: ${e.message}');
       rethrow;
     }
   }
 
   @override
-  Future<String?> startRecording(DecodingOptions options, bool loop) {
-    return _whisperKitApple.startRecording(options: options, loop: loop);
+  Future<String?> startRecording(DecodingOptions options, bool loop) async {
+    try {
+      final Map<String, dynamic> arguments = {
+        'options': options.toJson(),
+        'loop': loop,
+      };
+      return await methodChannel.invokeMethod<String>('startRecording', arguments);
+    } on PlatformException catch (e) {
+      debugPrint('Error starting recording: ${e.message}');
+      rethrow;
+    }
   }
 
   @override
-  Future<String?> stopRecording(bool loop) {
-    return _whisperKitApple.stopRecording(loop: loop);
+  Future<String?> stopRecording(bool loop) async {
+    try {
+      return await methodChannel.invokeMethod<String>('stopRecording', {'loop': loop});
+    } on PlatformException catch (e) {
+      debugPrint('Error stopping recording: ${e.message}');
+      rethrow;
+    }
   }
 
   @override
   Stream<TranscriptionResult> get transcriptionStream =>
-      _whisperKitApple.transcriptionStream;
+      _transcriptionStreamController.stream;
 }

@@ -5,12 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
-import 'flutter_whisperkit_apple_platform_interface.dart';
 import 'src/whisper_kit_message.g.dart';
 
-/// An implementation of [FlutterWhisperkitApplePlatform] that uses method channels.
-class MethodChannelFlutterWhisperkitApple
-    extends FlutterWhisperkitApplePlatform {
+/// An implementation that uses method channels to communicate with the native platform.
+class MethodChannelFlutterWhisperkitApple {
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('flutter_whisperkit_apple');
@@ -26,7 +24,6 @@ class MethodChannelFlutterWhisperkitApple
       StreamController<TranscriptionResult>.broadcast();
 
   /// Stream of transcription results
-  @override
   Stream<TranscriptionResult> get transcriptionStream =>
       _transcriptionStreamController.stream;
 
@@ -58,7 +55,6 @@ class MethodChannelFlutterWhisperkitApple
     );
   }
 
-  @override
   Future<String?> loadModel(
     String? variant,
     String? modelRepo,
@@ -78,7 +74,6 @@ class MethodChannelFlutterWhisperkitApple
     }
   }
 
-  @override
   Future<String?> transcribeFromFile(
     String filePath,
     DecodingOptions options,
@@ -91,7 +86,6 @@ class MethodChannelFlutterWhisperkitApple
     }
   }
 
-  @override
   Future<String?> startRecording(DecodingOptions options, bool loop) async {
     try {
       return _whisperKitMessage.startRecording(options.toJson(), loop);
@@ -101,7 +95,6 @@ class MethodChannelFlutterWhisperkitApple
     }
   }
 
-  @override
   Future<String?> stopRecording(bool loop) async {
     try {
       return _whisperKitMessage.stopRecording(loop);

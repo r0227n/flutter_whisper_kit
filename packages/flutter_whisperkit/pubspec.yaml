@@ -14,8 +14,6 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
-  flutter_whisperkit_apple:
-    path: ../flutter_whisperkit_apple
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +25,6 @@ flutter:
   plugin:
     platforms:
       ios:
-        pluginClass: FlutterWhisperkitPlugin
+        default_package: flutter_whisperkit_apple
       macos:
-        pluginClass: FlutterWhisperkitPlugin
+        default_package: flutter_whisperkit_apple
