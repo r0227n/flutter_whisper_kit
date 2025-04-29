@@ -2,9 +2,9 @@ import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(
   PigeonOptions(
-    dartOut: '../flutter_whisperkit/lib/src/whisper_kit_message.g.dart',
+    dartOut: 'lib/src/whisper_kit_message.g.dart',
     swiftOut:
-        'macos/flutter_whisperkit_apple/Sources/flutter_whisperkit_apple/WhisperKitMessage.g.swift',
+        '../flutter_whisperkit_apple/macos/flutter_whisperkit_apple/Sources/flutter_whisperkit_apple/WhisperKitMessage.g.swift',
     dartPackageName: 'flutter_whisperkit',
   ),
 )
