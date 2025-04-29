@@ -1,0 +1,9 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Add additional lint rules here
+
+analyzer:
+  exclude:
+    # Add excluded files/directories here
