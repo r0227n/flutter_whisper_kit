@@ -542,9 +542,17 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
       DispatchQueue.main.async {
         if let result = result {
           let resultDict = result.toJson()
-          if let jsonData = try? JSONSerialization.data(withJSONObject: resultDict, options: []),
-             let jsonString = String(data: jsonData, encoding: .utf8) {
-            eventSink(jsonString)
+          do {
+            let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+              eventSink(jsonString)
+            } else {
+              print("Error: Failed to convert JSON data to string.")
+              eventSink(FlutterError(code: "JSON_CONVERSION_ERROR", message: "Failed to convert JSON data to string.", details: nil))
+            }
+          } catch {
+            print("Error: JSON serialization failed with error: \(error.localizedDescription)")
+            eventSink(FlutterError(code: "JSON_SERIALIZATION_ERROR", message: "JSON serialization failed.", details: error.localizedDescription))
           }
         } else {
           eventSink("")
