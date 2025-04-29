@@ -8,16 +8,31 @@ import 'flutter_whisperkit_apple_method_channel.dart';
 /// The main entry point for the Flutter WhisperKit Apple plugin.
 class FlutterWhisperkitApple extends FlutterWhisperkitPlatform {
   /// Create a singleton instance
-  static final FlutterWhisperkitApple _instance = FlutterWhisperkitApple._();
-
-  /// Factory constructor to return the singleton instance
-  factory FlutterWhisperkitApple() => _instance;
+  static FlutterWhisperkitApple? _instance;
 
   /// Method channel implementation
-  final MethodChannelFlutterWhisperkitApple _methodChannel = MethodChannelFlutterWhisperkitApple();
+  final MethodChannelFlutterWhisperkitApple _methodChannel;
 
-  /// Private constructor for singleton
-  FlutterWhisperkitApple._() {
+  /// Factory constructor to return the singleton instance
+  /// 
+  /// For normal usage, this returns the singleton instance.
+  /// For testing, you can provide a custom method channel implementation.
+  factory FlutterWhisperkitApple({MethodChannelFlutterWhisperkitApple? methodChannel}) {
+    if (methodChannel != null) {
+      // For testing: create a new instance with the provided method channel
+      return FlutterWhisperkitApple._(methodChannel: methodChannel);
+    }
+    
+    // For normal usage: return or create the singleton instance
+    _instance ??= FlutterWhisperkitApple._(
+      methodChannel: MethodChannelFlutterWhisperkitApple()
+    );
+    return _instance!;
+  }
+
+  /// Constructor with optional method channel for testing
+  FlutterWhisperkitApple._({required MethodChannelFlutterWhisperkitApple methodChannel}) 
+      : _methodChannel = methodChannel {
     // Register this implementation as the default instance
     FlutterWhisperkitPlatform.instance = this;
   }

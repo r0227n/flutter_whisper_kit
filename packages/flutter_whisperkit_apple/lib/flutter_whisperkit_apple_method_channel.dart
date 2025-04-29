@@ -28,10 +28,11 @@ class MethodChannelFlutterWhisperkitApple {
       _transcriptionStreamController.stream;
 
   /// The Pigeon-generated API for WhisperKit
-  final _whisperKitMessage = WhisperKitMessage();
+  final WhisperKitMessage _whisperKitMessage;
 
   /// Constructor that sets up the event channel listener
-  MethodChannelFlutterWhisperkitApple() {
+  MethodChannelFlutterWhisperkitApple({WhisperKitMessage? whisperKitMessage}) 
+      : _whisperKitMessage = whisperKitMessage ?? WhisperKitMessage() {
     // Listen to the event channel and forward events to the stream controller
     transcriptionStreamChannel.receiveBroadcastStream().listen(
       (dynamic event) {

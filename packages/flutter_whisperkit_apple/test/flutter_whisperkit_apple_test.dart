@@ -6,6 +6,7 @@ import 'package:flutter_whisperkit/src/model_loader.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 import 'test_utils/mocks.dart';
+import 'test_utils/mock_whisper_kit_message.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +20,13 @@ void main() {
 
     test('loadModel returns success message', () async {
       // Arrange
-      FlutterWhisperkitApple flutterWhisperkitApplePlugin = FlutterWhisperkitApple();
+      final mockWhisperKitMessage = MockWhisperKitMessage();
+      final methodChannel = MethodChannelFlutterWhisperkitApple(
+        whisperKitMessage: mockWhisperKitMessage
+      );
+      final flutterWhisperkitApplePlugin = FlutterWhisperkitApple(
+        methodChannel: methodChannel
+      );
       setUpMockPlatform();
       
       // Act & Assert
@@ -28,7 +35,7 @@ void main() {
           'tiny-en',
           modelRepo: 'argmaxinc/whisperkit-coreml',
         ),
-        'Model loaded',
+        'Model loaded successfully',
       );
     });
 

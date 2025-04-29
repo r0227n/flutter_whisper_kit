@@ -5,6 +5,7 @@ import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 import 'test_utils/mocks.dart';
+import 'test_utils/mock_whisper_kit_message.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,16 @@ void main() {
     });
 
     setUp(() {
-      plugin = FlutterWhisperkitApple();
+      // Create a method channel with mock WhisperKitMessage
+      final mockWhisperKitMessage = MockWhisperKitMessage();
+      final methodChannel = MethodChannelFlutterWhisperkitApple(
+        whisperKitMessage: mockWhisperKitMessage
+      );
+      
+      // Create plugin instance with mock method channel
+      plugin = FlutterWhisperkitApple(methodChannel: methodChannel);
+      
+      // Set up mock platform interface
       setUpMockPlatform();
     });
 
