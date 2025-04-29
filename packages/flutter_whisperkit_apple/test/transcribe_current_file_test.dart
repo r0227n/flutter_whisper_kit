@@ -4,198 +4,145 @@ import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
 import 'package:flutter_whisperkit_apple/src/models/transcription_result.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-class MockFlutterWhisperkitApplePlatform
-    with MockPlatformInterfaceMixin
-    implements FlutterWhisperkitApplePlatform {
-  @override
-  Future<String?> loadModel(
-    String? variant,
-    String? modelRepo,
-    bool? redownload,
-    int? storageLocation,
-  ) => Future.value('Model loaded');
-
-  @override
-  Future<String?> transcribeFromFile(
-    String filePath,
-    DecodingOptions? options,
-  ) {
-    if (filePath.isEmpty) {
-      return Future.value(null);
-    }
-
-    // Mock JSON response for a successful transcription
-    const mockJson = '''
-    {
-      "text": "Hello world. This is a test.",
-      "segments": [
-        {
-          "id": 0,
-          "seek": 0,
-          "text": "Hello world.",
-          "start": 0.0,
-          "end": 2.0,
-          "tokens": [1, 2, 3],
-          "temperature": 1.0,
-          "avgLogprob": -0.5,
-          "compressionRatio": 1.2,
-          "noSpeechProb": 0.1
-        },
-        {
-          "id": 1,
-          "seek": 0,
-          "text": "This is a test.",
-          "start": 2.0,
-          "end": 4.0,
-          "tokens": [4, 5, 6, 7],
-          "temperature": 1.0,
-          "avgLogprob": -0.4,
-          "compressionRatio": 1.3,
-          "noSpeechProb": 0.05
-        }
-      ],
-      "language": "en",
-      "timings": {
-        "pipelineStart": 0.0,
-        "firstTokenTime": 0.4,
-        "inputAudioSeconds": 4.0,
-        "audioLoading": 0.1,
-        "audioProcessing": 0.2,
-        "encoding": 0.3,
-        "decodingLoop": 0.5,
-        "fullPipeline": 1.0
-      }
-    }
-    ''';
-
-    return Future.value(mockJson);
-  }
-
-  @override
-  Future<String?> startRecording(DecodingOptions options, bool loop) =>
-      Future.value('Recording started');
-
-  @override
-  Future<String?> stopRecording(bool loop) => Future.value('Recording stopped');
-
-  @override
-  Stream<String> get transcriptionStream =>
-      Stream<String>.fromIterable(['Test transcription']);
-}
+import 'test_utils/mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  final FlutterWhisperkitApplePlatform initialPlatform =
-      FlutterWhisperkitApplePlatform.instance;
+  group('File Transcription', () {
+    late FlutterWhisperkitApple plugin;
+    
+    group('Platform Interface', () {
+      test('default instance is MethodChannelFlutterWhisperkitApple', () {
+        // Save the original instance
+        final originalInstance = FlutterWhisperkitApplePlatform.instance;
+        
+        // Create a new instance for testing
+        FlutterWhisperkitApplePlatform.instance = MethodChannelFlutterWhisperkitApple();
+        
+        // Assert
+        expect(
+          FlutterWhisperkitApplePlatform.instance,
+          isInstanceOf<MethodChannelFlutterWhisperkitApple>(),
+        );
+        
+        // Restore the original instance
+        FlutterWhisperkitApplePlatform.instance = originalInstance;
+      });
+    });
 
-  test('$MethodChannelFlutterWhisperkitApple is the default instance', () {
-    expect(
-      initialPlatform,
-      isInstanceOf<MethodChannelFlutterWhisperkitApple>(),
-    );
-  });
+    setUp(() {
+      plugin = FlutterWhisperkitApple();
+      setUpMockPlatform();
+    });
 
-  test('transcribeFromFile returns JSON string', () async {
-    FlutterWhisperkitApple flutterWhisperkitApplePlugin =
-        FlutterWhisperkitApple();
-    MockFlutterWhisperkitApplePlatform fakePlatform =
-        MockFlutterWhisperkitApplePlatform();
-    FlutterWhisperkitApplePlatform.instance = fakePlatform;
+    group('transcribeFromFile', () {
+      test('returns TranscriptionResult for valid file path', () async {
+        // Act
+        final result = await plugin.transcribeFromFile('test.wav');
+        
+        // Assert
+        expect(result, isNotNull);
+        expect(result, isA<TranscriptionResult>());
+        expect(result.text, 'Hello world. This is a test.');
+        expect(result.segments.length, 2);
+        expect(result.language, 'en');
+      });
 
-    expect(
-      await flutterWhisperkitApplePlugin.transcribeFromFile('test.wav'),
-      isNotNull,
-    );
-    expect(
-      await flutterWhisperkitApplePlugin.transcribeFromFile('test.wav'),
-      isA<TranscriptionResult>(),
-    );
-  });
+      test('with custom DecodingOptions returns TranscriptionResult', () async {
+        // Arrange
+        final options = DecodingOptions(
+          language: 'en',
+          temperature: 0.7,
+          wordTimestamps: true,
+        );
 
-  test('transcribeFromFile with DecodingOptions returns JSON string', () async {
-    FlutterWhisperkitApple flutterWhisperkitApplePlugin =
-        FlutterWhisperkitApple();
-    MockFlutterWhisperkitApplePlatform fakePlatform =
-        MockFlutterWhisperkitApplePlatform();
-    FlutterWhisperkitApplePlatform.instance = fakePlatform;
+        // Act
+        final result = await plugin.transcribeFromFile(
+          'test.wav',
+          options: options,
+        );
+        
+        // Assert
+        expect(result, isNotNull);
+        expect(result, isA<TranscriptionResult>());
+      });
 
-    final options = DecodingOptions(
-      language: 'en',
-      temperature: 0.7,
-      wordTimestamps: true,
-    );
+      test('throws exception with empty file path', () async {
+        // Act & Assert
+        expect(
+          () => plugin.transcribeFromFile(''),
+          throwsException,
+        );
+      });
+    });
 
-    expect(
-      await flutterWhisperkitApplePlugin.transcribeFromFile(
-        'test.wav',
-        options: options,
-      ),
-      isNotNull,
-    );
-    expect(
-      await flutterWhisperkitApplePlugin.transcribeFromFile(
-        'test.wav',
-        options: options,
-      ),
-      isA<TranscriptionResult>(),
-    );
-  });
+    group('DecodingOptions', () {
+      test('creates correct options object with default values', () {
+        // Act
+        final options = DecodingOptions();
+        
+        // Assert
+        expect(options.verbose, false);
+        expect(options.task, DecodingTask.transcribe);
+        expect(options.temperature, 0.0);
+      });
 
-  test('transcribeFromFile with empty path throws exception', () async {
-    FlutterWhisperkitApple flutterWhisperkitApplePlugin =
-        FlutterWhisperkitApple();
-    MockFlutterWhisperkitApplePlatform fakePlatform =
-        MockFlutterWhisperkitApplePlatform();
-    FlutterWhisperkitApplePlatform.instance = fakePlatform;
+      test('creates correct options object with custom values', () {
+        // Arrange & Act
+        final options = DecodingOptions(
+          task: DecodingTask.transcribe,
+          language: 'en',
+          temperature: 0.7,
+          sampleLength: 100,
+          temperatureFallbackCount: 5,
+          usePrefillPrompt: true,
+          usePrefillCache: true,
+          detectLanguage: true,
+          skipSpecialTokens: true,
+          withoutTimestamps: false,
+          maxInitialTimestamp: 1.0,
+          wordTimestamps: true,
+          clipTimestamps: [0.0],
+          concurrentWorkerCount: 4,
+          chunkingStrategy: ChunkingStrategy.vad,
+        );
 
-    expect(
-      () => flutterWhisperkitApplePlugin.transcribeFromFile(''),
-      throwsException,
-    );
-  });
+        // Assert
+        expect(options, isA<DecodingOptions>());
+        expect(options.task, DecodingTask.transcribe);
+        expect(options.language, 'en');
+        expect(options.temperature, 0.7);
+        expect(options.sampleLength, 100);
+        expect(options.temperatureFallbackCount, 5);
+        expect(options.usePrefillPrompt, true);
+        expect(options.usePrefillCache, true);
+        expect(options.detectLanguage, true);
+        expect(options.skipSpecialTokens, true);
+        expect(options.withoutTimestamps, false);
+        expect(options.maxInitialTimestamp, 1.0);
+        expect(options.wordTimestamps, true);
+        expect(options.chunkingStrategy, ChunkingStrategy.vad);
+      });
 
-  test('DecodingOptions creates correct options object', () {
-    final options = DecodingOptions(
-      task: DecodingTask.transcribe,
-      language: 'en',
-      temperature: 0.7,
-      sampleLength: 100,
-      temperatureFallbackCount: 5,
-      usePrefillPrompt: true,
-      usePrefillCache: true,
-      detectLanguage: true,
-      skipSpecialTokens: true,
-      withoutTimestamps: false,
-      maxInitialTimestamp: 1.0,
-      wordTimestamps: true,
-      clipTimestamps: [0.0],
-      concurrentWorkerCount: 4,
-      chunkingStrategy: ChunkingStrategy.vad,
-    );
-
-    expect(options, isA<DecodingOptions>());
-    expect(options.task, DecodingTask.transcribe);
-    expect(options.language, 'en');
-    expect(options.temperature, 0.7);
-    expect(options.sampleLength, 100);
-    expect(options.temperatureFallbackCount, 5);
-    expect(options.usePrefillPrompt, true);
-    expect(options.usePrefillCache, true);
-    expect(options.detectLanguage, true);
-    expect(options.skipSpecialTokens, true);
-    expect(options.withoutTimestamps, false);
-    expect(options.maxInitialTimestamp, 1.0);
-    expect(options.wordTimestamps, true);
-    expect(options.chunkingStrategy, ChunkingStrategy.vad);
-
-    // Test toJson method
-    final json = options.toJson();
-    expect(json, isA<Map<String, dynamic>>());
-    expect(json['task'], 'transcribe');
-    expect(json['language'], 'en');
-    expect(json['temperature'], 0.7);
+      test('toJson method returns correct map', () {
+        // Arrange
+        final options = DecodingOptions(
+          task: DecodingTask.transcribe,
+          language: 'en',
+          temperature: 0.7,
+        );
+        
+        // Act
+        final json = options.toJson();
+        
+        // Assert
+        expect(json, isA<Map<String, dynamic>>());
+        expect(json['task'], 'transcribe');
+        expect(json['language'], 'en');
+        expect(json['temperature'], 0.7);
+      });
+    });
   });
 }

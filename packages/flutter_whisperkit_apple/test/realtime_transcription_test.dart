@@ -3,65 +3,67 @@ import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-class MockFlutterWhisperkitApplePlatform
-    with MockPlatformInterfaceMixin
-    implements FlutterWhisperkitApplePlatform {
-  @override
-  Future<String?> loadModel(
-    String? variant,
-    String? modelRepo,
-    bool? redownload,
-    int? storageLocation,
-  ) => Future.value('Model loaded');
-
-  @override
-  Future<String?> transcribeFromFile(
-    String filePath,
-    DecodingOptions options,
-  ) => Future.value('{"text":"Hello world","segments":[]}');
-
-  @override
-  Future<String?> startRecording(DecodingOptions options, bool loop) =>
-      Future.value('Recording started');
-
-  @override
-  Future<String?> stopRecording(bool loop) => Future.value('Recording stopped');
-
-  @override
-  Stream<String> get transcriptionStream =>
-      Stream<String>.fromIterable(['Test transcription']);
-}
+import 'test_utils/mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  final FlutterWhisperkitApplePlatform initialPlatform =
-      FlutterWhisperkitApplePlatform.instance;
+  group('Realtime Transcription', () {
+    late FlutterWhisperkitApple plugin;
+    
+    group('Platform Interface', () {
+      test('default instance is MethodChannelFlutterWhisperkitApple', () {
+        // Save the original instance
+        final originalInstance = FlutterWhisperkitApplePlatform.instance;
+        
+        // Create a new instance for testing
+        FlutterWhisperkitApplePlatform.instance = MethodChannelFlutterWhisperkitApple();
+        
+        // Assert
+        expect(
+          FlutterWhisperkitApplePlatform.instance,
+          isInstanceOf<MethodChannelFlutterWhisperkitApple>(),
+        );
+        
+        // Restore the original instance
+        FlutterWhisperkitApplePlatform.instance = originalInstance;
+      });
+    });
 
-  test('$MethodChannelFlutterWhisperkitApple is the default instance', () {
-    expect(
-      initialPlatform,
-      isInstanceOf<MethodChannelFlutterWhisperkitApple>(),
-    );
-  });
+    setUp(() {
+      plugin = FlutterWhisperkitApple();
+      setUpMockPlatform();
+    });
 
-  test('startRecording test', () async {
-    final MockFlutterWhisperkitApplePlatform fakePlatform =
-        MockFlutterWhisperkitApplePlatform();
-    FlutterWhisperkitApplePlatform.instance = fakePlatform;
+    test('startRecording initiates audio recording with default options', () async {
+      // Act & Assert
+      expect(await plugin.startRecording(), 'Recording started');
+    });
 
-    final plugin = FlutterWhisperkitApple();
-    expect(await plugin.startRecording(), 'Recording started');
-  });
+    test('startRecording initiates audio recording with custom options', () async {
+      // Arrange
+      final options = DecodingOptions(
+        language: 'en',
+        temperature: 0.5,
+        wordTimestamps: true,
+      );
+      
+      // Act & Assert
+      expect(await plugin.startRecording(options: options), 'Recording started');
+    });
 
-  test('stopRecording test', () async {
-    final MockFlutterWhisperkitApplePlatform fakePlatform =
-        MockFlutterWhisperkitApplePlatform();
-    FlutterWhisperkitApplePlatform.instance = fakePlatform;
+    test('stopRecording ends audio recording', () async {
+      // Act & Assert
+      expect(await plugin.stopRecording(), 'Recording stopped');
+    });
 
-    final plugin = FlutterWhisperkitApple();
-    expect(await plugin.stopRecording(), 'Recording stopped');
+    test('transcriptionStream emits transcription results', () async {
+      // Act
+      final stream = plugin.transcriptionStream;
+      
+      // Assert
+      expect(stream, emits('Test transcription'));
+    });
   });
 }
