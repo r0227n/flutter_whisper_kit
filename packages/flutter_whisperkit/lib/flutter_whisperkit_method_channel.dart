@@ -2,15 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_whisperkit/src/whisper_kit_message.g.dart';
 import 'src/models.dart';
 
 import 'flutter_whisperkit_platform_interface.dart';
 
 /// An implementation of [FlutterWhisperkitPlatform] that uses method channels.
 class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
-  /// The method channel used to interact with the native platform.
-  @visibleForTesting
-  final methodChannel = const MethodChannel('flutter_whisperkit');
+  final _whisperKitMessage = WhisperKitMessage();
 
   /// The event channel for streaming transcription results
   @visibleForTesting
@@ -30,13 +29,23 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
         if (event is String) {
           if (event.isEmpty) {
             // Empty string means recording stopped
-            _transcriptionStreamController.add(const TranscriptionResult(
-              text: '', segments: [], language: '', timings: TranscriptionTimings()));
+            _transcriptionStreamController.add(
+              const TranscriptionResult(
+                text: '',
+                segments: [],
+                language: '',
+                timings: TranscriptionTimings(),
+              ),
+            );
           } else {
             try {
-              _transcriptionStreamController.add(TranscriptionResult.fromJsonString(event));
+              _transcriptionStreamController.add(
+                TranscriptionResult.fromJsonString(event),
+              );
             } catch (e) {
-              _transcriptionStreamController.addError(Exception('Failed to parse transcription result: $e'));
+              _transcriptionStreamController.addError(
+                Exception('Failed to parse transcription result: $e'),
+              );
             }
           }
         }
@@ -47,22 +56,6 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     );
   }
 
-  /// Handles platform exceptions and provides consistent error handling
-  Future<T> _handlePlatformException<T>(String methodName, Future<T> Function() action) async {
-    try {
-      return await action();
-    } on PlatformException catch (e) {
-      debugPrint('Error in $methodName: ${e.message}');
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      debugPrint('Unexpected error in $methodName: $e');
-      throw WhisperKitError(
-        code: WhisperKitErrorCode.unknown,
-        message: 'Unexpected error in $methodName: $e',
-      );
-    }
-  }
-
   @override
   Future<String?> loadModel(
     String? variant, {
@@ -70,15 +63,12 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     bool? redownload,
     ModelStorageLocation? storageLocation,
   }) async {
-    return _handlePlatformException('loadModel', () {
-      final Map<String, dynamic> arguments = {
-        'variant': variant,
-        'modelRepo': modelRepo,
-        'redownload': redownload,
-        'storageLocation': storageLocation,
-      };
-      return methodChannel.invokeMethod<String>('loadModel', arguments);
-    });
+    return _whisperKitMessage.loadModel(
+      variant,
+      modelRepo,
+      redownload,
+      storageLocation?.index,
+    );
   }
 
   @override
@@ -102,13 +92,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
   }) async {
-    return _handlePlatformException('transcribeFromFile', () {
-      final Map<String, dynamic> arguments = {
-        'filePath': filePath,
-        'options': options.toJson(),
-      };
-      return methodChannel.invokeMethod<String>('transcribeFromFile', arguments);
-    });
+    return _whisperKitMessage.transcribeFromFile(filePath, options.toJson());
   }
 
   @override
@@ -131,20 +115,12 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     ),
     bool loop = true,
   }) async {
-    return _handlePlatformException('startRecording', () {
-      final Map<String, dynamic> arguments = {
-        'options': options.toJson(),
-        'loop': loop,
-      };
-      return methodChannel.invokeMethod<String>('startRecording', arguments);
-    });
+    return _whisperKitMessage.startRecording(options.toJson(), loop);
   }
 
   @override
   Future<String?> stopRecording({bool loop = true}) async {
-    return _handlePlatformException('stopRecording', () {
-      return methodChannel.invokeMethod<String>('stopRecording', {'loop': loop});
-    });
+    return _whisperKitMessage.stopRecording(loop);
   }
 
   @override

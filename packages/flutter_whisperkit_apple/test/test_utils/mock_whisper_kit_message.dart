@@ -1,23 +1,32 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_whisperkit/src/models.dart';
-import 'package:flutter_whisperkit_apple/src/whisper_kit_message.g.dart';
+import 'package:flutter_whisperkit/src/whisper_kit_message.g.dart';
 
 /// A mock implementation of [WhisperKitMessage] for testing.
 class MockWhisperKitMessage implements WhisperKitMessage {
   @override
   final BinaryMessenger? pigeonVar_binaryMessenger = null;
-  
+
   @override
   final String pigeonVar_messageChannelSuffix = '';
+
   /// Mock implementation of loadModel
   @override
-  Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation) async {
+  Future<String?> loadModel(
+    String? variant,
+    String? modelRepo,
+    bool? redownload,
+    int? storageLocation,
+  ) async {
     return 'Model loaded successfully';
   }
 
   /// Mock implementation of transcribeFromFile
   @override
-  Future<String?> transcribeFromFile(String filePath, Map<String, Object?> options) async {
+  Future<String?> transcribeFromFile(
+    String filePath,
+    Map<String, Object?> options,
+  ) async {
     if (filePath.isEmpty) {
       throw WhisperKitError(
         code: WhisperKitErrorCode.invalidArguments,
@@ -74,7 +83,10 @@ class MockWhisperKitMessage implements WhisperKitMessage {
 
   /// Mock implementation of startRecording
   @override
-  Future<String?> startRecording(Map<String, Object?> options, bool loop) async {
+  Future<String?> startRecording(
+    Map<String, Object?> options,
+    bool loop,
+  ) async {
     return 'Recording started';
   }
 
