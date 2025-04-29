@@ -13,14 +13,32 @@ private let transcriptionStreamChannelName = "flutter_whisperkit_apple/transcrip
 private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
   
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    eventSink = events
+    return nil
+  }
+  
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    eventSink = nil
+    return nil
+  }
+  
   func sendTranscription(_ result: TranscriptionResult?) {
     if let eventSink = eventSink {
       DispatchQueue.main.async {
         if let result = result {
           let resultDict = result.toJson()
-          if let jsonData = try? JSONSerialization.data(withJSONObject: resultDict, options: []),
-             let jsonString = String(data: jsonData, encoding: .utf8) {
-            eventSink(jsonString)
+          do {
+            let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+              eventSink(jsonString)
+            } else {
+              print("Error: Failed to convert JSON data to string.")
+              eventSink(FlutterError(code: "JSON_CONVERSION_ERROR", message: "Failed to convert JSON data to string.", details: nil))
+            }
+          } catch {
+            print("Error: JSON serialization failed with error: \(error.localizedDescription)")
+            eventSink(FlutterError(code: "JSON_SERIALIZATION_ERROR", message: "JSON serialization failed.", details: error.localizedDescription))
           }
         } else {
           eventSink("")
@@ -147,16 +165,8 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
-  func transcribeFromFile(filePath: String?, options: [AnyHashable?: Any]?, completion: @escaping (Result<String?, Error>) -> Void)
+  func transcribeFromFile(filePath: String, options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
   {
-    guard let filePath = filePath else {
-      completion(
-        .failure(
-          NSError(
-            domain: "WhisperKitError", code: 5001,
-            userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
-      return
-    }
     
     guard let whisperKit = whisperKit else {
       completion(
@@ -659,25 +669,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         userInfo: [NSLocalizedDescriptionKey: "Not enough audio data for transcription"])
     }
     
-    var decodingOptions = DecodingOptions()
-    
-    if let options = options as? [String: Any] {
-      if let task = options["task"] as? String, task == "translate" {
-        decodingOptions.task = .translate
-      }
-      
-      if let language = options["language"] as? String {
-        decodingOptions.language = language
-      }
-      
-      if let temperature = options["temperature"] as? Double {
-        decodingOptions.temperature = temperature
-      }
-      
-      if let wordTimestamps = options["wordTimestamps"] as? Bool {
-        decodingOptions.wordTimestamps = wordTimestamps
-      }
-    }
+    let decodingOptions = try DecodingOptions.fromJson(options)
     
     let transcriptionResults = try await whisperKit.transcribe(
       audioArray: Array(currentBuffer),

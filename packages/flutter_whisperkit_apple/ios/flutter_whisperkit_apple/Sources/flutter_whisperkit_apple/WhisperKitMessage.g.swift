@@ -88,9 +88,10 @@ class WhisperKitMessagePigeonCodec: FlutterStandardMessageCodec, @unchecked Send
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WhisperKitMessage {
-  func createWhisperKit(model: String?, modelRepo: String?, completion: @escaping (Result<String?, Error>) -> Void)
   func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void)
-  func transcribeFromFile(filePath: String, options: [String?: Any?]?, completion: @escaping (Result<String?, Error>) -> Void)
+  func transcribeFromFile(filePath: String, options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
+  func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
+  func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -99,24 +100,6 @@ class WhisperKitMessageSetup {
   /// Sets up an instance of `WhisperKitMessage` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: WhisperKitMessage?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let createWhisperKitChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.createWhisperKit\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      createWhisperKitChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let modelArg: String? = nilOrValue(args[0])
-        let modelRepoArg: String? = nilOrValue(args[1])
-        api.createWhisperKit(model: modelArg, modelRepo: modelRepoArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      createWhisperKitChannel.setMessageHandler(nil)
-    }
     let loadModelChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.loadModel\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       loadModelChannel.setMessageHandler { message, reply in
@@ -142,7 +125,7 @@ class WhisperKitMessageSetup {
       transcribeFromFileChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let filePathArg = args[0] as! String
-        let optionsArg: [String?: Any?]? = nilOrValue(args[1])
+        let optionsArg = args[1] as! [String: Any?]
         api.transcribeFromFile(filePath: filePathArg, options: optionsArg) { result in
           switch result {
           case .success(let res):
@@ -154,6 +137,43 @@ class WhisperKitMessageSetup {
       }
     } else {
       transcribeFromFileChannel.setMessageHandler(nil)
+    }
+    
+    let startRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.startRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startRecordingChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let optionsArg = args[0] as! [String: Any?]
+        let loopArg = args[1] as! Bool
+        api.startRecording(options: optionsArg, loop: loopArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startRecordingChannel.setMessageHandler(nil)
+    }
+    
+    let stopRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.stopRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      stopRecordingChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let loopArg = args[0] as! Bool
+        api.stopRecording(loop: loopArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      stopRecordingChannel.setMessageHandler(nil)
     }
   }
 }
