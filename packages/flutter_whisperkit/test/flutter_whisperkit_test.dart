@@ -2,15 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_method_channel.dart';
-import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperkitPlatform {
-  @override
-  Future<String?> getPlatformVersion() => Future.value('42');
-
   @override
   Future<String?> loadModel(
     String? variant, {
@@ -42,7 +39,7 @@ class MockFlutterWhisperkitPlatform
 
   @override
   // TODO: implement transcriptionStream
-  Stream<String> get transcriptionStream => throw UnimplementedError();
+  Stream<TranscriptionResult> get transcriptionStream => throw UnimplementedError();
 }
 
 void main() {

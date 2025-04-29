@@ -19,4 +19,9 @@ void main() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
   });
+  
+  test('platform instance can be created', () {
+    expect(platform, isNotNull);
+    expect(platform.methodChannel, isNotNull);
+  });
 }
