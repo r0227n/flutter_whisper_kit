@@ -723,5 +723,17 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
     WhisperKitApiImpl.transcriptionStreamHandler = streamHandler
     let channel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: registrar.messenger())
     channel.setStreamHandler(streamHandler)
+    
+    let methodChannel = FlutterMethodChannel(name: "flutter_whisperkit_apple/register", binaryMessenger: registrar.messenger())
+    registrar.addMethodCallDelegate(FlutterWhisperkitApplePlugin(), channel: methodChannel)
+  }
+  
+  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    switch call.method {
+    case "registerWith":
+      result(true)
+    default:
+      result(FlutterMethodNotImplemented)
+    }
   }
 }

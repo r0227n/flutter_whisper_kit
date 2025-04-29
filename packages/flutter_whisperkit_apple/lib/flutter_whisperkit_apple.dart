@@ -1,10 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 import 'flutter_whisperkit_apple_platform_interface.dart';
+import 'flutter_whisperkit_apple_registrar.dart';
 
 /// The main entry point for the Flutter WhisperKit Apple plugin.
 class FlutterWhisperkitApple {
+  /// Registers this implementation with the main platform interface.
+  static void registerWith() => FlutterWhisperkitAppleRegistrar.registerWith();
+  
   /// Loads a WhisperKit model.
   ///
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').

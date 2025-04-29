@@ -1,13 +1,15 @@
 import 'dart:async';
 
+import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 import 'flutter_whisperkit_apple_method_channel.dart';
 
-abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
+/// The iOS/macOS implementation of [FlutterWhisperkitPlatform].
+abstract class FlutterWhisperkitApplePlatform extends FlutterWhisperkitPlatform {
   /// Constructs a FlutterWhisperkitApplePlatform.
-  FlutterWhisperkitApplePlatform() : super(token: _token);
+  FlutterWhisperkitApplePlatform() : super();
 
   static final Object _token = Object();
 
@@ -25,41 +27,5 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
   static set instance(FlutterWhisperkitApplePlatform instance) {
     PlatformInterface.verifyToken(instance, _token);
     _instance = instance;
-  }
-
-  Future<String?> loadModel(
-    String? variant,
-    String? modelRepo,
-    bool? redownload,
-    int? storageLocation,
-  ) {
-    throw UnimplementedError('loadModel() has not been implemented.');
-  }
-
-  Future<String?> transcribeFromFile(String filePath, DecodingOptions options) {
-    throw UnimplementedError('transcribeFromFile() has not been implemented.');
-  }
-
-  /// Starts recording audio from the microphone for real-time transcription.
-  ///
-  /// [options] - Optional decoding options for the transcription.
-  /// [loop] - Whether to continuously transcribe in a loop.
-  Future<String?> startRecording(DecodingOptions options, bool loop) {
-    throw UnimplementedError('startRecording() has not been implemented.');
-  }
-
-  /// Stops recording audio and optionally triggers transcription.
-  ///
-  /// [loop] - Whether the recording was started with loop mode.
-  Future<String?> stopRecording(bool loop) {
-    throw UnimplementedError('stopRecording() has not been implemented.');
-  }
-
-  /// Stream of real-time transcription results.
-  ///
-  /// This stream emits TranscriptionResult objects containing the full transcription data as it becomes available.
-  /// The stream will emit an empty result when recording stops.
-  Stream<TranscriptionResult> get transcriptionStream {
-    throw UnimplementedError('transcriptionStream has not been implemented.');
   }
 }
