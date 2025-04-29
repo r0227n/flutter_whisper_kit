@@ -24,7 +24,7 @@ class FlutterWhisperkit {
       variant,
       modelRepo: modelRepo,
       redownload: redownload,
-      storageLocation: storageLocation.index,
+      storageLocation: storageLocation,
     );
   }
 

@@ -13,7 +13,7 @@ class MockFlutterWhisperkitPlatform
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
+    ModelStorageLocation? storageLocation,
   }) => Future.value('Model loaded');
 
   @override

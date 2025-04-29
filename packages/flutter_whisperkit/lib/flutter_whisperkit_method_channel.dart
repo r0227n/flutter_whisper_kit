@@ -70,7 +70,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
+    ModelStorageLocation? storageLocation,
   }) async {
     return _handlePlatformException('loadModel', () {
       final Map<String, dynamic> arguments = {

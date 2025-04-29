@@ -42,13 +42,13 @@ class FlutterWhisperkitApple extends FlutterWhisperkitPlatform {
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
   /// [modelRepo] - The repository to download the model from (default: 'argmaxinc/whisperkit-coreml').
   /// [redownload] - Whether to force redownload the model even if it exists locally.
-  /// [storageLocation] - Where to store the model (0: package directory, 1: user folder).
+  /// [storageLocation] - Where to store the model (ModelStorageLocation.packageDirectory or ModelStorageLocation.userFolder).
   @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
+    ModelStorageLocation? storageLocation,
   }) {
     return _methodChannel.loadModel(
       variant: variant,
