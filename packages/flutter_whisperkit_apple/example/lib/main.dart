@@ -141,6 +141,7 @@ class _MyAppState extends State<MyApp> {
             _loadingProgress = progress;
           });
         },
+        storageLocation: _storageLocation,
       );
 
       if (!mounted) return;
