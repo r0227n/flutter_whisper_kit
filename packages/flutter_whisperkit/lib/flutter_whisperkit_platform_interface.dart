@@ -27,6 +27,11 @@ abstract class FlutterWhisperkitPlatform extends PlatformInterface {
   }
 
   /// Loads a WhisperKit model.
+  ///
+  /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
+  /// [modelRepo] - The repository to download the model from (default: 'argmaxinc/whisperkit-coreml').
+  /// [redownload] - Whether to force redownload the model even if it exists locally.
+  /// [storageLocation] - Where to store the model (ModelStorageLocation.packageDirectory or ModelStorageLocation.userFolder).
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,

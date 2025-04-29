@@ -3,6 +3,9 @@ import 'dart:async';
 import 'flutter_whisperkit_platform_interface.dart';
 import 'src/models.dart';
 
+// Export model loader for public use
+export 'src/model_loader.dart';
+
 /// The main entry point for the Flutter WhisperKit plugin.
 class FlutterWhisperkit {
   /// Loads a WhisperKit model.
@@ -10,18 +13,18 @@ class FlutterWhisperkit {
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
   /// [modelRepo] - The repository to download the model from (default: 'argmaxinc/whisperkit-coreml').
   /// [redownload] - Whether to force redownload the model even if it exists locally.
-  /// [storageLocation] - Where to store the model (0: package directory, 1: user folder).
+  /// [storageLocation] - Where to store the model (ModelStorageLocation.packageDirectory or ModelStorageLocation.userFolder).
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
+    ModelStorageLocation storageLocation = ModelStorageLocation.packageDirectory,
   }) {
     return FlutterWhisperkitPlatform.instance.loadModel(
       variant,
       modelRepo: modelRepo,
       redownload: redownload,
-      storageLocation: storageLocation,
+      storageLocation: storageLocation.index,
     );
   }
 
