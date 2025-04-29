@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
         'large-v3',
         modelRepo: 'argmaxinc/whisperkit-coreml',
         redownload: true,
-        storageLocation: 0,
+        storageLocation: ModelStorageLocation.packageDirectory,
       );
 
       setState(() {
