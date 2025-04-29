@@ -50,7 +50,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   }
 
   /// Handles platform exceptions and provides consistent error handling
-  T _handlePlatformException<T>(String methodName, Future<T> Function() action) async {
+  Future<T> _handlePlatformException<T>(String methodName, Future<T> Function() action) async {
     try {
       return await action();
     } on PlatformException catch (e) {
