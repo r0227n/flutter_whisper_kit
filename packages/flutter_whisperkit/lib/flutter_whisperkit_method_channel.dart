@@ -18,12 +18,6 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   final _whisperKitApple = FlutterWhisperkitApple();
 
   @override
-  Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
-  }
-
-  @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
@@ -39,9 +33,15 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   }
 
   @override
-  Future<String?> transcribeFromFile(String filePath, DecodingOptions options) async {
+  Future<String?> transcribeFromFile(
+    String filePath,
+    DecodingOptions options,
+  ) async {
     try {
-      final result = await _whisperKitApple.transcribeFromFile(filePath, options: options);
+      final result = await _whisperKitApple.transcribeFromFile(
+        filePath,
+        options: options,
+      );
       // Convert the TranscriptionResult to a JSON string to pass through the platform interface
       return jsonEncode(result.toJson());
     } catch (e) {
@@ -61,5 +61,6 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   }
 
   @override
-  Stream<String> get transcriptionStream => _whisperKitApple.transcriptionStream;
+  Stream<String> get transcriptionStream =>
+      _whisperKitApple.transcriptionStream;
 }

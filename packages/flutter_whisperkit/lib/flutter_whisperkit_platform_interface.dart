@@ -26,10 +26,6 @@ abstract class FlutterWhisperkitPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
-
   /// Loads a WhisperKit model.
   Future<String?> loadModel(
     String? variant, {

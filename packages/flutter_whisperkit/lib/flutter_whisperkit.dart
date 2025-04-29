@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'flutter_whisperkit_platform_interface.dart';
@@ -6,11 +5,6 @@ import 'src/models.dart';
 
 /// The main entry point for the Flutter WhisperKit plugin.
 class FlutterWhisperkit {
-  /// Returns the platform version.
-  Future<String?> getPlatformVersion() {
-    return FlutterWhisperkitPlatform.instance.getPlatformVersion();
-  }
-
   /// Loads a WhisperKit model.
   ///
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
@@ -57,7 +51,10 @@ class FlutterWhisperkit {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
   }) {
-    return FlutterWhisperkitPlatform.instance.transcribeFromFile(filePath, options);
+    return FlutterWhisperkitPlatform.instance.transcribeFromFile(
+      filePath,
+      options,
+    );
   }
 
   /// Starts recording audio from the microphone for real-time transcription.
