@@ -77,14 +77,14 @@ class MethodChannelFlutterWhisperkitApple {
     String? variant,
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
+    ModelStorageLocation? storageLocation,
   }) async {
     return _handlePlatformException('loadModel', () {
       return _whisperKitMessage.loadModel(
         variant,
         modelRepo,
         redownload,
-        storageLocation,
+        storageLocation?.index,
       );
     });
   }
