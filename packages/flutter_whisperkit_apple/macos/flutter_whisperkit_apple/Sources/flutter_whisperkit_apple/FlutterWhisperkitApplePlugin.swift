@@ -8,7 +8,7 @@ enum ModelStorageLocation: Int64 {
   case userFolder = 1
 }
 
-private let transcriptionStreamChannelName = "flutter_whisperkit_apple/transcription_stream"
+private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_stream"
 
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?

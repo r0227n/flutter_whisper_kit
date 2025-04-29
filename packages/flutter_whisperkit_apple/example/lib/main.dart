@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
-import 'package:flutter_whisperkit_apple/model_loader.dart';
+import 'package:flutter_whisperkit/flutter_whisperkit.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 void main() {
@@ -31,7 +30,7 @@ class _MyAppState extends State<MyApp> {
   StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
 
   // Use the proper plugin class instead of the generated message class
-  final _flutterWhisperkitApple = FlutterWhisperkitApple();
+  final _flutterWhisperkit = FlutterWhisperkit();
 
   // Use the model loader for a cleaner API
   final _modelLoader = WhisperKitModelLoader();
@@ -54,7 +53,7 @@ class _MyAppState extends State<MyApp> {
     if (_isRecording) {
       // Stop recording
       try {
-        final result = await _flutterWhisperkitApple.stopRecording(loop: true);
+        final result = await _flutterWhisperkit.stopRecording(loop: true);
 
         // Cancel the transcription stream subscription
         _transcriptionSubscription?.cancel();
@@ -72,7 +71,7 @@ class _MyAppState extends State<MyApp> {
     } else {
       // Start recording
       try {
-        final result = await _flutterWhisperkitApple.startRecording(
+        final result = await _flutterWhisperkit.startRecording(
           options: const DecodingOptions(
             verbose: true,
             task: DecodingTask.transcribe,
@@ -84,7 +83,7 @@ class _MyAppState extends State<MyApp> {
         );
 
         // Subscribe to the transcription stream
-        _transcriptionSubscription = _flutterWhisperkitApple.transcriptionStream
+        _transcriptionSubscription = _flutterWhisperkit.transcriptionStream
             .listen(
               (result) {
                 setState(() {
@@ -92,8 +91,13 @@ class _MyAppState extends State<MyApp> {
                     _realtimeTranscription = result.text;
                     _segments = result.segments;
                     _language = result.language;
-                    _confidence = result.segments.isEmpty ? 0.0 : 
-                      result.segments.map((s) => s.avgLogprob).reduce((a, b) => a + b) / result.segments.length;
+                    _confidence =
+                        result.segments.isEmpty
+                            ? 0.0
+                            : result.segments
+                                    .map((s) => s.avgLogprob)
+                                    .reduce((a, b) => a + b) /
+                                result.segments.length;
                   }
                 });
               },
@@ -286,8 +290,9 @@ class _MyAppState extends State<MyApp> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  final result = await _flutterWhisperkitApple
-                      .transcribeFromFile('assets/test.mp3');
+                  final result = await _flutterWhisperkit.transcribeFromFile(
+                    'assets/test.mp3',
+                  );
 
                   print('Transcribed: $result');
                 },
@@ -336,8 +341,10 @@ class _MyAppState extends State<MyApp> {
                       style: const TextStyle(fontFamily: 'monospace'),
                     ),
                     if (_language.isNotEmpty) Text('Language: $_language'),
-                    if (_confidence != 0.0) Text('Confidence: ${_confidence.toStringAsFixed(2)}'),
-                    if (_segments.isNotEmpty) Text('Segments: ${_segments.length}'),
+                    if (_confidence != 0.0)
+                      Text('Confidence: ${_confidence.toStringAsFixed(2)}'),
+                    if (_segments.isNotEmpty)
+                      Text('Segments: ${_segments.length}'),
                   ],
                 ),
               ),

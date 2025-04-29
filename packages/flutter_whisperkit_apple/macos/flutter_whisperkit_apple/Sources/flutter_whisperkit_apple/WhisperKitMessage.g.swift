@@ -100,7 +100,7 @@ class WhisperKitMessageSetup {
   /// Sets up an instance of `WhisperKitMessage` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: WhisperKitMessage?, messageChannelSuffix: String = "") {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
-    let loadModelChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.loadModel\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let loadModelChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit.WhisperKitMessage.loadModel\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       loadModelChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -120,7 +120,7 @@ class WhisperKitMessageSetup {
     } else {
       loadModelChannel.setMessageHandler(nil)
     }
-    let transcribeFromFileChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeFromFile\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let transcribeFromFileChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit.WhisperKitMessage.transcribeFromFile\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       transcribeFromFileChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -138,7 +138,7 @@ class WhisperKitMessageSetup {
     } else {
       transcribeFromFileChannel.setMessageHandler(nil)
     }
-    let startRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.startRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let startRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit.WhisperKitMessage.startRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startRecordingChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -156,7 +156,7 @@ class WhisperKitMessageSetup {
     } else {
       startRecordingChannel.setMessageHandler(nil)
     }
-    let stopRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.stopRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let stopRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisperkit.WhisperKitMessage.stopRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       stopRecordingChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]

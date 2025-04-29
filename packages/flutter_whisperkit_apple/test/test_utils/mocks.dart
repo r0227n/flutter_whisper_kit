@@ -1,28 +1,47 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
+import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-/// Mock implementation of [FlutterWhisperkitApplePlatform] for testing.
-class MockFlutterWhisperkitApplePlatform
+/// Mock implementation of [FlutterWhisperkitPlatform] for testing.
+class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
-    implements FlutterWhisperkitApplePlatform {
+    implements FlutterWhisperkitPlatform {
   
   @override
   Future<String?> loadModel(
-    String? variant,
+    String? variant, {
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
-  ) => Future.value('Model loaded');
+    ModelStorageLocation? storageLocation,
+  }) => Future.value('Model loaded');
 
   @override
   Future<String?> transcribeFromFile(
-    String filePath,
-    DecodingOptions options,
-  ) {
+    String filePath, {
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      detectLanguage: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: true,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
+  }) {
     if (filePath.isEmpty) {
-      return Future.value(null);
+      throw WhisperKitError(
+        code: WhisperKitErrorCode.invalidArguments,
+        message: 'File path cannot be empty',
+      );
     }
 
     // Mock JSON response for a successful transcription
@@ -73,11 +92,28 @@ class MockFlutterWhisperkitApplePlatform
   }
 
   @override
-  Future<String?> startRecording(DecodingOptions options, bool loop) =>
-      Future.value('Recording started');
+  Future<String?> startRecording({
+    DecodingOptions options = const DecodingOptions(
+      verbose: true,
+      task: DecodingTask.transcribe,
+      language: 'ja',
+      temperature: 0.0,
+      temperatureFallbackCount: 5,
+      sampleLength: 224,
+      usePrefillPrompt: true,
+      usePrefillCache: true,
+      skipSpecialTokens: true,
+      withoutTimestamps: false,
+      wordTimestamps: true,
+      clipTimestamps: [0.0],
+      concurrentWorkerCount: 4,
+      chunkingStrategy: ChunkingStrategy.vad,
+    ),
+    bool loop = true,
+  }) => Future.value('Recording started');
 
   @override
-  Future<String?> stopRecording(bool loop) => 
+  Future<String?> stopRecording({bool loop = true}) => 
       Future.value('Recording stopped');
 
   @override
@@ -111,8 +147,8 @@ class MockFlutterWhisperkitApplePlatform
 /// Sets up a mock platform for testing.
 /// 
 /// Returns the mock platform instance.
-MockFlutterWhisperkitApplePlatform setUpMockPlatform() {
-  final mockPlatform = MockFlutterWhisperkitApplePlatform();
-  FlutterWhisperkitApplePlatform.instance = mockPlatform;
+MockFlutterWhisperkitPlatform setUpMockPlatform() {
+  final mockPlatform = MockFlutterWhisperkitPlatform();
+  FlutterWhisperkitPlatform.instance = mockPlatform;
   return mockPlatform;
 }

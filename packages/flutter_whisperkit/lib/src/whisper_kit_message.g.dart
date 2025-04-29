@@ -51,7 +51,7 @@ class WhisperKitMessage {
   final String pigeonVar_messageChannelSuffix;
 
   Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.loadModel$pigeonVar_messageChannelSuffix';
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit.WhisperKitMessage.loadModel$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -74,7 +74,7 @@ class WhisperKitMessage {
   }
 
   Future<String?> transcribeFromFile(String filePath, Map<String, Object?> options) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.transcribeFromFile$pigeonVar_messageChannelSuffix';
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit.WhisperKitMessage.transcribeFromFile$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -97,7 +97,7 @@ class WhisperKitMessage {
   }
 
   Future<String?> startRecording(Map<String, Object?> options, bool loop) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.startRecording$pigeonVar_messageChannelSuffix';
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit.WhisperKitMessage.startRecording$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -120,7 +120,7 @@ class WhisperKitMessage {
   }
 
   Future<String?> stopRecording(bool loop) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit_apple.WhisperKitMessage.stopRecording$pigeonVar_messageChannelSuffix';
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit.WhisperKitMessage.stopRecording$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,

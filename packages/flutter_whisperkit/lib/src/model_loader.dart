@@ -1,20 +1,13 @@
-import 'flutter_whisperkit_apple.dart';
-
-/// Storage location for WhisperKit models.
-enum ModelStorageLocation {
-  /// Store models in the application's package directory.
-  packageDirectory,
-
-  /// Store models in a user-accessible folder.
-  userFolder,
-}
+import '../flutter_whisperkit.dart';
+import 'models.dart';
 
 /// A class for loading and managing WhisperKit models.
 class WhisperKitModelLoader {
   /// Creates a new WhisperKitModelLoader instance.
-  WhisperKitModelLoader() : _plugin = FlutterWhisperkitApple();
+  WhisperKitModelLoader() : _whisperkit = FlutterWhisperkit();
 
-  final FlutterWhisperkitApple _plugin;
+  final FlutterWhisperkit _whisperkit;
+  ModelStorageLocation _storageLocation = ModelStorageLocation.packageDirectory;
 
   /// Loads a WhisperKit model.
   ///
@@ -28,14 +21,13 @@ class WhisperKitModelLoader {
     String modelRepo = 'argmaxinc/whisperkit-coreml',
     bool redownload = false,
     Function(double progress)? onProgress,
-    ModelStorageLocation storageLocation =
-        ModelStorageLocation.packageDirectory,
+    ModelStorageLocation? storageLocation,
   }) async {
-    return _plugin.loadModel(
+    return _whisperkit.loadModel(
       variant,
       modelRepo: modelRepo,
       redownload: redownload,
-      storageLocation: storageLocation.index,
+      storageLocation: storageLocation ?? _storageLocation,
     );
   }
 
@@ -43,11 +35,8 @@ class WhisperKitModelLoader {
   ///
   /// [location] - The storage location to use.
   void setStorageLocation(ModelStorageLocation location) {
-    // This is stored for future loadModel calls
     _storageLocation = location;
   }
-
-  ModelStorageLocation _storageLocation = ModelStorageLocation.packageDirectory;
 
   /// Gets the current storage location for WhisperKit models.
   ModelStorageLocation get storageLocation => _storageLocation;

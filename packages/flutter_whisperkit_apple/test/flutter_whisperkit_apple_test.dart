@@ -1,25 +1,33 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
-import 'package:flutter_whisperkit_apple/model_loader.dart';
+import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
+import 'package:flutter_whisperkit/src/model_loader.dart';
+import 'package:flutter_whisperkit/src/models.dart';
 
 import 'test_utils/mocks.dart';
+import 'test_utils/mock_whisper_kit_message.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('FlutterWhisperkitApple', () {
-    final FlutterWhisperkitApplePlatform initialPlatform = FlutterWhisperkitApplePlatform.instance;
+    final FlutterWhisperkitPlatform initialPlatform = FlutterWhisperkitPlatform.instance;
 
-    test('platform interface uses method channel by default', () {
-      expect(initialPlatform, isInstanceOf<MethodChannelFlutterWhisperkitApple>());
+    test('FlutterWhisperkitApple extends FlutterWhisperkitPlatform', () {
+      expect(FlutterWhisperkitApple(), isA<FlutterWhisperkitPlatform>());
     });
 
     test('loadModel returns success message', () async {
       // Arrange
-      FlutterWhisperkitApple flutterWhisperkitApplePlugin = FlutterWhisperkitApple();
-      MockFlutterWhisperkitApplePlatform fakePlatform = setUpMockPlatform();
+      final mockWhisperKitMessage = MockWhisperKitMessage();
+      final methodChannel = MethodChannelFlutterWhisperkitApple(
+        whisperKitMessage: mockWhisperKitMessage
+      );
+      final flutterWhisperkitApplePlugin = FlutterWhisperkitApple(
+        methodChannel: methodChannel
+      );
+      setUpMockPlatform();
       
       // Act & Assert
       expect(
@@ -27,7 +35,7 @@ void main() {
           'tiny-en',
           modelRepo: 'argmaxinc/whisperkit-coreml',
         ),
-        'Model loaded',
+        'Model loaded successfully',
       );
     });
 
