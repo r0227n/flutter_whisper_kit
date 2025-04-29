@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
+import 'package:flutter_whisperkit_apple/src/models/transcription_result.dart';
 
 import 'flutter_whisperkit_apple_platform_interface.dart';
 import 'src/whisper_kit_message.g.dart';
@@ -21,12 +23,12 @@ class MethodChannelFlutterWhisperkitApple
   );
 
   /// Stream controller for transcription results
-  final StreamController<String> _transcriptionStreamController =
-      StreamController<String>.broadcast();
+  final StreamController<TranscriptionResult> _transcriptionStreamController =
+      StreamController<TranscriptionResult>.broadcast();
 
   /// Stream of transcription results
   @override
-  Stream<String> get transcriptionStream =>
+  Stream<TranscriptionResult> get transcriptionStream =>
       _transcriptionStreamController.stream;
 
   /// The Pigeon-generated API for WhisperKit
@@ -38,7 +40,17 @@ class MethodChannelFlutterWhisperkitApple
     transcriptionStreamChannel.receiveBroadcastStream().listen(
       (dynamic event) {
         if (event is String) {
-          _transcriptionStreamController.add(event);
+          if (event.isEmpty) {
+            // Empty string means recording stopped
+            _transcriptionStreamController.add(const TranscriptionResult(
+              text: '', segments: [], language: '', timings: TranscriptionTimings()));
+          } else {
+            try {
+              _transcriptionStreamController.add(TranscriptionResult.fromJsonString(event));
+            } catch (e) {
+              _transcriptionStreamController.addError(Exception('Failed to parse transcription result: $e'));
+            }
+          }
         }
       },
       onError: (dynamic error) {

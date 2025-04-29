@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
+import 'package:flutter_whisperkit_apple/src/models/transcription_result.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 /// Mock implementation of [FlutterWhisperkitApplePlatform] for testing.
@@ -81,8 +82,31 @@ class MockFlutterWhisperkitApplePlatform
       Future.value('Recording stopped');
 
   @override
-  Stream<String> get transcriptionStream =>
-      Stream<String>.fromIterable(['Test transcription']);
+  Stream<TranscriptionResult> get transcriptionStream => Stream<TranscriptionResult>.fromIterable([
+    TranscriptionResult.fromJsonString('''
+      {
+        "text": "Test transcription",
+        "segments": [
+          {
+            "id": 0,
+            "seek": 0,
+            "text": "Test transcription",
+            "start": 0.0,
+            "end": 2.0,
+            "tokens": [1, 2, 3],
+            "temperature": 1.0,
+            "avgLogprob": -0.5,
+            "compressionRatio": 1.2,
+            "noSpeechProb": 0.1
+          }
+        ],
+        "language": "en",
+        "timings": {
+          "fullPipeline": 1.0
+        }
+      }
+    ''')
+  ]);
 }
 
 /// Sets up a mock platform for testing.

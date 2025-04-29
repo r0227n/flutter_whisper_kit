@@ -454,7 +454,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
               lastTranscribedText = result.text
               
               if let streamHandler = WhisperKitApiImpl.transcriptionStreamHandler as? TranscriptionStreamHandler {
-                streamHandler.sendTranscription(result.text)
+                streamHandler.sendTranscription(result)
               }
             }
           }
@@ -467,7 +467,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       }
       
       if let streamHandler = WhisperKitApiImpl.transcriptionStreamHandler as? TranscriptionStreamHandler {
-        streamHandler.sendTranscription("")
+        streamHandler.sendTranscription(nil)
       }
     }
   }
@@ -537,10 +537,18 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
     return nil
   }
   
-  func sendTranscription(_ text: String) {
+  func sendTranscription(_ result: TranscriptionResult?) {
     if let eventSink = eventSink {
       DispatchQueue.main.async {
-        eventSink(text)
+        if let result = result {
+          let resultDict = result.toJson()
+          if let jsonData = try? JSONSerialization.data(withJSONObject: resultDict, options: []),
+             let jsonString = String(data: jsonData, encoding: .utf8) {
+            eventSink(jsonString)
+          }
+        } else {
+          eventSink("")
+        }
       }
     }
   }

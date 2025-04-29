@@ -8,9 +8,44 @@ enum ModelStorageLocation: Int64 {
   case userFolder = 1
 }
 
+private let transcriptionStreamChannelName = "flutter_whisperkit_apple/transcription_stream"
+
+private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
+  private var eventSink: FlutterEventSink?
+  
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    eventSink = events
+    return nil
+  }
+  
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    eventSink = nil
+    return nil
+  }
+  
+  func sendTranscription(_ result: TranscriptionResult?) {
+    if let eventSink = eventSink {
+      DispatchQueue.main.async {
+        if let result = result {
+          let resultDict = result.toJson()
+          if let jsonData = try? JSONSerialization.data(withJSONObject: resultDict, options: []),
+             let jsonString = String(data: jsonData, encoding: .utf8) {
+            eventSink(jsonString)
+          }
+        } else {
+          eventSink("")
+        }
+      }
+    }
+  }
+}
+
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
+  private var isRecording: Bool = false
+  private var transcriptionTask: Task<Void, Never>?
+  public static var transcriptionStreamHandler: TranscriptionStreamHandler?
 
   func loadModel(
     variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
@@ -507,11 +542,193 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
     return WhisperKit.formatModelFiles(localModels)
   }
+  
+  func startRecording(
+    options: [String: Any?], loop: Bool,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    guard let whisperKit = whisperKit else {
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [
+              NSLocalizedDescriptionKey:
+                "WhisperKit instance not initialized. Call loadModel first."
+            ])))
+      return
+    }
+    
+    if whisperKit.audioProcessor == nil {
+      whisperKit.audioProcessor = AudioProcessor()
+    }
+    
+    Task(priority: .userInitiated) {
+      do {
+        guard await AudioProcessor.requestRecordPermission() else {
+          throw NSError(
+            domain: "WhisperKitError", code: 3002,
+            userInfo: [NSLocalizedDescriptionKey: "Microphone access was not granted."])
+        }
+        
+        var deviceId: DeviceID?
+        
+        try whisperKit.audioProcessor.startRecordingLive(inputDeviceID: deviceId) { _ in
+        }
+        
+        isRecording = true
+        
+        if loop {
+          self.startRealtimeLoop(options: options)
+        }
+        
+        completion(.success("Recording started successfully"))
+      } catch {
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  func stopRecording(
+    loop: Bool, completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    guard let whisperKit = whisperKit else {
+      completion(
+        .failure(
+          NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [
+              NSLocalizedDescriptionKey:
+                "WhisperKit instance not initialized. Call loadModel first."
+            ])))
+      return
+    }
+    
+    isRecording = false
+    stopRealtimeTranscription()
+    whisperKit.audioProcessor.stopRecording()
+    
+    if !loop {
+      Task {
+        do {
+          _ = try await transcribeCurrentBufferInternal(options: [:])
+          completion(.success("Recording stopped and transcription completed"))
+        } catch {
+          completion(.failure(error))
+        }
+      }
+    } else {
+      completion(.success("Recording stopped"))
+    }
+  }
+  
+  
+  private func startRealtimeLoop(options: [String: Any?]) {
+    transcriptionTask = Task {
+      var lastTranscribedText = ""
+      
+      while isRecording && !Task.isCancelled {
+        do {
+          if let result = try await transcribeCurrentBufferInternal(options: options) {
+            if result.text != lastTranscribedText {
+              lastTranscribedText = result.text
+              
+              if let streamHandler = WhisperKitApiImpl.transcriptionStreamHandler as? TranscriptionStreamHandler {
+                streamHandler.sendTranscription(result)
+              }
+            }
+          }
+          
+          try await Task.sleep(nanoseconds: 300_000_000) // 300ms delay between transcriptions
+        } catch {
+          print("Realtime transcription error: \(error.localizedDescription)")
+          try? await Task.sleep(nanoseconds: 1_000_000_000) // 1s delay on error
+        }
+      }
+      
+      if let streamHandler = WhisperKitApiImpl.transcriptionStreamHandler as? TranscriptionStreamHandler {
+        streamHandler.sendTranscription(nil)
+      }
+    }
+  }
+  
+  private func stopRealtimeTranscription() {
+    transcriptionTask?.cancel()
+    transcriptionTask = nil
+  }
+  
+  private func transcribeCurrentBufferInternal(options: [String: Any?]) async throws -> TranscriptionResult? {
+    guard let whisperKit = whisperKit else { return nil }
+    
+    let currentBuffer = whisperKit.audioProcessor.audioSamples
+    
+    let bufferSeconds = Float(currentBuffer.count) / Float(WhisperKit.sampleRate)
+    guard bufferSeconds > 1.0 else {
+      throw NSError(
+        domain: "WhisperKitError", code: 3003,
+        userInfo: [NSLocalizedDescriptionKey: "Not enough audio data for transcription"])
+    }
+    
+    var decodingOptions = DecodingOptions()
+    
+    if let options = options as? [String: Any] {
+      if let task = options["task"] as? String, task == "translate" {
+        decodingOptions.task = .translate
+      }
+      
+      if let language = options["language"] as? String {
+        decodingOptions.language = language
+      }
+      
+      if let temperature = options["temperature"] as? Double {
+        decodingOptions.temperature = temperature
+      }
+      
+      if let wordTimestamps = options["wordTimestamps"] as? Bool {
+        decodingOptions.wordTimestamps = wordTimestamps
+      }
+    }
+    
+    let transcriptionResults = try await whisperKit.transcribe(
+      audioArray: Array(currentBuffer),
+      decodeOptions: decodingOptions
+    )
+    
+    return mergeTranscriptionResults(transcriptionResults)
+  }
+  
+  private func mergeTranscriptionResults(_ results: [TranscriptionResult]) -> TranscriptionResult? {
+    guard !results.isEmpty else { return nil }
+    
+    if results.count == 1 {
+      return results[0]
+    }
+    
+    var mergedText = ""
+    var mergedSegments: [TranscriptionSegment] = []
+    
+    for result in results {
+      mergedText += result.text
+      mergedSegments.append(contentsOf: result.segments)
+    }
+    
+    return TranscriptionResult(
+      text: mergedText,
+      segments: mergedSegments,
+      language: results[0].language,
+      timings: results[0].timings,
+      seekTime: results[0].seekTime
+    )
+  }
 }
 
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    // Pigeonで生成されたSetupコードを呼び出す
     WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger(), api: WhisperKitApiImpl())
+    
+    let streamHandler = TranscriptionStreamHandler()
+    WhisperKitApiImpl.transcriptionStreamHandler = streamHandler
+    let channel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: registrar.messenger())
+    channel.setStreamHandler(streamHandler)
   }
 }
