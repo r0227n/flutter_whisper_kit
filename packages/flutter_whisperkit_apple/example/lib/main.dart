@@ -285,12 +285,15 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  final result = await _flutterWhisperkitApple
-                      .transcribeFromFile('assets/test.mp3');
-
-                  print('Transcribed: $result');
-                },
+                onPressed: _isModelLoaded ? () async {
+                  try {
+                    final result = await _flutterWhisperkitApple
+                        .transcribeFromFile('assets/test.mp3');
+                    print('Transcribed: $result');
+                  } catch (e) {
+                    print('Transcription error: $e');
+                  }
+                } : null,
                 child: const Text('Transcribe File'),
               ),
 
