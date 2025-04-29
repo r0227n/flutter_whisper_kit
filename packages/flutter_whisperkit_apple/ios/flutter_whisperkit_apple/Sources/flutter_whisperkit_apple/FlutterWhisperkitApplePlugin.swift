@@ -698,6 +698,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     var mergedSegments: [TranscriptionSegment] = []
     
     for result in results {
+      if !mergedText.isEmpty {
+        mergedText += " "
+      }
       mergedText += result.text
       mergedSegments.append(contentsOf: result.segments)
     }
