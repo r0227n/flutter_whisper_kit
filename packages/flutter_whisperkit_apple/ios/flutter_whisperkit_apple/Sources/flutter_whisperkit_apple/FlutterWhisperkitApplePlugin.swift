@@ -13,14 +13,32 @@ private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_s
 private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
   
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    eventSink = events
+    return nil
+  }
+  
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    eventSink = nil
+    return nil
+  }
+  
   func sendTranscription(_ result: TranscriptionResult?) {
     if let eventSink = eventSink {
       DispatchQueue.main.async {
         if let result = result {
           let resultDict = result.toJson()
-          if let jsonData = try? JSONSerialization.data(withJSONObject: resultDict, options: []),
-             let jsonString = String(data: jsonData, encoding: .utf8) {
-            eventSink(jsonString)
+          do {
+            let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+              eventSink(jsonString)
+            } else {
+              print("Error: Failed to convert JSON data to string.")
+              eventSink(FlutterError(code: "JSON_CONVERSION_ERROR", message: "Failed to convert JSON data to string.", details: nil))
+            }
+          } catch {
+            print("Error: JSON serialization failed with error: \(error.localizedDescription)")
+            eventSink(FlutterError(code: "JSON_SERIALIZATION_ERROR", message: "JSON serialization failed.", details: error.localizedDescription))
           }
         } else {
           eventSink("")
@@ -147,17 +165,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
-  func transcribeFromFile(filePath: String?, options: [AnyHashable?: Any]?, completion: @escaping (Result<String?, Error>) -> Void)
-  {
-    guard let filePath = filePath else {
-      completion(
-        .failure(
-          NSError(
-            domain: "WhisperKitError", code: 5001,
-            userInfo: [NSLocalizedDescriptionKey: "File path is required"])))
-      return
-    }
-    
+  func transcribeFromFile(
+    filePath: String, options: [String: Any?],
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
     guard let whisperKit = whisperKit else {
       completion(
         .failure(
@@ -169,9 +180,23 @@ private class WhisperKitApiImpl: WhisperKitMessage {
             ])))
       return
     }
-    
+
     Task {
       do {
+        guard FileManager.default.fileExists(atPath: filePath) else {
+          throw NSError(
+            domain: "WhisperKitError", code: 4002,
+            userInfo: [NSLocalizedDescriptionKey: "Audio file does not exist at path: \(filePath)"])
+        }
+
+        guard FileManager.default.isReadableFile(atPath: filePath) else {
+          throw NSError(
+            domain: "WhisperKitError", code: 4003,
+            userInfo: [
+              NSLocalizedDescriptionKey: "No read permission for audio file at path: \(filePath)"
+            ])
+        }
+
         print("Loading audio file: \(filePath)")
         let loadingStart = Date()
         let audioFileSamples = try await Task {
@@ -181,307 +206,30 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         }.value
         print("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
 
-        var decodingOptions = DecodingOptions()
+        let decodingOptions = try DecodingOptions.fromJson(options)
 
-        if let options = options {
-          if let decodingOptionsDict = options["decodingOptions"] as? [String: Any] {
-            if let task = decodingOptionsDict["task"] as? String {
-              if task == "translate" {
-                decodingOptions.task = .translate
-              } else {
-                decodingOptions.task = .transcribe
-              }
-            }
-            
-            if let language = decodingOptionsDict["language"] as? String {
-              decodingOptions.language = language
-            }
-            
-            if let temperature = decodingOptionsDict["temperature"] as? Double {
-              decodingOptions.temperature = temperature
-            }
-            
-            if let sampleLen = decodingOptionsDict["sampleLen"] as? Int {
-              decodingOptions.sampleLen = sampleLen
-            }
-            
-            if let bestOf = decodingOptionsDict["bestOf"] as? Int {
-              decodingOptions.bestOf = bestOf
-            }
-            
-            if let beamSize = decodingOptionsDict["beamSize"] as? Int {
-              decodingOptions.beamSize = beamSize
-            }
-            
-            if let patience = decodingOptionsDict["patience"] as? Double {
-              decodingOptions.patience = patience
-            }
-            
-            if let lengthPenalty = decodingOptionsDict["lengthPenalty"] as? Double {
-              decodingOptions.lengthPenalty = lengthPenalty
-            }
-            
-            if let suppressBlank = decodingOptionsDict["suppressBlank"] as? Bool {
-              decodingOptions.suppressBlank = suppressBlank
-            }
-            
-            if let suppressTokens = decodingOptionsDict["suppressTokens"] as? Bool {
-              decodingOptions.suppressTokens = suppressTokens
-            }
-            
-            if let withoutTimestamps = decodingOptionsDict["withoutTimestamps"] as? Bool {
-              decodingOptions.withoutTimestamps = withoutTimestamps
-            }
-            
-            if let maxInitialTimestamp = decodingOptionsDict["maxInitialTimestamp"] as? Double {
-              decodingOptions.maxInitialTimestamp = maxInitialTimestamp
-            }
-            
-            if let wordTimestamps = decodingOptionsDict["wordTimestamps"] as? Bool {
-              decodingOptions.wordTimestamps = wordTimestamps
-            }
-            
-            if let prependPunctuations = decodingOptionsDict["prependPunctuations"] as? String {
-              decodingOptions.prependPunctuations = prependPunctuations
-            }
-            
-            if let appendPunctuations = decodingOptionsDict["appendPunctuations"] as? String {
-              decodingOptions.appendPunctuations = appendPunctuations
-            }
-            
-            if let logProbThreshold = decodingOptionsDict["logProbThreshold"] as? Double {
-              decodingOptions.logProbThreshold = logProbThreshold
-            }
-            
-            if let noSpeechThreshold = decodingOptionsDict["noSpeechThreshold"] as? Double {
-              decodingOptions.noSpeechThreshold = noSpeechThreshold
-            }
-            
-            if let compressionRatioThreshold = decodingOptionsDict["compressionRatioThreshold"] as? Double {
-              decodingOptions.compressionRatioThreshold = compressionRatioThreshold
-            }
-            
-            if let conditionOnPreviousText = decodingOptionsDict["conditionOnPreviousText"] as? String {
-              decodingOptions.conditionOnPreviousText = conditionOnPreviousText
-            }
-            
-            if let prompt = decodingOptionsDict["prompt"] as? String {
-              decodingOptions.prompt = prompt
-            }
-          } else {
-            for (key, value) in options {
-              if let key = key as? String {
-                switch key {
-                case "task":
-                  if let task = value as? String, task == "translate" {
-                    decodingOptions.task = .translate
-                  } else {
-                    decodingOptions.task = .transcribe
-                  }
-                case "language":
-                  if let language = value as? String {
-                    decodingOptions.language = language
-                  }
-                case "temperature":
-                  if let temperature = value as? Double {
-                    decodingOptions.temperature = temperature
-                  }
-                case "sampleLen":
-                  if let sampleLen = value as? Int {
-                    decodingOptions.sampleLen = sampleLen
-                  }
-                case "bestOf":
-                  if let bestOf = value as? Int {
-                    decodingOptions.bestOf = bestOf
-                  }
-                case "beamSize":
-                  if let beamSize = value as? Int {
-                    decodingOptions.beamSize = beamSize
-                  }
-                case "patience":
-                  if let patience = value as? Double {
-                    decodingOptions.patience = patience
-                  }
-                case "lengthPenalty":
-                  if let lengthPenalty = value as? Double {
-                    decodingOptions.lengthPenalty = lengthPenalty
-                  }
-                case "suppressBlank":
-                  if let suppressBlank = value as? Bool {
-                    decodingOptions.suppressBlank = suppressBlank
-                  }
-                case "suppressTokens":
-                  if let suppressTokens = value as? Bool {
-                    decodingOptions.suppressTokens = suppressTokens
-                  }
-                case "withoutTimestamps":
-                  if let withoutTimestamps = value as? Bool {
-                    decodingOptions.withoutTimestamps = withoutTimestamps
-                  }
-                case "maxInitialTimestamp":
-                  if let maxInitialTimestamp = value as? Double {
-                    decodingOptions.maxInitialTimestamp = maxInitialTimestamp
-                  }
-                case "wordTimestamps":
-                  if let wordTimestamps = value as? Bool {
-                    decodingOptions.wordTimestamps = wordTimestamps
-                  }
-                case "prependPunctuations":
-                  if let prependPunctuations = value as? String {
-                    decodingOptions.prependPunctuations = prependPunctuations
-                  }
-                case "appendPunctuations":
-                  if let appendPunctuations = value as? String {
-                    decodingOptions.appendPunctuations = appendPunctuations
-                  }
-                case "logProbThreshold":
-                  if let logProbThreshold = value as? Double {
-                    decodingOptions.logProbThreshold = logProbThreshold
-                  }
-                case "noSpeechThreshold":
-                  if let noSpeechThreshold = value as? Double {
-                    decodingOptions.noSpeechThreshold = noSpeechThreshold
-                  }
-                case "compressionRatioThreshold":
-                  if let compressionRatioThreshold = value as? Double {
-                    decodingOptions.compressionRatioThreshold = compressionRatioThreshold
-                  }
-                case "conditionOnPreviousText":
-                  if let conditionOnPreviousText = value as? String {
-                    decodingOptions.conditionOnPreviousText = conditionOnPreviousText
-                  }
-                case "prompt":
-                  if let prompt = value as? String {
-                    decodingOptions.prompt = prompt
-                  }
-                default:
-                  break
-                }
-              }
-            }
-          }
+        let transcription: TranscriptionResult? = try await transcribeAudioSamples(
+          audioFileSamples,
+          options: decodingOptions,
+        )
+
+        guard let transcription = transcription else {
+          throw NSError(
+            domain: "WhisperKitError", code: 2004,
+            userInfo: [NSLocalizedDescriptionKey: "Transcription result is nil"])
         }
-
-        let transcription = try await whisperKit.transcribe(
-          audioArray: audioFileSamples, decodeOptions: decodingOptions)
-
-        var transcriptionDict: [String: Any] = [:]
-
-        if let text = transcription?.text {
-          transcriptionDict["text"] = text
-        }
-
-        if let language = transcription?.language {
-          transcriptionDict["language"] = language
-        }
-
-        if let segments = transcription?.segments {
-          var segmentsArray: [[String: Any]] = []
-
-          for segment in segments {
-            var segmentDict: [String: Any] = [
-              "id": segment.id,
-              "seek": segment.seek,
-              "text": segment.text,
-              "start": segment.start,
-              "end": segment.end,
-              "temperature": segment.temperature,
-              "avgLogprob": segment.avgLogprob,
-              "compressionRatio": segment.compressionRatio,
-              "noSpeechProb": segment.noSpeechProb,
-            ]
-
-            if let tokens = segment.tokens {
-              segmentDict["tokens"] = tokens
-            }
-
-            if let tokenLogProbs = segment.tokenLogProbs {
-              var logProbsArray: [Any] = []
-              for logProbs in tokenLogProbs {
-                var logProbsDict: [String: Double] = [:]
-                for (token, prob) in logProbs {
-                  logProbsDict[String(token)] = prob
-                }
-                logProbsArray.append(logProbsDict)
-              }
-              segmentDict["tokenLogProbs"] = logProbsArray
-            }
-
-            if let words = segment.words {
-              var wordsArray: [[String: Any]] = []
-              for word in words {
-                let wordDict: [String: Any] = [
-                  "word": word.word,
-                  "tokens": word.tokens,
-                  "start": word.start,
-                  "end": word.end,
-                  "probability": word.probability,
-                ]
-                wordsArray.append(wordDict)
-              }
-              segmentDict["words"] = wordsArray
-            }
-
-            segmentsArray.append(segmentDict)
-          }
-
-          transcriptionDict["segments"] = segmentsArray
-        }
-
-        if let timings = transcription?.timings {
-          transcriptionDict["timings"] = [
-            "pipelineStart": timings.pipelineStart,
-            "firstTokenTime": timings.firstTokenTime,
-            "inputAudioSeconds": timings.inputAudioSeconds,
-            "modelLoading": timings.modelLoading,
-            "prewarmLoadTime": timings.prewarmLoadTime,
-            "encoderLoadTime": timings.encoderLoadTime,
-            "decoderLoadTime": timings.decoderLoadTime,
-            "encoderSpecializationTime": timings.encoderSpecializationTime,
-            "decoderSpecializationTime": timings.decoderSpecializationTime,
-            "tokenizerLoadTime": timings.tokenizerLoadTime,
-            "audioLoading": timings.audioLoading,
-            "audioProcessing": timings.audioProcessing,
-            "logmels": timings.logmels,
-            "encoding": timings.encoding,
-            "prefill": timings.prefill,
-            "decodingInit": timings.decodingInit,
-            "decodingLoop": timings.decodingLoop,
-            "decodingPredictions": timings.decodingPredictions,
-            "decodingFiltering": timings.decodingFiltering,
-            "decodingSampling": timings.decodingSampling,
-            "decodingFallback": timings.decodingFallback,
-            "decodingWindowing": timings.decodingWindowing,
-            "decodingKvCaching": timings.decodingKvCaching,
-            "decodingWordTimestamps": timings.decodingWordTimestamps,
-            "decodingNonPrediction": timings.decodingNonPrediction,
-            "totalAudioProcessingRuns": timings.totalAudioProcessingRuns,
-            "totalLogmelRuns": timings.totalLogmelRuns,
-            "totalEncodingRuns": timings.totalEncodingRuns,
-            "totalDecodingLoops": timings.totalDecodingLoops,
-            "totalKVUpdateRuns": timings.totalKVUpdateRuns,
-            "totalTimestampAlignmentRuns": timings.totalTimestampAlignmentRuns,
-            "totalDecodingFallbacks": timings.totalDecodingFallbacks,
-            "totalDecodingWindows": timings.totalDecodingWindows,
-            "fullPipeline": timings.fullPipeline,
-          ]
-        }
-
-        if let seekTime = transcription?.seekTime {
-          transcriptionDict["seekTime"] = seekTime
-        }
+        let transcriptionDict = transcription.toJson()
 
         do {
           let jsonData = try JSONSerialization.data(withJSONObject: transcriptionDict, options: [])
-          if let jsonString = String(data: jsonData, encoding: .utf8) {
-            completion(.success(jsonString))
-          } else {
+          guard let jsonString = String(data: jsonData, encoding: .utf8) else {
             throw NSError(
               domain: "WhisperKitError", code: 2003,
               userInfo: [
                 NSLocalizedDescriptionKey: "Failed to create JSON string from transcription result"
               ])
           }
+          completion(.success(jsonString))
         } catch {
           throw NSError(
             domain: "WhisperKitError", code: 2002,
@@ -490,11 +238,50 @@ private class WhisperKitApiImpl: WhisperKitMessage {
                 "Failed to serialize transcription result: \(error.localizedDescription)"
             ])
         }
+
       } catch {
-        print("transcribeFromFile error: \(error.localizedDescription)")
         completion(.failure(error))
       }
     }
+  }
+  
+  func transcribeAudioSamples(_ samples: [Float], options: DecodingOptions?) async throws
+    -> TranscriptionResult?
+  {
+    guard let whisperKit = whisperKit else { return nil }
+    var selectedLanguage: String = "japanese"
+    let languageCode = Constants.languages[selectedLanguage, default: Constants.defaultLanguageCode]
+    let task: DecodingTask = .transcribe
+    var lastConfirmedSegmentEndSeconds: Float = 0
+    let seekClip: [Float] = [lastConfirmedSegmentEndSeconds]
+
+    let options =
+      options
+      ?? DecodingOptions(
+        verbose: true,
+        task: task,
+        language: languageCode,
+        temperature: Float(0),
+        temperatureFallbackCount: Int(5),
+        sampleLength: Int(224),
+        usePrefillPrompt: true,
+        usePrefillCache: true,
+        skipSpecialTokens: true,
+        withoutTimestamps: false,
+        wordTimestamps: true,
+        clipTimestamps: seekClip,
+        concurrentWorkerCount: Int(4),
+        chunkingStrategy: .vad
+      )
+
+    let transcriptionResults: [TranscriptionResult] = try await whisperKit.transcribe(
+      audioArray: samples,
+      decodeOptions: options,
+    )
+
+    let mergedResults = mergeTranscriptionResults(transcriptionResults)
+
+    return mergedResults
   }
 
   private func getModelFolderPath() -> URL {
@@ -659,27 +446,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         userInfo: [NSLocalizedDescriptionKey: "Not enough audio data for transcription"])
     }
     
-    var decodingOptions = DecodingOptions()
+    let decodingOptions = try DecodingOptions.fromJson(options)
     
-    if let options = options as? [String: Any] {
-      if let task = options["task"] as? String, task == "translate" {
-        decodingOptions.task = .translate
-      }
-      
-      if let language = options["language"] as? String {
-        decodingOptions.language = language
-      }
-      
-      if let temperature = options["temperature"] as? Double {
-        decodingOptions.temperature = temperature
-      }
-      
-      if let wordTimestamps = options["wordTimestamps"] as? Bool {
-        decodingOptions.wordTimestamps = wordTimestamps
-      }
-    }
-    
-    let transcriptionResults = try await whisperKit.transcribe(
+    let transcriptionResults: [TranscriptionResult] = try await whisperKit.transcribe(
       audioArray: Array(currentBuffer),
       decodeOptions: decodingOptions
     )
