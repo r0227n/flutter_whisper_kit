@@ -30,3 +30,5 @@ flutter:
         default_package: flutter_whisperkit_apple
       macos:
         default_package: flutter_whisperkit_apple
+      android:
+        default_package: flutter_whisperkit_android # For future implementation

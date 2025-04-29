@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter_whisperkit/flutter_whisperkit.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
+// Import platform implementations
+import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart'
+    if (dart.library.html) 'package:flutter_whisperkit/flutter_whisperkit_web.dart'
+    if (dart.library.io) 'package:flutter_whisperkit/flutter_whisperkit_android.dart';
+
 void main() {
+  // Register the appropriate platform implementation
+  if (Platform.isIOS || Platform.isMacOS) {
+    FlutterWhisperkitApple.registerWith();
+  }
+  // Future Android implementation would be registered here
+  // if (Platform.isAndroid) {
+  //   FlutterWhisperkitAndroid.registerWith();
+  // }
+  
   runApp(const MyApp());
 }
 
