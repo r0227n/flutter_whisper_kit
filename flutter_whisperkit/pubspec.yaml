@@ -1,0 +1,32 @@
+name: flutter_whisperkit
+description: Flutter plugin for WhisperKit speech recognition
+version: 0.0.1
+homepage: https://github.com/r0227n/flutter_whisperkit
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  plugin_platform_interface: ^2.0.2
+  huggingface_client: ^1.6.2
+  path_provider: ^2.1.2
+  shared_preferences: ^2.2.2
+  collection: ^1.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  mockito: ^5.4.2
+  build_runner: ^2.4.6
+
+flutter:
+  plugin:
+    platforms:
+      ios:
+        default_package: flutter_whisperkit_apple
+      macos:
+        default_package: flutter_whisperkit_apple

@@ -1,7 +1,7 @@
 name: flutter_whisperkit_apple
-description: "A new Flutter plugin project."
+description: "Flutter plugin for WhisperKit speech recognition on Apple platforms"
 version: 0.0.1
-homepage:
+homepage: https://github.com/r0227n/flutter_whisperkit
 
 environment:
   sdk: ^3.7.2
@@ -11,9 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
-  huggingface_client: ^1.6.2
-  path_provider: ^2.1.2
-  shared_preferences: ^2.2.2
+  flutter_whisperkit:
+    path: ../flutter_whisperkit
   collection: ^1.18.0
 
 dev_dependencies:

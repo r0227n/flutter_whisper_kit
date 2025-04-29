@@ -1,22 +1,14 @@
-import 'dart:async';
+import '../model/model_support_config.dart';
+import '../service/model_support_service.dart';
 
-import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit/flutter_whisperkit.dart';
-import 'package:flutter_whisperkit/src/api/model_support_api.dart';
-import 'package:flutter_whisperkit/src/model/model_support_config.dart';
-import 'package:flutter_whisperkit/src/service/model_support_service.dart';
-
-/// Main class for WhisperKit model support functionality.
-/// This class delegates to the flutter_whisperkit package implementation.
-class WhisperKitModelSupport {
-  static const MethodChannel _channel = MethodChannel('flutter_whisperkit_apple');
+/// API for fetching and managing model support configurations.
+class ModelSupportApi {
+  /// The model support service.
+  final ModelSupportService _service;
   
-  /// The FlutterWhisperkit instance.
-  final FlutterWhisperkit _whisperkit;
-  
-  /// Creates a new [WhisperKitModelSupport] instance.
-  WhisperKitModelSupport({String? token}) 
-      : _whisperkit = FlutterWhisperkit(token: token);
+  /// Creates a new [ModelSupportApi] instance.
+  ModelSupportApi({String? token}) 
+      : _service = ModelSupportService(token: token);
 
   /// Fetches model support configuration from the specified repository.
   /// 
@@ -33,7 +25,7 @@ class WhisperKitModelSupport {
     String? revision,
     bool forceRefresh = false,
   }) {
-    return _whisperkit.modelSupport.fetchModelSupportConfig(
+    return _service.fetchModelSupportConfig(
       repo: repo,
       configPath: configPath,
       revision: revision,
@@ -41,29 +33,23 @@ class WhisperKitModelSupport {
     );
   }
 
-  /// Gets the platform version.
-  Future<String?> getPlatformVersion() async {
-    final version = await _channel.invokeMethod<String>('getPlatformVersion');
-    return version;
-  }
-
   /// Clears the cached configuration.
   Future<void> clearCache() {
-    return _whisperkit.modelSupport.clearCache();
+    return _service.clearCache();
   }
 
   /// Checks if the specified model is supported on the current device.
   Future<bool> isModelSupported(ModelSupportConfig config, String modelName) {
-    return _whisperkit.modelSupport.isModelSupported(config, modelName);
+    return _service.isModelSupported(config, modelName);
   }
 
   /// Gets the list of supported models for the current device.
   Future<List<String>> getSupportedModels(ModelSupportConfig config) {
-    return _whisperkit.modelSupport.getSupportedModels(config);
+    return _service.getSupportedModels(config);
   }
 
   /// Gets the default model for the current device.
   Future<String> getDefaultModel(ModelSupportConfig config) {
-    return _whisperkit.modelSupport.getDefaultModel(config);
+    return _service.getDefaultModel(config);
   }
 }
