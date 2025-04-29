@@ -23,12 +23,25 @@ class WhisperKitModelLoader {
     Function(double progress)? onProgress,
     ModelStorageLocation? storageLocation,
   }) async {
-    return _whisperkit.loadModel(
-      variant,
-      modelRepo: modelRepo,
-      redownload: redownload,
-      storageLocation: storageLocation ?? _storageLocation,
-    );
+    // Subscribe to the progress stream if a callback is provided
+    StreamSubscription<double>? progressSubscription;
+    if (onProgress != null) {
+      progressSubscription = _whisperkit.modelProgressStream.listen(onProgress);
+    }
+    
+    try {
+      final result = await _whisperkit.loadModel(
+        variant,
+        modelRepo: modelRepo,
+        redownload: redownload,
+        storageLocation: storageLocation ?? _storageLocation,
+      );
+      
+      return result;
+    } finally {
+      // Cancel the subscription when the future completes
+      await progressSubscription?.cancel();
+    }
   }
 
   /// Sets the storage location for WhisperKit models.

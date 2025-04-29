@@ -9,9 +9,20 @@ enum ModelStorageLocation: Int64 {
 }
 
 private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_stream"
+private let modelProgressStreamChannelName = "flutter_whisperkit/model_progress_stream"
 
 private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
+  
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    eventSink = events
+    return nil
+  }
+  
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    eventSink = nil
+    return nil
+  }
   
   func sendTranscription(_ result: TranscriptionResult?) {
     if let eventSink = eventSink {
@@ -30,12 +41,35 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
   }
 }
 
+private class ModelLoadingStreamHandler: NSObject, FlutterStreamHandler {
+  private var eventSink: FlutterEventSink?
+  
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    eventSink = events
+    return nil
+  }
+  
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    eventSink = nil
+    return nil
+  }
+  
+  func sendProgress(_ progress: Double) {
+    if let eventSink = eventSink {
+      DispatchQueue.main.async {
+        eventSink(progress)
+      }
+    }
+  }
+}
+
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
   private var isRecording: Bool = false
   private var transcriptionTask: Task<Void, Never>?
   public static var transcriptionStreamHandler: TranscriptionStreamHandler?
+  public static var modelProgressStreamHandler: ModelLoadingStreamHandler?
 
   func loadModel(
     variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
@@ -113,7 +147,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           do {
             modelFolder = try await WhisperKit.download(
               variant: variant,
-              from: modelRepo ?? "argmaxinc/whisperkit-coreml"
+              from: modelRepo ?? "argmaxinc/whisperkit-coreml",
+              progressCallback: { progress in
+                WhisperKitApiImpl.modelProgressStreamHandler?.sendProgress(progress.fractionCompleted * 0.7)
+              }
             )
           } catch {
             print("Download error: \(error.localizedDescription)")
@@ -127,11 +164,14 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
         if let folder = modelFolder {
           whisperKit.modelFolder = folder
-
+          
+          WhisperKitApiImpl.modelProgressStreamHandler?.sendProgress(0.7)
           try await whisperKit.prewarmModels()
-
+          
+          WhisperKitApiImpl.modelProgressStreamHandler?.sendProgress(0.9)
           try await whisperKit.loadModels()
-
+          
+          WhisperKitApiImpl.modelProgressStreamHandler?.sendProgress(1.0)
           completion(.success("Model \(variant) loaded successfully"))
         } else {
           throw NSError(
@@ -719,9 +759,14 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger(), api: WhisperKitApiImpl())
     
-    let streamHandler = TranscriptionStreamHandler()
-    WhisperKitApiImpl.transcriptionStreamHandler = streamHandler
-    let channel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: registrar.messenger())
-    channel.setStreamHandler(streamHandler)
+    let transcriptionStreamHandler = TranscriptionStreamHandler()
+    WhisperKitApiImpl.transcriptionStreamHandler = transcriptionStreamHandler
+    let transcriptionChannel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: registrar.messenger())
+    transcriptionChannel.setStreamHandler(transcriptionStreamHandler)
+    
+    let modelProgressStreamHandler = ModelLoadingStreamHandler()
+    WhisperKitApiImpl.modelProgressStreamHandler = modelProgressStreamHandler
+    let modelProgressChannel = FlutterEventChannel(name: modelProgressStreamChannelName, binaryMessenger: registrar.messenger())
+    modelProgressChannel.setStreamHandler(modelProgressStreamHandler)
   }
 }
