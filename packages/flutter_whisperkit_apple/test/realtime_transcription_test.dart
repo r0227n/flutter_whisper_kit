@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
@@ -14,20 +14,14 @@ void main() {
     
     group('Platform Interface', () {
       test('default instance is MethodChannelFlutterWhisperkitApple', () {
-        // Save the original instance
-        final originalInstance = FlutterWhisperkitApplePlatform.instance;
-        
-        // Create a new instance for testing
-        FlutterWhisperkitApplePlatform.instance = MethodChannelFlutterWhisperkitApple();
+        // Register the Apple implementation
+        FlutterWhisperkitApple.registerWith();
         
         // Assert
         expect(
-          FlutterWhisperkitApplePlatform.instance,
+          FlutterWhisperkitPlatform.instance,
           isInstanceOf<MethodChannelFlutterWhisperkitApple>(),
         );
-        
-        // Restore the original instance
-        FlutterWhisperkitApplePlatform.instance = originalInstance;
       });
     });
 
