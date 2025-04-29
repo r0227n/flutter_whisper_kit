@@ -36,7 +36,7 @@ abstract class FlutterWhisperkitPlatform extends PlatformInterface {
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
+    ModelStorageLocation? storageLocation,
   }) {
     throw UnimplementedError('loadModel() has not been implemented.');
   }
