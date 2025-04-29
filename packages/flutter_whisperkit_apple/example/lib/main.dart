@@ -136,7 +136,7 @@ class _MyAppState extends State<MyApp> {
         variant: _selectedVariant,
         modelRepo: 'argmaxinc/whisperkit-coreml',
         redownload: redownload,
-        onProgress: (progress) {
+        onProgress: (double progress) {
           setState(() {
             _loadingProgress = progress;
           });

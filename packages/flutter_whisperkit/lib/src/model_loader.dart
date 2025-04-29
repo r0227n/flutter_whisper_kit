@@ -1,5 +1,6 @@
-import '../flutter_whisperkit.dart';
+import 'dart:async';
 import 'models.dart';
+import '../flutter_whisperkit.dart';
 
 /// A class for loading and managing WhisperKit models.
 class WhisperKitModelLoader {
@@ -28,7 +29,7 @@ class WhisperKitModelLoader {
     if (onProgress != null) {
       progressSubscription = _whisperkit.modelProgressStream.listen(onProgress);
     }
-    
+
     try {
       final result = await _whisperkit.loadModel(
         variant,
@@ -36,7 +37,7 @@ class WhisperKitModelLoader {
         redownload: redownload,
         storageLocation: storageLocation ?? _storageLocation,
       );
-      
+
       return result;
     } finally {
       // Cancel the subscription when the future completes
