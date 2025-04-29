@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_whisperkit_apple_method_channel.dart';
@@ -45,5 +47,28 @@ abstract class FlutterWhisperkitApplePlatform extends PlatformInterface {
 
   Future<String?> transcribeFromFile(String filePath, DecodingOptions options) {
     throw UnimplementedError('transcribeFromFile() has not been implemented.');
+  }
+
+  /// Starts recording audio from the microphone for real-time transcription.
+  ///
+  /// [options] - Optional decoding options for the transcription.
+  /// [loop] - Whether to continuously transcribe in a loop.
+  Future<String?> startRecording(DecodingOptions options, bool loop) {
+    throw UnimplementedError('startRecording() has not been implemented.');
+  }
+
+  /// Stops recording audio and optionally triggers transcription.
+  ///
+  /// [loop] - Whether the recording was started with loop mode.
+  Future<String?> stopRecording(bool loop) {
+    throw UnimplementedError('stopRecording() has not been implemented.');
+  }
+  
+  /// Stream of real-time transcription results.
+  ///
+  /// This stream emits String values containing the transcribed text as it becomes available.
+  /// The stream will emit an empty string when recording stops.
+  Stream<String> get transcriptionStream {
+    throw UnimplementedError('transcriptionStream has not been implemented.');
   }
 }

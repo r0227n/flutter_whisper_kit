@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'package:flutter_whisperkit_apple/model_loader.dart';
+import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,6 +22,10 @@ class _MyAppState extends State<MyApp> {
   String _modelStatus = 'No model loaded';
   bool _isLoading = false;
   double _loadingProgress = 0.0;
+  bool _isModelLoaded = false;
+  bool _isRecording = false;
+  String _realtimeTranscription = '';
+  StreamSubscription<String>? _transcriptionSubscription;
 
   // Use the proper plugin class instead of the generated message class
   final _flutterWhisperkitApple = FlutterWhisperkitApple();
@@ -38,6 +43,13 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPlatformState();
+  }
+  
+  @override
+  void dispose() {
+    // Cancel the transcription subscription when the widget is disposed
+    _transcriptionSubscription?.cancel();
+    super.dispose();
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -83,6 +95,67 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  // Start recording for real-time transcription
+  Future<void> _toggleRecording() async {
+    if (_isRecording) {
+      // Stop recording
+      try {
+        final result = await _flutterWhisperkitApple.stopRecording(loop: true);
+        
+        // Cancel the transcription stream subscription
+        _transcriptionSubscription?.cancel();
+        _transcriptionSubscription = null;
+        
+        setState(() {
+          _isRecording = false;
+          _modelStatus = 'Recording stopped: $result';
+        });
+      } catch (e) {
+        setState(() {
+          _modelStatus = 'Error stopping recording: $e';
+        });
+      }
+    } else {
+      // Start recording
+      try {
+        final result = await _flutterWhisperkitApple.startRecording(
+          options: const DecodingOptions(
+            verbose: true,
+            task: DecodingTask.transcribe,
+            language: 'en',
+            temperature: 0.0,
+            wordTimestamps: true,
+          ),
+          loop: true, // Use loop mode for continuous transcription in Swift
+        );
+        
+        // Subscribe to the transcription stream
+        _transcriptionSubscription = _flutterWhisperkitApple.transcriptionStream.listen(
+          (transcription) {
+            setState(() {
+              if (transcription.isNotEmpty) {
+                _realtimeTranscription = transcription;
+              }
+            });
+          },
+          onError: (error) {
+            print('Transcription stream error: $error');
+          },
+        );
+        
+        setState(() {
+          _isRecording = true;
+          _realtimeTranscription = 'Listening... Speak now.';
+          _modelStatus = 'Recording started: $result';
+        });
+      } catch (e) {
+        setState(() {
+          _modelStatus = 'Error starting recording: $e';
+        });
+      }
+    }
+  }
+
   // Load a model using the model loader
   Future<void> _loadModel({bool redownload = false}) async {
     setState(() {
@@ -111,11 +184,13 @@ class _MyAppState extends State<MyApp> {
 
       setState(() {
         _isLoading = false;
+        _isModelLoaded = true;
         _modelStatus = 'Model loaded: $result';
       });
     } on PlatformException catch (e) {
       setState(() {
         _isLoading = false;
+        _isModelLoaded = false;
         _modelStatus = 'Error loading model: ${e.message}';
       });
     }
@@ -267,7 +342,45 @@ class _MyAppState extends State<MyApp> {
 
                   print('Transcribed: $result');
                 },
-                child: const Text('Transcribe'),
+                child: const Text('Transcribe File'),
+              ),
+              
+              const SizedBox(height: 20),
+              
+              // Real-time transcription section
+              const Text(
+                'Real-time Transcription',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              
+              const SizedBox(height: 10),
+              
+              // Start/stop recording button
+              ElevatedButton(
+                onPressed: _isModelLoaded ? _toggleRecording : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _isRecording ? Colors.red : Colors.green,
+                ),
+                child: Text(_isRecording ? 'Stop Recording' : 'Start Recording'),
+              ),
+              
+              const SizedBox(height: 10),
+              
+              // Real-time transcription display
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                constraints: const BoxConstraints(minHeight: 100),
+                width: double.infinity,
+                child: Text(
+                  _realtimeTranscription.isEmpty 
+                      ? 'Speak to see transcription here...' 
+                      : _realtimeTranscription,
+                  style: const TextStyle(fontFamily: 'monospace'),
+                ),
               ),
             ],
           ),

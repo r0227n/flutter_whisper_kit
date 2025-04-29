@@ -3,6 +3,7 @@ import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_platform_interface.dart';
 import 'package:flutter_whisperkit_apple/src/models/decoding_options.dart';
+import 'package:flutter_whisperkit_apple/src/models/transcription_result.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockFlutterWhisperkitApplePlatform
@@ -78,9 +79,23 @@ class MockFlutterWhisperkitApplePlatform
 
     return Future.value(mockJson);
   }
+  
+  @override
+  Future<String?> startRecording(DecodingOptions options, bool loop) =>
+      Future.value('Recording started');
+      
+  @override
+  Future<String?> stopRecording(bool loop) =>
+      Future.value('Recording stopped');
+  
+  @override
+  Stream<String> get transcriptionStream => 
+      Stream<String>.fromIterable(['Test transcription']);
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  
   final FlutterWhisperkitApplePlatform initialPlatform =
       FlutterWhisperkitApplePlatform.instance;
 
@@ -104,7 +119,7 @@ void main() {
     );
     expect(
       await flutterWhisperkitApplePlugin.transcribeFromFile('test.wav'),
-      isA<String>(),
+      isA<TranscriptionResult>(),
     );
   });
 
@@ -133,18 +148,21 @@ void main() {
         'test.wav',
         options: options,
       ),
-      isA<String>(),
+      isA<TranscriptionResult>(),
     );
   });
 
-  test('transcribeFromFile with empty path returns null', () async {
+  test('transcribeFromFile with empty path throws exception', () async {
     FlutterWhisperkitApple flutterWhisperkitApplePlugin =
         FlutterWhisperkitApple();
     MockFlutterWhisperkitApplePlatform fakePlatform =
         MockFlutterWhisperkitApplePlatform();
     FlutterWhisperkitApplePlatform.instance = fakePlatform;
 
-    expect(await flutterWhisperkitApplePlugin.transcribeFromFile(''), isNull);
+    expect(
+      () => flutterWhisperkitApplePlugin.transcribeFromFile(''),
+      throwsException,
+    );
   });
 
   test('DecodingOptions creates correct options object', () {
