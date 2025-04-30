@@ -1,7 +1,13 @@
-import Cocoa
-import FlutterMacOS
 import Foundation
 import WhisperKit
+
+#if os(iOS)
+  import Flutter
+#elseif os(macOS)
+  import FlutterMacOS
+#else
+  #error("Unsupported platform.")
+#endif
 
 enum ModelStorageLocation: Int64 {
   case packageDirectory = 0
@@ -564,11 +570,20 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
 
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger, api: WhisperKitApiImpl())
-    
+    #if os(iOS)
+      let messenger = registrar.messenger()
+    #elseif os(macOS)
+      let messenger = registrar.messenger
+    #else
+      #error("Unsupported platform.")
+    #endif
+
     let streamHandler = TranscriptionStreamHandler()
     WhisperKitApiImpl.transcriptionStreamHandler = streamHandler
-    let channel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: registrar.messenger)
+    
+    WhisperKitMessageSetup.setUp(binaryMessenger: messenger, api: WhisperKitApiImpl())
+    
+    let channel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: messenger)
     channel.setStreamHandler(streamHandler)
   }
 }
