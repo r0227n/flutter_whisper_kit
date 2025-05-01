@@ -9,11 +9,6 @@ import WhisperKit
   #error("Unsupported platform.")
 #endif
 
-enum ModelStorageLocation: Int64 {
-  case packageDirectory = 0
-  case userFolder = 1
-}
-
 private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_stream"
 
 #if os(iOS)
@@ -22,14 +17,13 @@ private var flutterPluginRegistrar: FlutterPluginRegistrar?
 
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
-  private var modelStorageLocation: ModelStorageLocation = .packageDirectory
   private var isRecording: Bool = false
   private var transcriptionTask: Task<Void, Never>?
   public static var transcriptionStreamHandler: TranscriptionStreamHandler?
 
   func loadModel(
-    variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
-    modelPath: String?, computeUnits: Int64?, prewarmMode: Bool?,
+    variant: String?, modelRepo: String?, redownload: Bool?,
+    modelPath: String?, prewarmMode: Bool?,
     completion: @escaping (Result<String?, Error>) -> Void
   ) {
     guard let variant = variant else {
@@ -41,11 +35,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       return
     }
 
-    if let storageLocation = storageLocation,
-      let location = ModelStorageLocation(rawValue: storageLocation)
-    {
-      modelStorageLocation = location
-    }
 
     Task {
       do {
@@ -368,32 +357,12 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   }
 
   private func getModelFolderPath() -> URL {
-    switch modelStorageLocation {
-    case .packageDirectory:
-      if let appSupport = FileManager.default.urls(
-        for: .applicationSupportDirectory, in: .userDomainMask
-      ).first {
-        return appSupport.appendingPathComponent("WhisperKitModels")
-      }
-      return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
-
-    case .userFolder:
-      if let downloads = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)
-        .first
-      {
-        let testFile = downloads.appendingPathComponent("whisperkit_write_test.txt")
-        do {
-          try "test".write(to: testFile, atomically: true, encoding: .utf8)
-          try FileManager.default.removeItem(at: testFile)
-
-          return downloads.appendingPathComponent("WhisperKitModels")
-        } catch {
-          print("Cannot write to Downloads directory: \(error.localizedDescription)")
-        }
-      }
-
-      return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
+    if let appSupport = FileManager.default.urls(
+      for: .applicationSupportDirectory, in: .userDomainMask
+    ).first {
+      return appSupport.appendingPathComponent("WhisperKitModels")
     }
+    return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
   }
 
   private func getDocumentsDirectory() -> URL {
