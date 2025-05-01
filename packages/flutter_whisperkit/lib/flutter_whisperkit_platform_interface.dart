@@ -106,4 +106,9 @@ abstract class FlutterWhisperkitPlatform extends PlatformInterface {
   Stream<TranscriptionResult> get transcriptionStream {
     throw UnimplementedError('transcriptionStream has not been implemented.');
   }
+  
+  /// Stream of model loading progress updates.
+  Stream<Progress> get modelProgressStream {
+    throw UnimplementedError('modelProgressStream has not been implemented.');
+  }
 }

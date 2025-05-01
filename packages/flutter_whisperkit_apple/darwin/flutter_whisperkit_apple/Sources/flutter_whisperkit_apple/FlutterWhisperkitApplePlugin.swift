@@ -15,6 +15,7 @@ enum ModelStorageLocation: Int64 {
 }
 
 private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_stream"
+private let modelProgressStreamChannelName = "flutter_whisperkit/model_progress_stream"
 
 #if os(iOS)
 private var flutterPluginRegistrar: FlutterPluginRegistrar?
@@ -26,6 +27,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   private var isRecording: Bool = false
   private var transcriptionTask: Task<Void, Never>?
   public static var transcriptionStreamHandler: TranscriptionStreamHandler?
+  public static var modelProgressStreamHandler: ModelProgressStreamHandler?
 
   func loadModel(
     variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
@@ -103,7 +105,12 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           do {
             modelFolder = try await WhisperKit.download(
               variant: variant,
-              from: modelRepo ?? "argmaxinc/whisperkit-coreml"
+              from: modelRepo ?? "argmaxinc/whisperkit-coreml",
+              progressCallback: { progress in
+                if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
+                  streamHandler.sendProgress(progress)
+                }
+              }
             )
           } catch {
             print("Download error: \(error.localizedDescription)")
@@ -119,9 +126,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           whisperKit.modelFolder = folder
 
           try await whisperKit.prewarmModels()
-
+          
           try await whisperKit.loadModels()
-
+          
           completion(.success("Model \(variant) loaded successfully"))
         } else {
           throw NSError(
@@ -588,6 +595,36 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
   }
 }
 
+private class ModelProgressStreamHandler: NSObject, FlutterStreamHandler {
+  private var eventSink: FlutterEventSink?
+
+  func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+    eventSink = events
+    return nil
+  }
+
+  func onCancel(withArguments arguments: Any?) -> FlutterError? {
+    eventSink = nil
+    return nil
+  }
+  
+  func sendProgress(_ progress: Progress) {
+    if let eventSink = eventSink {
+      DispatchQueue.main.async {
+        let progressDict: [String: Any] = [
+          "totalUnitCount": progress.totalUnitCount,
+          "completedUnitCount": progress.completedUnitCount,
+          "fractionCompleted": progress.fractionCompleted,
+          "isIndeterminate": progress.isIndeterminate,
+          "isPaused": progress.isPaused,
+          "isCancelled": progress.isCancelled
+        ]
+        eventSink(progressDict)
+      }
+    }
+  }
+}
+
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     #if os(iOS)
@@ -602,10 +639,16 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
     let streamHandler = TranscriptionStreamHandler()
     WhisperKitApiImpl.transcriptionStreamHandler = streamHandler
     
+    let modelProgressHandler = ModelProgressStreamHandler()
+    WhisperKitApiImpl.modelProgressStreamHandler = modelProgressHandler
+    
     WhisperKitMessageSetup.setUp(binaryMessenger: messenger, api: WhisperKitApiImpl())
     
-    let channel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: messenger)
-    channel.setStreamHandler(streamHandler)
+    let transcriptionChannel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: messenger)
+    transcriptionChannel.setStreamHandler(streamHandler)
+    
+    let modelProgressChannel = FlutterEventChannel(name: modelProgressStreamChannelName, binaryMessenger: messenger)
+    modelProgressChannel.setStreamHandler(modelProgressHandler)
   }
 }
 

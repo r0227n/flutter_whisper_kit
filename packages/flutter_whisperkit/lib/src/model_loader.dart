@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../flutter_whisperkit.dart';
 import 'models.dart';
 
@@ -23,12 +25,27 @@ class WhisperKitModelLoader {
     Function(double progress)? onProgress,
     ModelStorageLocation? storageLocation,
   }) async {
-    return _whisperkit.loadModel(
+    // Initialize the model loading
+    final result = _whisperkit.loadModel(
       variant,
       modelRepo: modelRepo,
       redownload: redownload,
       storageLocation: storageLocation ?? _storageLocation,
     );
+
+    // Subscribe to the progress stream if a callback is provided
+    StreamSubscription<Progress>? progressSubscription;
+    if (onProgress != null) {
+      progressSubscription = _whisperkit.modelProgressStream.listen((progress) {
+        onProgress(progress.fractionCompleted);
+      });
+    }
+
+    try {
+      return await result;
+    } finally {
+      progressSubscription?.cancel();
+    }
   }
 
   /// Sets the storage location for WhisperKit models.
