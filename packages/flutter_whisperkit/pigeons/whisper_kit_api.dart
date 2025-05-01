@@ -16,6 +16,9 @@ abstract class WhisperKitMessage {
     String? modelRepo,
     bool? redownload,
     int? storageLocation,
+    String? modelPath,
+    int? computeUnits,
+    bool? prewarmMode,
   );
   @async
   String? transcribeFromFile(String filePath, Map<String, Object?> options);

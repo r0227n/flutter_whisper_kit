@@ -17,6 +17,9 @@ class MockWhisperKitMessage implements WhisperKitMessage {
     String? modelRepo,
     bool? redownload,
     int? storageLocation,
+    String? modelPath,
+    int? computeUnits,
+    bool? prewarmMode,
   ) async {
     return 'Model loaded successfully';
   }

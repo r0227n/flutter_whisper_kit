@@ -29,6 +29,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
   func loadModel(
     variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
+    modelPath: String?, computeUnits: Int64?, prewarmMode: Bool?,
     completion: @escaping (Result<String?, Error>) -> Void
   ) {
     guard let variant = variant else {
@@ -69,10 +70,26 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         }
 
         if whisperKit == nil {
+          var mlComputeUnits: MLComputeUnits = .all
+          if let computeUnitsValue = computeUnits {
+            switch computeUnitsValue {
+            case 0:
+              mlComputeUnits = .cpuOnly
+            case 1:
+              mlComputeUnits = .cpuAndGPU
+            case 2:
+              mlComputeUnits = .cpuAndNeuralEngine
+            case 3, _:
+              mlComputeUnits = .all
+            }
+          }
+          
+          let shouldPrewarm = prewarmMode ?? true
+          
           let config = WhisperKitConfig(
             verbose: true,
             logLevel: .debug,
-            prewarm: false,
+            prewarm: shouldPrewarm,
             load: false,
             download: false
           )
@@ -89,8 +106,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
         var modelFolder: URL?
         let localModels = await getLocalModels()
-
-        if localModels.contains(variant) && !(redownload ?? false) {
+        
+        if let modelPathString = modelPath, !modelPathString.isEmpty {
+          modelFolder = URL(fileURLWithPath: modelPathString)
+        } else if localModels.contains(variant) && !(redownload ?? false) {
           modelFolder = modelDirURL.appendingPathComponent(variant)
         } else {
           let downloadDestination = modelDirURL.appendingPathComponent(variant)
@@ -117,12 +136,31 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
         if let folder = modelFolder {
           whisperKit.modelFolder = folder
-
-          try await whisperKit.prewarmModels()
-
-          try await whisperKit.loadModels()
-
-          completion(.success("Model \(variant) loaded successfully"))
+          
+          var mlComputeUnits: MLComputeUnits = .all
+          if let computeUnitsValue = computeUnits {
+            switch computeUnitsValue {
+            case 0:
+              mlComputeUnits = .cpuOnly
+            case 1:
+              mlComputeUnits = .cpuAndGPU
+            case 2:
+              mlComputeUnits = .cpuAndNeuralEngine
+            case 3, _:
+              mlComputeUnits = .all
+            }
+          }
+          
+          let shouldPrewarm = prewarmMode ?? true
+          
+          try await whisperKit.loadModel(
+            at: nil, 
+            modelPath: folder, 
+            computeUnits: mlComputeUnits, 
+            prewarmMode: shouldPrewarm
+          )
+          
+          completion(.success("Model \(variant ?? "custom") loaded successfully"))
         } else {
           throw NSError(
             domain: "WhisperKitError", code: 1003,

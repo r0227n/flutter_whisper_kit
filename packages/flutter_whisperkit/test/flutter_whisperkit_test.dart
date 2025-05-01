@@ -17,6 +17,9 @@ class MockFlutterWhisperkitPlatform
     String? modelRepo,
     bool? redownload,
     ModelStorageLocation? storageLocation,
+    String? modelPath,
+    MLComputeUnits? computeUnits,
+    bool? prewarmMode,
   }) {
     // TODO: implement loadModel
     throw UnimplementedError();
