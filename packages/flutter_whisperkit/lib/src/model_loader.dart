@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../flutter_whisperkit.dart';
 import 'models.dart';
 
@@ -30,7 +32,7 @@ class WhisperKitModelLoader {
       redownload: redownload,
       storageLocation: storageLocation ?? _storageLocation,
     );
-    
+
     // Subscribe to the progress stream if a callback is provided
     StreamSubscription<Progress>? progressSubscription;
     if (onProgress != null) {
@@ -38,7 +40,7 @@ class WhisperKitModelLoader {
         onProgress(progress.fractionCompleted);
       });
     }
-    
+
     try {
       return await result;
     } finally {

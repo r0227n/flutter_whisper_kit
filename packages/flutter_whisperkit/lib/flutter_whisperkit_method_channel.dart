@@ -16,7 +16,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   final EventChannel transcriptionStreamChannel = const EventChannel(
     'flutter_whisperkit/transcription_stream',
   );
-  
+
   @visibleForTesting
   final EventChannel modelProgressStreamChannel = const EventChannel(
     'flutter_whisperkit/model_progress_stream',
@@ -25,7 +25,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   /// Stream controller for transcription results
   final StreamController<TranscriptionResult> _transcriptionStreamController =
       StreamController<TranscriptionResult>.broadcast();
-      
+
   /// Stream controller for model loading progress
   final StreamController<Progress> _modelProgressStreamController =
       StreamController<Progress>.broadcast();
@@ -63,7 +63,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
         _transcriptionStreamController.addError(error);
       },
     );
-    
+
     // Listen to the model progress event channel and forward events to the stream controller
     modelProgressStreamChannel.receiveBroadcastStream().listen(
       (dynamic event) {
@@ -159,8 +159,8 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   @override
   Stream<TranscriptionResult> get transcriptionStream =>
       _transcriptionStreamController.stream;
-      
+
   @override
-  Stream<double> get modelProgressStream =>
+  Stream<Progress> get modelProgressStream =>
       _modelProgressStreamController.stream;
 }
