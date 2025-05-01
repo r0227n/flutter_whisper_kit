@@ -77,10 +77,6 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
               Exception('Failed to parse progress data: $e'),
             );
           }
-        } else if (event is double) {
-          // Legacy support for double values
-          final progress = Progress(fractionCompleted: event);
-          _modelProgressStreamController.add(progress);
         }
       },
       onError: (dynamic error) {
