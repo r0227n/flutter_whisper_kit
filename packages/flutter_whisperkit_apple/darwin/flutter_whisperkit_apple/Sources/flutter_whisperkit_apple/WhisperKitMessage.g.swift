@@ -88,7 +88,7 @@ class WhisperKitMessagePigeonCodec: FlutterStandardMessageCodec, @unchecked Send
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WhisperKitMessage {
-  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, modelPath: String?, computeUnits: Int64?, prewarmMode: Bool?, completion: @escaping (Result<String?, Error>) -> Void)
+  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, modelPath: String?, prewarmMode: Bool?, completion: @escaping (Result<String?, Error>) -> Void)
   func transcribeFromFile(filePath: String, options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
   func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
@@ -107,11 +107,9 @@ class WhisperKitMessageSetup {
         let variantArg: String? = nilOrValue(args[0])
         let modelRepoArg: String? = nilOrValue(args[1])
         let redownloadArg: Bool? = nilOrValue(args[2])
-        let storageLocationArg: Int64? = nilOrValue(args[3])
-        let modelPathArg: String? = nilOrValue(args[4])
-        let computeUnitsArg: Int64? = nilOrValue(args[5])
-        let prewarmModeArg: Bool? = nilOrValue(args[6])
-        api.loadModel(variant: variantArg, modelRepo: modelRepoArg, redownload: redownloadArg, storageLocation: storageLocationArg, modelPath: modelPathArg, computeUnits: computeUnitsArg, prewarmMode: prewarmModeArg) { result in
+        let modelPathArg: String? = nilOrValue(args[3])
+        let prewarmModeArg: Bool? = nilOrValue(args[4])
+        api.loadModel(variant: variantArg, modelRepo: modelRepoArg, redownload: redownloadArg, modelPath: modelPathArg, prewarmMode: prewarmModeArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))

@@ -68,9 +68,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
       variant,
       modelRepo,
       redownload,
-      null, // storageLocation (removed parameter)
       modelPath,
-      null, // computeUnits (removed parameter)
       prewarmMode,
     );
   }
