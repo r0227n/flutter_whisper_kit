@@ -159,9 +159,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           
           let shouldPrewarm = prewarmMode ?? true
           
-          try await whisperKit.loadModel(
-            at: nil, 
-            modelPath: folder, 
+          try await whisperKit.loadModels(
             computeUnits: mlComputeUnits, 
             prewarmMode: shouldPrewarm
           )
