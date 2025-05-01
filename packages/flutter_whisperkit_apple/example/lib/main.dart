@@ -38,9 +38,6 @@ class _MyAppState extends State<MyApp> {
   // Selected model variant
   String _selectedVariant = 'tiny-en';
 
-  // Selected storage location
-  ModelStorageLocation _storageLocation = ModelStorageLocation.packageDirectory;
-
   @override
   void dispose() {
     // Cancel the transcription subscription when the widget is disposed
@@ -130,9 +127,6 @@ class _MyAppState extends State<MyApp> {
     });
 
     try {
-      // Set the storage location
-      _modelLoader.setStorageLocation(_storageLocation);
-
       // Load the model
       final result = await _modelLoader.loadModel(
         variant: _selectedVariant,
@@ -210,39 +204,6 @@ class _MyAppState extends State<MyApp> {
                         child: Text(value),
                       );
                     }).toList(),
-              ),
-
-              const SizedBox(height: 10),
-
-              // Storage location selection
-              Row(
-                children: [
-                  const Text('Storage Location: '),
-                  Radio<ModelStorageLocation>(
-                    value: ModelStorageLocation.packageDirectory,
-                    groupValue: _storageLocation,
-                    onChanged: (ModelStorageLocation? value) {
-                      if (value != null) {
-                        setState(() {
-                          _storageLocation = value;
-                        });
-                      }
-                    },
-                  ),
-                  const Text('Package Directory'),
-                  Radio<ModelStorageLocation>(
-                    value: ModelStorageLocation.userFolder,
-                    groupValue: _storageLocation,
-                    onChanged: (ModelStorageLocation? value) {
-                      if (value != null) {
-                        setState(() {
-                          _storageLocation = value;
-                        });
-                      }
-                    },
-                  ),
-                  const Text('User Folder'),
-                ],
               ),
 
               const SizedBox(height: 10),

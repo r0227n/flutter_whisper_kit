@@ -3,7 +3,6 @@ library flutter_whisperkit.models;
 // Export the model classes
 export 'models/compute_units.dart';
 export 'models/decoding_options.dart';
-export 'models/model_storage_location.dart';
 export 'models/transcription_result.dart';
 export 'models/word_timing.dart';
 

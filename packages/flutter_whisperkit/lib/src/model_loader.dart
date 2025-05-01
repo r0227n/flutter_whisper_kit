@@ -1,5 +1,4 @@
 import '../flutter_whisperkit.dart';
-import 'models.dart';
 
 /// A class for loading and managing WhisperKit models.
 class WhisperKitModelLoader {
@@ -7,7 +6,6 @@ class WhisperKitModelLoader {
   WhisperKitModelLoader() : _whisperkit = FlutterWhisperkit();
 
   final FlutterWhisperkit _whisperkit;
-  ModelStorageLocation _storageLocation = ModelStorageLocation.packageDirectory;
 
   /// Loads a WhisperKit model.
   ///
@@ -34,14 +32,4 @@ class WhisperKitModelLoader {
       prewarmMode: prewarmMode,
     );
   }
-
-  /// Sets the storage location for WhisperKit models.
-  ///
-  /// [location] - The storage location to use.
-  void setStorageLocation(ModelStorageLocation location) {
-    _storageLocation = location;
-  }
-
-  /// Gets the current storage location for WhisperKit models.
-  ModelStorageLocation get storageLocation => _storageLocation;
 }

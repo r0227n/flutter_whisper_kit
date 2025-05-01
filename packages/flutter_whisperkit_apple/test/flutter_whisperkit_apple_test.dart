@@ -52,17 +52,7 @@ void main() {
         );
       });
 
-      test('can change storage location', () async {
-        // Arrange
-        setUpMockPlatform();
-        final modelLoader = WhisperKitModelLoader();
-        
-        // Act
-        modelLoader.setStorageLocation(ModelStorageLocation.userFolder);
-        
-        // Assert
-        expect(modelLoader.storageLocation, ModelStorageLocation.userFolder);
-      });
+      // Test removed as ModelStorageLocation has been removed from the codebase
     });
   });
 }

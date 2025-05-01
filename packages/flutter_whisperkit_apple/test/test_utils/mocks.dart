@@ -13,9 +13,7 @@ class MockFlutterWhisperkitPlatform
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    ModelStorageLocation? storageLocation,
     String? modelPath,
-    MLComputeUnits? computeUnits,
     bool? prewarmMode,
   }) => Future.value('Model loaded');
 
