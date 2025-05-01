@@ -124,4 +124,11 @@ class FlutterWhisperkit {
   /// ```
   Stream<TranscriptionResult> get transcriptionStream =>
       FlutterWhisperkitPlatform.instance.transcriptionStream;
+      
+  /// Stream of model loading progress updates.
+  ///
+  /// This stream emits double values between 0.0 and 1.0 representing the
+  /// progress of model loading (both downloading and initialization).
+  Stream<double> get modelProgressStream =>
+      FlutterWhisperkitPlatform.instance.modelProgressStream;
 }
