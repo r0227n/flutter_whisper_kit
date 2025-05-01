@@ -108,7 +108,13 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         let localModels = await getLocalModels()
         
         if let modelPathString = modelPath, !modelPathString.isEmpty {
-          modelFolder = URL(fileURLWithPath: modelPathString)
+          let modelPathURL = URL(fileURLWithPath: modelPathString)
+          if !FileManager.default.fileExists(atPath: modelPathURL.path) {
+            throw NSError(
+              domain: "WhisperKitError", code: 4002,
+              userInfo: [NSLocalizedDescriptionKey: "Model path does not exist: \(modelPathString)"])
+          }
+          modelFolder = modelPathURL
         } else if localModels.contains(variant) && !(redownload ?? false) {
           modelFolder = modelDirURL.appendingPathComponent(variant)
         } else {
