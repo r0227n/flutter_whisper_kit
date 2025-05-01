@@ -26,8 +26,9 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   final StreamController<TranscriptionResult> _transcriptionStreamController =
       StreamController<TranscriptionResult>.broadcast();
       
-  final StreamController<double> _modelProgressStreamController =
-      StreamController<double>.broadcast();
+  /// Stream controller for model loading progress
+  final StreamController<Progress> _modelProgressStreamController =
+      StreamController<Progress>.broadcast();
 
   /// Constructor that sets up the event channel listener
   MethodChannelFlutterWhisperkit() {
@@ -66,8 +67,20 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     // Listen to the model progress event channel and forward events to the stream controller
     modelProgressStreamChannel.receiveBroadcastStream().listen(
       (dynamic event) {
-        if (event is double) {
-          _modelProgressStreamController.add(event);
+        if (event is Map) {
+          try {
+            final progressMap = Map<String, dynamic>.from(event);
+            final progress = Progress.fromJson(progressMap);
+            _modelProgressStreamController.add(progress);
+          } catch (e) {
+            _modelProgressStreamController.addError(
+              Exception('Failed to parse progress data: $e'),
+            );
+          }
+        } else if (event is double) {
+          // Legacy support for double values
+          final progress = Progress(fractionCompleted: event);
+          _modelProgressStreamController.add(progress);
         }
       },
       onError: (dynamic error) {

@@ -108,7 +108,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
               from: modelRepo ?? "argmaxinc/whisperkit-coreml",
               progressCallback: { progress in
                 if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
-                  streamHandler.sendProgress(progress.fractionCompleted * 0.5) // Download is 0-50% of total progress
+                  let scaledProgress = Progress()
+                  scaledProgress.totalUnitCount = 100
+                  scaledProgress.completedUnitCount = Int64(progress.fractionCompleted * 50)
+                  streamHandler.sendProgress(scaledProgress)
                 }
               }
             )
@@ -126,17 +129,26 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           whisperKit.modelFolder = folder
           
           if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
-            streamHandler.sendProgress(0.5)
+            let progress = Progress()
+            progress.totalUnitCount = 100
+            progress.completedUnitCount = 50  // 50% complete after download
+            streamHandler.sendProgress(progress)
           }
           try await whisperKit.prewarmModels()
           
           if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
-            streamHandler.sendProgress(0.9)
+            let progress = Progress()
+            progress.totalUnitCount = 100
+            progress.completedUnitCount = 90  // 90% complete after prewarming
+            streamHandler.sendProgress(progress)
           }
           try await whisperKit.loadModels()
           
           if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
-            streamHandler.sendProgress(1.0)
+            let progress = Progress()
+            progress.totalUnitCount = 100
+            progress.completedUnitCount = 100  // 100% complete after loading
+            streamHandler.sendProgress(progress)
           }
           
           completion(.success("Model \(variant) loaded successfully"))
@@ -618,10 +630,29 @@ private class ModelProgressStreamHandler: NSObject, FlutterStreamHandler {
     return nil
   }
   
-  func sendProgress(_ progress: Double) {
+  func sendProgress(_ progress: Progress) {
     if let eventSink = eventSink {
       DispatchQueue.main.async {
-        eventSink(progress)
+        let progressDict: [String: Any] = [
+          "totalUnitCount": progress.totalUnitCount,
+          "completedUnitCount": progress.completedUnitCount,
+          "fractionCompleted": progress.fractionCompleted,
+          "isIndeterminate": progress.isIndeterminate,
+          "isPaused": progress.isPaused,
+          "isCancelled": progress.isCancelled
+        ]
+        eventSink(progressDict)
+      }
+    }
+  }
+  
+  func sendProgress(_ value: Double) {
+    if let eventSink = eventSink {
+      DispatchQueue.main.async {
+        let progress = Progress()
+        progress.totalUnitCount = 100
+        progress.completedUnitCount = Int64(value * 100)
+        self.sendProgress(progress)
       }
     }
   }

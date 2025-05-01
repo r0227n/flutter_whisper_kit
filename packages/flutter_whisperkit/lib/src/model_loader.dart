@@ -32,9 +32,11 @@ class WhisperKitModelLoader {
     );
     
     // Subscribe to the progress stream if a callback is provided
-    StreamSubscription<double>? progressSubscription;
+    StreamSubscription<Progress>? progressSubscription;
     if (onProgress != null) {
-      progressSubscription = _whisperkit.modelProgressStream.listen(onProgress);
+      progressSubscription = _whisperkit.modelProgressStream.listen((progress) {
+        onProgress(progress.fractionCompleted);
+      });
     }
     
     try {

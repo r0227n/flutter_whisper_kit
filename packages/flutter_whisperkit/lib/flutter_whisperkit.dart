@@ -5,6 +5,7 @@ import 'src/models.dart';
 
 // Export model loader for public use
 export 'src/model_loader.dart';
+export 'src/models/progress.dart';
 
 /// The main entry point for the Flutter WhisperKit plugin.
 class FlutterWhisperkit {
@@ -127,8 +128,8 @@ class FlutterWhisperkit {
       
   /// Stream of model loading progress updates.
   ///
-  /// This stream emits double values between 0.0 and 1.0 representing the
-  /// progress of model loading (both downloading and initialization).
-  Stream<double> get modelProgressStream =>
+  /// This stream emits Progress objects containing information about the ongoing task,
+  /// including completed units, total units, and the progress fraction.
+  Stream<Progress> get modelProgressStream =>
       FlutterWhisperkitPlatform.instance.modelProgressStream;
 }
