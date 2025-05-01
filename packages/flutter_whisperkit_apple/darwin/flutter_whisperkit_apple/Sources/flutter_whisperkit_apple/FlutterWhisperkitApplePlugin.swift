@@ -616,15 +616,51 @@ private func resolveAssetPath(assetPath: String) -> String? {
     return nil
   }
   
-  let assetName = assetPath.hasPrefix("assets/") ? String(assetPath.dropFirst(7)) : assetPath
   
-  let key = registrar.lookupKey(forAsset: assetName)
-  
-  guard let path = Bundle.main.path(forResource: key, ofType: nil) else {
-    print("Error: Could not find asset at path: \(assetPath)")
-    return nil
+  let key1 = registrar.lookupKey(forAsset: assetPath)
+  print("Debug: Full path key: \(key1)")
+  if let path1 = Bundle.main.path(forResource: key1, ofType: nil) {
+    print("Debug: Found asset using full path: \(path1)")
+    return path1
   }
   
-  return path
+  let assetName = assetPath.hasPrefix("assets/") ? String(assetPath.dropFirst(7)) : assetPath
+  let key2 = registrar.lookupKey(forAsset: assetName)
+  print("Debug: Asset name key: \(key2)")
+  if let path2 = Bundle.main.path(forResource: key2, ofType: nil) {
+    print("Debug: Found asset using asset name: \(path2)")
+    return path2
+  }
+  
+  if let path3 = Bundle.main.path(forResource: assetName.split(separator: ".").first?.description, ofType: assetName.split(separator: ".").last?.description) {
+    print("Debug: Found asset directly in bundle: \(path3)")
+    return path3
+  }
+  
+  let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+  let filePath = "\(documentsPath)/\(assetName)"
+  if FileManager.default.fileExists(atPath: filePath) {
+    print("Debug: Found asset in Documents directory: \(filePath)")
+    return filePath
+  }
+  
+  if let resourcePath = Bundle.main.resourcePath {
+    let possiblePaths = [
+      "\(resourcePath)/\(assetName)",
+      "\(resourcePath)/flutter_assets/\(assetName)",
+      "\(resourcePath)/Frameworks/App.framework/flutter_assets/\(assetName)"
+    ]
+    
+    for path in possiblePaths {
+      if FileManager.default.fileExists(atPath: path) {
+        print("Debug: Found asset at path: \(path)")
+        return path
+      }
+    }
+  }
+  
+  print("Error: Could not find asset at path: \(assetPath)")
+  print("Debug: Available resources in main bundle: \(Bundle.main.paths(forResourcesOfType: nil, inDirectory: nil))")
+  return nil
 }
 #endif
