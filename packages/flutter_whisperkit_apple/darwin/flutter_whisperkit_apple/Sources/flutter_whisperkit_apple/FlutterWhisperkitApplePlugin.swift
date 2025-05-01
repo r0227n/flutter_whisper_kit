@@ -108,10 +108,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
               from: modelRepo ?? "argmaxinc/whisperkit-coreml",
               progressCallback: { progress in
                 if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
-                  let scaledProgress = Progress()
-                  scaledProgress.totalUnitCount = 100
-                  scaledProgress.completedUnitCount = Int64(progress.fractionCompleted * 50)
-                  streamHandler.sendProgress(scaledProgress)
+                  streamHandler.sendProgress(progress)
                 }
               }
             )
@@ -127,29 +124,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
         if let folder = modelFolder {
           whisperKit.modelFolder = folder
-          
-          if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
-            let progress = Progress()
-            progress.totalUnitCount = 100
-            progress.completedUnitCount = 50  // 50% complete after download
-            streamHandler.sendProgress(progress)
-          }
+
           try await whisperKit.prewarmModels()
           
-          if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
-            let progress = Progress()
-            progress.totalUnitCount = 100
-            progress.completedUnitCount = 90  // 90% complete after prewarming
-            streamHandler.sendProgress(progress)
-          }
           try await whisperKit.loadModels()
-          
-          if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
-            let progress = Progress()
-            progress.totalUnitCount = 100
-            progress.completedUnitCount = 100  // 100% complete after loading
-            streamHandler.sendProgress(progress)
-          }
           
           completion(.success("Model \(variant) loaded successfully"))
         } else {
@@ -619,12 +597,12 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
 
 private class ModelProgressStreamHandler: NSObject, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
-  
+
   func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
     eventSink = events
     return nil
   }
-  
+
   func onCancel(withArguments arguments: Any?) -> FlutterError? {
     eventSink = nil
     return nil
@@ -642,17 +620,6 @@ private class ModelProgressStreamHandler: NSObject, FlutterStreamHandler {
           "isCancelled": progress.isCancelled
         ]
         eventSink(progressDict)
-      }
-    }
-  }
-  
-  func sendProgress(_ value: Double) {
-    if let eventSink = eventSink {
-      DispatchQueue.main.async {
-        let progress = Progress()
-        progress.totalUnitCount = 100
-        progress.completedUnitCount = Int64(value * 100)
-        self.sendProgress(progress)
       }
     }
   }
