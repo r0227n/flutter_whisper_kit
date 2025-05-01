@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
       });
 
       final result = await _flutterWhisperkitPlugin.loadModel(
-        'large-v3',
+        'tiny',
         modelRepo: 'argmaxinc/whisperkit-coreml',
         redownload: true,
         storageLocation: ModelStorageLocation.packageDirectory,

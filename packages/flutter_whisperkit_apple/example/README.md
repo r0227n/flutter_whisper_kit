@@ -12,12 +12,12 @@ To run this example app, you need to configure the following settings:
    - Add network permissions by adding `NSAppTransportSecurity` with `NSAllowsArbitraryLoads` set to `true`
    - Add the following usage descriptions:
      ```xml
-     <key>NSLocalNetworkUsageDescription</key>
-     <string>This app needs to access your local network to download WhisperKit models</string>
-     <key>NSDownloadsFolderUsageDescription</key>
-     <string>This app needs to access your Downloads folder to store WhisperKit models</string>
-     <key>NSDocumentsFolderUsageDescription</key>
-     <string>This app needs to access your Documents folder to store WhisperKit models</string>
+     <key>NSMicrophoneUsageDescription</key>
+     <string>This app needs microphone access to record audio for speech transcription using WhisperKit</string>
+	   <key>NSDownloadsFolderUsageDescription</key>
+	   <string>This app needs to access your Downloads folder to store WhisperKit models</string>
+	   <key>NSDocumentsFolderUsageDescription</key>
+	   <string>This app needs to access your Documents folder to store WhisperKit models</string>
      ```
 
 2. **Entitlements**:

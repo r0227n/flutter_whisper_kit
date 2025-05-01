@@ -4,7 +4,7 @@ import 'package:pigeon/pigeon.dart';
   PigeonOptions(
     dartOut: 'lib/src/whisper_kit_message.g.dart',
     swiftOut:
-        '../flutter_whisperkit_apple/macos/flutter_whisperkit_apple/Sources/flutter_whisperkit_apple/WhisperKitMessage.g.swift',
+        '../flutter_whisperkit_apple/darwin/flutter_whisperkit_apple/Sources/flutter_whisperkit_apple/WhisperKitMessage.g.swift',
     dartPackageName: 'flutter_whisperkit',
   ),
 )

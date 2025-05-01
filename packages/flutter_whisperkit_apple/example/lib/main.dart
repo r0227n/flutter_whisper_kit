@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
           options: const DecodingOptions(
             verbose: true,
             task: DecodingTask.transcribe,
-            language: 'en',
+            language: 'ja',
             temperature: 0.0,
             wordTimestamps: true,
           ),
@@ -86,6 +86,8 @@ class _MyAppState extends State<MyApp> {
         _transcriptionSubscription = _flutterWhisperkit.transcriptionStream
             .listen(
               (result) {
+                print(result.toJson());
+                print('Transcription result: ${result.text}');
                 setState(() {
                   if (result.text.isNotEmpty) {
                     _realtimeTranscription = result.text;

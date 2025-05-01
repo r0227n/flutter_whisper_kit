@@ -27,6 +27,8 @@ flutter:
       ios:
         pluginClass: FlutterWhisperkitApplePlugin
         swift_package_manager: true
+        sharedDarwinSource: true
       macos:
         pluginClass: FlutterWhisperkitApplePlugin
         swift_package_manager: true
+        sharedDarwinSource: true

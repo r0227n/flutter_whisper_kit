@@ -1,7 +1,13 @@
-import Cocoa
-import FlutterMacOS
 import Foundation
 import WhisperKit
+
+#if os(iOS)
+  import Flutter
+#elseif os(macOS)
+  import FlutterMacOS
+#else
+  #error("Unsupported platform.")
+#endif
 
 enum ModelStorageLocation: Int64 {
   case packageDirectory = 0
@@ -9,6 +15,10 @@ enum ModelStorageLocation: Int64 {
 }
 
 private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_stream"
+
+#if os(iOS)
+private var flutterPluginRegistrar: FlutterPluginRegistrar?
+#endif
 
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
@@ -145,28 +155,44 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
     Task {
       do {
+        let resolvedPath: String
+        #if os(iOS)
+        if filePath.hasPrefix("assets/") {
+          guard let path = resolveAssetPath(assetPath: filePath) else {
+            throw NSError(
+              domain: "WhisperKitError", code: 4002,
+              userInfo: [NSLocalizedDescriptionKey: "Could not resolve asset path: \(filePath)"])
+          }
+          resolvedPath = path
+        } else {
+          resolvedPath = filePath
+        }
+        #else
+        resolvedPath = filePath
+        #endif
+        
         // Check if file exists and is readable
-        guard FileManager.default.fileExists(atPath: filePath) else {
+        guard FileManager.default.fileExists(atPath: resolvedPath) else {
           throw NSError(
             domain: "WhisperKitError", code: 4002,
-            userInfo: [NSLocalizedDescriptionKey: "Audio file does not exist at path: \(filePath)"])
+            userInfo: [NSLocalizedDescriptionKey: "Audio file does not exist at path: \(resolvedPath)"])
         }
 
         // Check file permissions
-        guard FileManager.default.isReadableFile(atPath: filePath) else {
+        guard FileManager.default.isReadableFile(atPath: resolvedPath) else {
           throw NSError(
             domain: "WhisperKitError", code: 4003,
             userInfo: [
-              NSLocalizedDescriptionKey: "No read permission for audio file at path: \(filePath)"
+              NSLocalizedDescriptionKey: "No read permission for audio file at path: \(resolvedPath)"
             ])
         }
 
         // Load and convert buffer in a limited scope
-        Logging.debug("Loading audio file: \(filePath)")
+        Logging.debug("Loading audio file: \(resolvedPath)")
         let loadingStart = Date()
         let audioFileSamples = try await Task {
           try autoreleasepool {
-            try AudioProcessor.loadAudioAsFloatArray(fromPath: filePath)
+            try AudioProcessor.loadAudioAsFloatArray(fromPath: resolvedPath)
           }
         }.value
         Logging.debug("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
@@ -564,11 +590,77 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
 
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    WhisperKitMessageSetup.setUp(binaryMessenger: registrar.messenger, api: WhisperKitApiImpl())
-    
+    #if os(iOS)
+      let messenger = registrar.messenger()
+      flutterPluginRegistrar = registrar
+    #elseif os(macOS)
+      let messenger = registrar.messenger
+    #else
+      #error("Unsupported platform.")
+    #endif
+
     let streamHandler = TranscriptionStreamHandler()
     WhisperKitApiImpl.transcriptionStreamHandler = streamHandler
-    let channel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: registrar.messenger)
+    
+    WhisperKitMessageSetup.setUp(binaryMessenger: messenger, api: WhisperKitApiImpl())
+    
+    let channel = FlutterEventChannel(name: transcriptionStreamChannelName, binaryMessenger: messenger)
     channel.setStreamHandler(streamHandler)
   }
 }
+
+#if os(iOS)
+private func resolveAssetPath(assetPath: String) -> String? {
+  guard let registrar = flutterPluginRegistrar else {
+    print("Error: Flutter plugin registrar not available")
+    return nil
+  }
+  
+  
+  let key1 = registrar.lookupKey(forAsset: assetPath)
+  print("Debug: Full path key: \(key1)")
+  if let path1 = Bundle.main.path(forResource: key1, ofType: nil) {
+    print("Debug: Found asset using full path: \(path1)")
+    return path1
+  }
+  
+  let assetName = assetPath.hasPrefix("assets/") ? String(assetPath.dropFirst(7)) : assetPath
+  let key2 = registrar.lookupKey(forAsset: assetName)
+  print("Debug: Asset name key: \(key2)")
+  if let path2 = Bundle.main.path(forResource: key2, ofType: nil) {
+    print("Debug: Found asset using asset name: \(path2)")
+    return path2
+  }
+  
+  if let path3 = Bundle.main.path(forResource: assetName.split(separator: ".").first?.description, ofType: assetName.split(separator: ".").last?.description) {
+    print("Debug: Found asset directly in bundle: \(path3)")
+    return path3
+  }
+  
+  let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+  let filePath = "\(documentsPath)/\(assetName)"
+  if FileManager.default.fileExists(atPath: filePath) {
+    print("Debug: Found asset in Documents directory: \(filePath)")
+    return filePath
+  }
+  
+  if let resourcePath = Bundle.main.resourcePath {
+    let possiblePaths = [
+      "\(resourcePath)/\(assetName)",
+      "\(resourcePath)/flutter_assets/\(assetName)",
+      "\(resourcePath)/Frameworks/App.framework/flutter_assets/\(assetName)"
+    ]
+    
+    for path in possiblePaths {
+      if FileManager.default.fileExists(atPath: path) {
+        print("Debug: Found asset at path: \(path)")
+        return path
+      }
+    }
+  }
+  
+  print("Error: Could not find asset at path: \(assetPath)")
+  print("Debug: Available resources in main bundle: \(Bundle.main.paths(forResourcesOfType: nil, inDirectory: nil))")
+  return nil
+}
+#endif
