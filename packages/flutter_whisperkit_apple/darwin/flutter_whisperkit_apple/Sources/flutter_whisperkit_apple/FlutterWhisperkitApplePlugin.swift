@@ -16,6 +16,10 @@ enum ModelStorageLocation: Int64 {
 
 private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_stream"
 
+#if os(iOS)
+private var flutterPluginRegistrar: FlutterPluginRegistrar?
+#endif
+
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
   private var modelStorageLocation: ModelStorageLocation = .packageDirectory
@@ -151,28 +155,44 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
     Task {
       do {
+        let resolvedPath: String
+        #if os(iOS)
+        if filePath.hasPrefix("assets/") {
+          guard let path = resolveAssetPath(assetPath: filePath) else {
+            throw NSError(
+              domain: "WhisperKitError", code: 4002,
+              userInfo: [NSLocalizedDescriptionKey: "Could not resolve asset path: \(filePath)"])
+          }
+          resolvedPath = path
+        } else {
+          resolvedPath = filePath
+        }
+        #else
+        resolvedPath = filePath
+        #endif
+        
         // Check if file exists and is readable
-        guard FileManager.default.fileExists(atPath: filePath) else {
+        guard FileManager.default.fileExists(atPath: resolvedPath) else {
           throw NSError(
             domain: "WhisperKitError", code: 4002,
-            userInfo: [NSLocalizedDescriptionKey: "Audio file does not exist at path: \(filePath)"])
+            userInfo: [NSLocalizedDescriptionKey: "Audio file does not exist at path: \(resolvedPath)"])
         }
 
         // Check file permissions
-        guard FileManager.default.isReadableFile(atPath: filePath) else {
+        guard FileManager.default.isReadableFile(atPath: resolvedPath) else {
           throw NSError(
             domain: "WhisperKitError", code: 4003,
             userInfo: [
-              NSLocalizedDescriptionKey: "No read permission for audio file at path: \(filePath)"
+              NSLocalizedDescriptionKey: "No read permission for audio file at path: \(resolvedPath)"
             ])
         }
 
         // Load and convert buffer in a limited scope
-        Logging.debug("Loading audio file: \(filePath)")
+        Logging.debug("Loading audio file: \(resolvedPath)")
         let loadingStart = Date()
         let audioFileSamples = try await Task {
           try autoreleasepool {
-            try AudioProcessor.loadAudioAsFloatArray(fromPath: filePath)
+            try AudioProcessor.loadAudioAsFloatArray(fromPath: resolvedPath)
           }
         }.value
         Logging.debug("Loaded audio file in \(Date().timeIntervalSince(loadingStart)) seconds")
@@ -572,6 +592,7 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
     #if os(iOS)
       let messenger = registrar.messenger()
+      flutterPluginRegistrar = registrar
     #elseif os(macOS)
       let messenger = registrar.messenger
     #else
@@ -587,3 +608,23 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
     channel.setStreamHandler(streamHandler)
   }
 }
+
+#if os(iOS)
+private func resolveAssetPath(assetPath: String) -> String? {
+  guard let registrar = flutterPluginRegistrar else {
+    print("Error: Flutter plugin registrar not available")
+    return nil
+  }
+  
+  let assetName = assetPath.hasPrefix("assets/") ? String(assetPath.dropFirst(7)) : assetPath
+  
+  let key = registrar.lookupKey(forAsset: assetName)
+  
+  guard let path = Bundle.main.path(forResource: key, ofType: nil) else {
+    print("Error: Could not find asset at path: \(assetPath)")
+    return nil
+  }
+  
+  return path
+}
+#endif
