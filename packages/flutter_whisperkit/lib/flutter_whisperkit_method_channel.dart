@@ -61,18 +61,14 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    ModelStorageLocation? storageLocation,
     String? modelPath,
-    MLComputeUnits? computeUnits,
     bool? prewarmMode,
   }) async {
     return _whisperKitMessage.loadModel(
       variant,
       modelRepo,
       redownload,
-      storageLocation?.index,
       modelPath,
-      computeUnits?.index,
       prewarmMode,
     );
   }

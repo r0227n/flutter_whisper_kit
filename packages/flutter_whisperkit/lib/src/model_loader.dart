@@ -15,26 +15,22 @@ class WhisperKitModelLoader {
   /// [modelRepo] - The repository to download the model from (default: 'argmaxinc/whisperkit-coreml').
   /// [redownload] - Whether to force redownload the model even if it exists locally.
   /// [onProgress] - A callback function that receives download progress updates.
-  /// [storageLocation] - Where to store the model (default: ModelStorageLocation.packageDirectory).
   /// [modelPath] - Path to the CoreML model file. If null, the app's internal directory will be used.
   ///               If the specified path does not exist, an exception will be thrown.
+  /// [prewarmMode] - Whether to prewarm the model (true) or load it immediately (false).
   Future<String?> loadModel({
     required String variant,
     String modelRepo = 'argmaxinc/whisperkit-coreml',
     bool redownload = false,
     Function(double progress)? onProgress,
-    ModelStorageLocation? storageLocation,
     String? modelPath,
-    MLComputeUnits computeUnits = MLComputeUnits.all,
     bool prewarmMode = true,
   }) async {
     return _whisperkit.loadModel(
       variant,
       modelRepo: modelRepo,
       redownload: redownload,
-      storageLocation: storageLocation ?? _storageLocation,
       modelPath: modelPath,
-      computeUnits: computeUnits,
       prewarmMode: prewarmMode,
     );
   }

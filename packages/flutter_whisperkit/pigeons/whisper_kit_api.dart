@@ -15,9 +15,7 @@ abstract class WhisperKitMessage {
     String? variant,
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
     String? modelPath,
-    int? computeUnits,
     bool? prewarmMode,
   );
   @async

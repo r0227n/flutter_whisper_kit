@@ -13,28 +13,22 @@ class FlutterWhisperkit {
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
   /// [modelRepo] - The repository to download the model from (default: 'argmaxinc/whisperkit-coreml').
   /// [redownload] - Whether to force redownload the model even if it exists locally.
-  /// [storageLocation] - Where to store the model (ModelStorageLocation.packageDirectory or ModelStorageLocation.userFolder).
   /// [modelPath] - Path to the CoreML model file (.mlmodelc or .mlpackage).
   ///               If null, the app's internal directory will be used as the default storage location.
   ///               If the specified path does not exist, an exception will be thrown.
-  /// [computeUnits] - Enum to specify available compute resources (MLComputeUnits.cpuOnly, cpuAndGPU, cpuAndNeuralEngine, all).
   /// [prewarmMode] - Whether to prewarm the model (true) or load it immediately (false).
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    ModelStorageLocation storageLocation = ModelStorageLocation.packageDirectory,
     String? modelPath,
-    MLComputeUnits computeUnits = MLComputeUnits.all,
     bool prewarmMode = true,
   }) {
     return FlutterWhisperkitPlatform.instance.loadModel(
       variant,
       modelRepo: modelRepo,
       redownload: redownload,
-      storageLocation: storageLocation,
       modelPath: modelPath,
-      computeUnits: computeUnits,
       prewarmMode: prewarmMode,
     );
   }

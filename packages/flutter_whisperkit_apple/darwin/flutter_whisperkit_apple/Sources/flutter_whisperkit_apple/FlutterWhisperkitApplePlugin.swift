@@ -143,24 +143,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         if let folder = modelFolder {
           whisperKit.modelFolder = folder
           
-          var mlComputeUnits: MLComputeUnits = .all
-          if let computeUnitsValue = computeUnits {
-            switch computeUnitsValue {
-            case 0:
-              mlComputeUnits = .cpuOnly
-            case 1:
-              mlComputeUnits = .cpuAndGPU
-            case 2:
-              mlComputeUnits = .cpuAndNeuralEngine
-            case 3, _:
-              mlComputeUnits = .all
-            }
-          }
-          
           let shouldPrewarm = prewarmMode ?? true
           
           try await whisperKit.loadModels(
-            computeUnits: mlComputeUnits, 
             prewarmMode: shouldPrewarm
           )
           
