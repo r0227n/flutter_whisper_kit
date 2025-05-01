@@ -50,14 +50,14 @@ class WhisperKitMessage {
 
   final String pigeonVar_messageChannelSuffix;
 
-  Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, int? storageLocation, String? modelPath, int? computeUnits, bool? prewarmMode) async {
+  Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, String? modelPath, bool? prewarmMode) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisperkit.WhisperKitMessage.loadModel$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[variant, modelRepo, redownload, storageLocation, modelPath, computeUnits, prewarmMode]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[variant, modelRepo, redownload, modelPath, prewarmMode]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
