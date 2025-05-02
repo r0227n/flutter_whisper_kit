@@ -15,7 +15,7 @@ class FlutterWhisperkit {
   /// [redownload] - Whether to force redownload the model even if it exists locally.
   /// [modelPath] - Path to the CoreML model file (.mlmodelc or .mlpackage).
   ///               If null, the app's internal directory will be used as the default storage location.
-  ///               If the specified path does not exist, an exception will be thrown.
+  ///               If the specified path does not exist, the model will be downloaded to that location.
   /// [prewarmMode] - Whether to prewarm the model (true) or load it immediately (false).
   Future<String?> loadModel(
     String? variant, {

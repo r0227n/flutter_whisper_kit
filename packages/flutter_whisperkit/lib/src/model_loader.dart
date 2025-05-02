@@ -14,7 +14,7 @@ class WhisperKitModelLoader {
   /// [redownload] - Whether to force redownload the model even if it exists locally.
   /// [onProgress] - A callback function that receives download progress updates.
   /// [modelPath] - Path to the CoreML model file. If null, the app's internal directory will be used.
-  ///               If the specified path does not exist, an exception will be thrown.
+  ///               If the specified path does not exist, the model will be downloaded to that location.
   /// [prewarmMode] - Whether to prewarm the model (true) or load it immediately (false).
   Future<String?> loadModel({
     required String variant,

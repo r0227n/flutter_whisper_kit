@@ -99,11 +99,29 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         if let modelPathString = modelPath, !modelPathString.isEmpty {
           let modelPathURL = URL(fileURLWithPath: modelPathString)
           if !FileManager.default.fileExists(atPath: modelPathURL.path) {
-            throw NSError(
-              domain: "WhisperKitError", code: 4002,
-              userInfo: [NSLocalizedDescriptionKey: "Model path does not exist: \(modelPathString)"])
+            let parentDirectory = modelPathURL.deletingLastPathComponent()
+            if !FileManager.default.fileExists(atPath: parentDirectory.path) {
+              try FileManager.default.createDirectory(
+                at: parentDirectory, withIntermediateDirectories: true, attributes: nil)
+            }
+            
+            do {
+              modelFolder = try await WhisperKit.download(
+                variant: variant,
+                from: modelRepo ?? "argmaxinc/whisperkit-coreml",
+                to: parentDirectory
+              )
+            } catch {
+              print("Download error: \(error.localizedDescription)")
+              throw NSError(
+                domain: "WhisperKitError", code: 1005,
+                userInfo: [
+                  NSLocalizedDescriptionKey: "Failed to download model to specified path: \(error.localizedDescription)"
+                ])
+            }
+          } else {
+            modelFolder = modelPathURL
           }
-          modelFolder = modelPathURL
         } else if localModels.contains(variant) && !(redownload ?? false) {
           modelFolder = modelDirURL.appendingPathComponent(variant)
         } else {
