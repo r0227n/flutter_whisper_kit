@@ -112,6 +112,31 @@ private class WhisperKitApiImpl: WhisperKitMessage {
                 }
               }
             )
+            // Save the downloaded model folder to the specified model directory
+            if let downloadedFolder = modelFolder {
+              // Ensure the model directory exists
+              if !FileManager.default.fileExists(atPath: modelDirURL.path) {
+                try FileManager.default.createDirectory(
+                  at: modelDirURL, withIntermediateDirectories: true, attributes: nil)
+              }
+              
+              // If the model was downloaded to a different location than modelDirURL,
+              // copy or move it to the correct location
+              if downloadedFolder.path != modelDirURL.appendingPathComponent(variant).path {
+                let targetFolder = modelDirURL.appendingPathComponent(variant)
+                
+                // Remove existing folder if it exists
+                if FileManager.default.fileExists(atPath: targetFolder.path) {
+                  try FileManager.default.removeItem(at: targetFolder)
+                }
+                
+                // Copy the downloaded folder to the model directory
+                try FileManager.default.copyItem(at: downloadedFolder, to: targetFolder)
+                
+                // Update the model folder reference
+                modelFolder = targetFolder
+              }
+            }
           } catch {
             print("Download error: \(error.localizedDescription)")
             throw NSError(
@@ -358,20 +383,16 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
 
     case .userFolder:
-      if let downloads = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask)
-        .first
-      {
-        let testFile = downloads.appendingPathComponent("whisperkit_write_test.txt")
+      let userPath = URL(fileURLWithPath: "<path_to_your_custom_directory>")
+        let testFile = userPath.appendingPathComponent("whisperkit_write_test.txt")
         do {
           try "test".write(to: testFile, atomically: true, encoding: .utf8)
           try FileManager.default.removeItem(at: testFile)
-
-          return downloads.appendingPathComponent("WhisperKitModels")
+          return userPath.appendingPathComponent("WhisperKitModels")
         } catch {
-          print("Cannot write to Downloads directory: \(error.localizedDescription)")
+          print("Cannot write to custom directory: \(error.localizedDescription)")
         }
-      }
-
+      
       return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
     }
   }
