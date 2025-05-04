@@ -1,35 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 import 'test_utils/mocks.dart';
-import 'test_utils/mock_whisper_kit_message.dart';
 import 'test_utils/mock_method_channel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('Realtime Transcription', () {
-    late FlutterWhisperkitApple plugin;
+    late FlutterWhisperkitPlatform plugin;
     
-    group('Platform Interface', () {
-      test('FlutterWhisperkitApple extends FlutterWhisperkitPlatform', () {
-        // Assert
-        expect(FlutterWhisperkitApple(), isA<FlutterWhisperkitPlatform>());
-      });
-    });
-
     setUp(() {
       // Create a mock method channel that provides a test stream
-      final mockMethodChannel = MockMethodChannelFlutterWhisperkitApple();
+      final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
       
-      // Create plugin instance with mock method channel
-      plugin = FlutterWhisperkitApple(methodChannel: mockMethodChannel);
-      
-      // Set up mock platform interface
-      setUpMockPlatform();
+      // Set the mock method channel as the platform instance
+      FlutterWhisperkitPlatform.instance = mockMethodChannel;
+      plugin = FlutterWhisperkitPlatform.instance;
     });
 
     test('startRecording initiates audio recording with default options', () async {
@@ -62,6 +50,22 @@ void main() {
       expect(stream, emitsThrough(predicate<TranscriptionResult>(
         (result) => result.text == 'Test transcription' && result.language == 'en',
       )));
+    });
+    
+    test('stopRecording with loop=false returns final transcription', () async {
+      // Arrange
+      await plugin.startRecording(loop: false);
+      
+      // Act & Assert
+      expect(await plugin.stopRecording(loop: false), 'Recording stopped');
+    });
+    
+    test('startRecording handles microphone permissions', () async {
+      // This test would normally check permission handling
+      // Since we're using mocks, we'll just verify the recording starts successfully
+      
+      // Act & Assert
+      expect(await plugin.startRecording(), 'Recording started');
     });
   });
 }

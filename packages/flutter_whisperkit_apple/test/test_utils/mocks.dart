@@ -13,8 +13,23 @@ class MockFlutterWhisperkitPlatform
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    ModelStorageLocation? storageLocation,
-  }) => Future.value('Model loaded');
+    String? modelDownloadPath,
+  }) {
+    // In a real implementation, we would use the modelDownloadPath parameter
+    // and report progress through the modelProgressStream
+    return Future.value('Model loaded');
+  }
+  
+  /// Stream of model loading progress updates
+  @override
+  Stream<Progress> get modelProgressStream => Stream<Progress>.fromIterable([
+    Progress(
+      completedUnitCount: 10,
+      totalUnitCount: 10,
+      fractionCompleted: 1.0,
+      isIndeterminate: false,
+    ),
+  ]);
 
   @override
   Future<String?> transcribeFromFile(

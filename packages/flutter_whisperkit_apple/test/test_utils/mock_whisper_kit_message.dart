@@ -16,8 +16,10 @@ class MockWhisperKitMessage implements WhisperKitMessage {
     String? variant,
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
+    String? modelDownloadPath,
   ) async {
+    // In a real implementation, we would use the modelDownloadPath parameter
+    // and report progress through the event channel
     return 'Model loaded successfully';
   }
 
