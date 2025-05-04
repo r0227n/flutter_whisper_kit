@@ -21,11 +21,11 @@ assignees: ''
 
 Make changes **only** within the following directories:
 
-- `/packages/flutter_whisperkit_apple/ios`
-- `/packages/flutter_whisperkit_apple/macos`
-- `/packages/flutter_whisperkit_apple/lib`
-- `/packages/flutter_whisperkit_apple/test`
-- `/packages/flutter_whisperkit_apple/example`
+- `/packages/flutter_whisper_kit_apple/ios`
+- `/packages/flutter_whisper_kit_apple/macos`
+- `/packages/flutter_whisper_kit_apple/lib`
+- `/packages/flutter_whisper_kit_apple/test`
+- `/packages/flutter_whisper_kit_apple/example`
 
 Do not modify any files outside of these directories.
 

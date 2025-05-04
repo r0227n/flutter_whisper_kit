@@ -320,8 +320,8 @@ enum ModelStorageLocation {
 }
 
 class WhisperKitModelLoader {
-  static const MethodChannel _channel = MethodChannel('flutter_whisperkit_apple/model_loader');
-  static const EventChannel _progressChannel = EventChannel('flutter_whisperkit_apple/model_progress');
+  static const MethodChannel _channel = MethodChannel('flutter_whisper_kit_apple/model_loader');
+  static const EventChannel _progressChannel = EventChannel('flutter_whisper_kit_apple/model_progress');
   
   ModelStorageLocation storageLocation = ModelStorageLocation.packageDirectory;
   
