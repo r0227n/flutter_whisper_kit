@@ -1,4 +1,4 @@
-# flutter_whisperkit_example
+# flutter_whisper_kit_example
 
 Demonstrates how to use the flutter_whisper_kit plugin.
 
