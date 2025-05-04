@@ -28,7 +28,7 @@ To use Flutter WhisperKit in your Flutter application, add the following depende
 
 ```yaml
 dependencies:
-  flutter_whisperkit: ^0.1.0
+  flutter_whisperkit: latest
 ```
 
 For detailed usage instructions, refer to the documentation in the individual package directories:

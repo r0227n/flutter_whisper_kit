@@ -18,7 +18,7 @@ Add the following to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_whisperkit: ^0.1.0
+  flutter_whisperkit: latest
 ```
 
 ## Usage
