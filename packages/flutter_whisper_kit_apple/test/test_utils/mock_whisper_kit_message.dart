@@ -9,7 +9,6 @@ class MockWhisperKitMessage extends FlutterWhisperKitPlatform {
     String? variant, {
     String? modelRepo,
     bool redownload = false,
-    bool hasProgressCallback = false,
   }) async {
     return 'Model loaded successfully';
   }

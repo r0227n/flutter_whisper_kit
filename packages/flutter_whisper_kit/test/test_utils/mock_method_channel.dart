@@ -13,7 +13,6 @@ class MockMethodChannelFlutterWhisperkit
     String? modelName, {
     String? modelRepo,
     bool redownload = false,
-    bool hasProgressCallback = false,
   }) async {
     return mockLoadModelResponse;
   }

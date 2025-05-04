@@ -9,7 +9,6 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
     String? variant, {
     String? modelRepo,
     bool redownload = false,
-    bool hasProgressCallback = false,
   }) {
     return Future.value('Model loaded');
   }
