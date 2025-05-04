@@ -89,7 +89,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         var modelFolder: URL?
         let localModels = await getLocalModels()
         let modelDirURL = getModelFolderPath()
-        
+
         if localModels.contains(variant) && !redownload {
           modelFolder = modelDirURL.appendingPathComponent(variant)
         } else {
@@ -152,7 +152,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           
           try await whisperKit.loadModels()
           
-          completion(.success("Model \(variant) loaded successfully"))
+          completion(.success(folder.path))
         } else {
           throw NSError(
             domain: "WhisperKitError", code: 1003,
