@@ -15,11 +15,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late final Future<String> _asyncLoadModel;
   String _transcriptionText = '';
   bool _isRecording = false;
   bool _isModelLoaded = false;
-  String _modelStatus = 'Model not loaded';
-  double _modelLoadProgress = 0.0;
+
   // Added state variables for file transcription
   String _fileTranscriptionText = '';
   bool _isTranscribingFile = false;
@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _loadModel();
+    _asyncLoadModel = _loadModel();
   }
 
   @override
@@ -40,31 +40,20 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  Future<void> _loadModel() async {
+  Future<String> _loadModel() async {
     try {
-      setState(() {
-        _modelStatus = 'Loading model...';
-      });
-
       final result = await _flutterWhisperkitPlugin.loadModel(
         'tiny',
         modelRepo: 'argmaxinc/whisperkit-coreml',
-        redownload: true,
-        onProgress: (progress) {
-          setState(() {
-            _modelLoadProgress = progress.fractionCompleted;
-          });
-        },
       );
 
       setState(() {
         _isModelLoaded = true;
-        _modelStatus = 'Model loaded: $result';
       });
+
+      return 'Model loaded: $result';
     } catch (e) {
-      setState(() {
-        _modelStatus = 'Error loading model: $e';
-      });
+      return 'Error loading model: $e';
     }
   }
 
@@ -84,7 +73,7 @@ class _MyAppState extends State<MyApp> {
     try {
       // Use a placeholder as specified in the task
       const filePath = '<mp3 file path>';
-      
+
       // Create custom decoding options
       final options = DecodingOptions(
         verbose: true,
@@ -137,7 +126,7 @@ class _MyAppState extends State<MyApp> {
           wordTimestamps: true,
           chunkingStrategy: ChunkingStrategy.vad,
         );
-        
+
         await _flutterWhisperkitPlugin.startRecording(options: options);
         _transcriptionSubscription = _flutterWhisperkitPlugin
             .transcriptionStream
@@ -163,129 +152,174 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('Flutter WhisperKit Example')),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Model loading section
-                Text('Model Status: $_modelStatus'),
-                if (_modelLoadProgress > 0 && _modelLoadProgress < 1) ...[
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(value: _modelLoadProgress),
-                  Text('${(_modelLoadProgress * 100).toStringAsFixed(1)}%'),
-                ],
-                const SizedBox(height: 16),
-                
-                // File transcription section
-                const Text(
-                  'File Transcription',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: _isModelLoaded ? _transcribeFromFile : null,
-                  child: Text(_isTranscribingFile 
-                      ? 'Transcribing...' 
-                      : 'Transcribe from File'),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _fileTranscriptionText.isEmpty
-                            ? 'Press the button to transcribe a file'
-                            : _fileTranscriptionText,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      if (_fileTranscriptionResult != null) ...[
-                        const SizedBox(height: 8),
-                        const Text('Detected Language:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(_fileTranscriptionResult?.language ?? 'Unknown'),
-                        const SizedBox(height: 8),
-                        const Text('Segments:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        ...(_fileTranscriptionResult?.segments ?? []).map(
-                          (segment) => Padding(
-                            padding: const EdgeInsets.only(bottom: 4.0),
-                            child: Text(
-                              '[${segment.start.toStringAsFixed(2)}s - ${segment.end.toStringAsFixed(2)}s]: ${segment.text}',
-                            ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 8.0,
+            children: [
+              FutureBuilder(
+                future: _asyncLoadModel,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Error loading model: ${snapshot.error}');
+                  } else if (snapshot.hasData) {
+                    return Text('Model loaded successfully');
+                  }
+
+                  return StreamBuilder(
+                    stream: _flutterWhisperkitPlugin.modelProgressStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text('Error loading model: ${snapshot.error}');
+                      }
+
+                      if (snapshot.data?.fractionCompleted == 1.0) {
+                        return const Center(
+                          child: Column(
+                            spacing: 16.0,
+                            children: [
+                              CircularProgressIndicator(),
+                              Text('Model loaded'),
+                            ],
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text('Performance:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('Real-time factor: ${_fileTranscriptionResult?.timings.realTimeFactor.toStringAsFixed(2)}x'),
-                        Text('Processing time: ${_fileTranscriptionResult?.timings.fullPipeline.toStringAsFixed(2)}s'),
-                      ],
-                    ],
-                  ),
+                        );
+                      }
+
+                      return Column(
+                        spacing: 16.0,
+                        children: [
+                          LinearProgressIndicator(
+                            value: snapshot.data?.fractionCompleted,
+                          ),
+                          Text(
+                            '${(snapshot.data?.fractionCompleted ?? 0) * 100}%',
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+
+              // File transcription section
+              const Text(
+                'File Transcription',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
+              ElevatedButton(
+                onPressed: _isModelLoaded ? _transcribeFromFile : null,
+                child: Text(
+                  _isTranscribingFile
+                      ? 'Transcribing...'
+                      : 'Transcribe from File',
                 ),
-                const SizedBox(height: 16),
-                
-                // Real-time transcription section
-                const Text(
-                  'Real-time Transcription',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
-                const SizedBox(height: 8),
-                Container(
-                  height: 200,
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Text(
-                      _transcriptionText.isEmpty
-                          ? 'Press the button to start recording'
-                          : _transcriptionText,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _fileTranscriptionText.isEmpty
+                          ? 'Press the button to transcribe a file'
+                          : _fileTranscriptionText,
                       style: const TextStyle(fontSize: 16),
                     ),
-                  ),
+                    if (_fileTranscriptionResult != null) ...[
+                      const Text(
+                        'Detected Language:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(_fileTranscriptionResult?.language ?? 'Unknown'),
+
+                      const Text(
+                        'Segments:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      ...(_fileTranscriptionResult?.segments ?? []).map(
+                        (segment) => Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
+                          child: Text(
+                            '[${segment.start.toStringAsFixed(2)}s - ${segment.end.toStringAsFixed(2)}s]: ${segment.text}',
+                          ),
+                        ),
+                      ),
+
+                      const Text(
+                        'Performance:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Real-time factor: ${_fileTranscriptionResult?.timings.realTimeFactor.toStringAsFixed(2)}x',
+                      ),
+                      Text(
+                        'Processing time: ${_fileTranscriptionResult?.timings.fullPipeline.toStringAsFixed(2)}s',
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _isModelLoaded ? _toggleRecording : null,
+              ),
+
+              // Real-time transcription section
+              const Text(
+                'Real-time Transcription',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
+              Container(
+                height: 200,
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: SingleChildScrollView(
                   child: Text(
-                    _isRecording ? 'Stop Recording' : 'Start Recording',
+                    _transcriptionText.isEmpty
+                        ? 'Press the button to start recording'
+                        : _transcriptionText,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
-                
-                // Model information section
-                const SizedBox(height: 24),
-                const Text(
-                  'Model Information',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
+              ElevatedButton(
+                onPressed: _isModelLoaded ? _toggleRecording : null,
+                child: Text(
+                  _isRecording ? 'Stop Recording' : 'Start Recording',
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'This example demonstrates the following FlutterWhisperKit features:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                const Text('• Model loading with progress tracking'),
-                const Text('• File transcription with custom options'),
-                const Text('• Real-time transcription with streaming results'),
-                const Text('• Detailed transcription results with segments and timing information'),
-                const SizedBox(height: 8),
-                const Text(
-                  'Note: The file transcription feature uses a placeholder path "<mp3 file path>" and will not actually transcribe a file when running this example.',
-                  style: TextStyle(fontStyle: FontStyle.italic),
-                ),
-              ],
-            ),
+              ),
+
+              // Model information section
+              const Text(
+                'Model Information',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+
+              const Text(
+                'This example demonstrates the following FlutterWhisperKit features:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+
+              const Text('• Model loading with progress tracking'),
+              const Text('• File transcription with custom options'),
+              const Text('• Real-time transcription with streaming results'),
+              const Text(
+                '• Detailed transcription results with segments and timing information',
+              ),
+
+              const Text(
+                'Note: The file transcription feature uses a placeholder path "<mp3 file path>" and will not actually transcribe a file when running this example.',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+            ],
           ),
         ),
       ),
