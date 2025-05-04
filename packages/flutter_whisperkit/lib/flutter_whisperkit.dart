@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'flutter_whisperkit_platform_interface.dart';
 import 'src/models.dart';
 
@@ -20,13 +21,19 @@ class FlutterWhisperkit {
     String? modelRepo,
     bool? redownload,
     String? modelDownloadPath,
-  }) {
-    return FlutterWhisperkitPlatform.instance.loadModel(
-      variant,
-      modelRepo: modelRepo,
-      redownload: redownload,
-      modelDownloadPath: modelDownloadPath,
-    );
+  }) async {
+    try {
+      return await FlutterWhisperkitPlatform.instance.loadModel(
+        variant,
+        modelRepo: modelRepo,
+        redownload: redownload,
+        modelDownloadPath: modelDownloadPath,
+      );
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Transcribes an audio file at the specified path.
@@ -54,11 +61,17 @@ class FlutterWhisperkit {
       concurrentWorkerCount: 4,
       chunkingStrategy: ChunkingStrategy.vad,
     ),
-  }) {
-    return FlutterWhisperkitPlatform.instance.transcribeFromFile(
-      filePath,
-      options: options,
-    );
+  }) async {
+    try {
+      return await FlutterWhisperkitPlatform.instance.transcribeFromFile(
+        filePath,
+        options: options,
+      );
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Starts recording audio from the microphone for real-time transcription.
@@ -86,11 +99,17 @@ class FlutterWhisperkit {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
     bool loop = true,
-  }) {
-    return FlutterWhisperkitPlatform.instance.startRecording(
-      options: options,
-      loop: loop,
-    );
+  }) async {
+    try {
+      return await FlutterWhisperkitPlatform.instance.startRecording(
+        options: options,
+        loop: loop,
+      );
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Stops recording audio and optionally triggers transcription.
@@ -99,8 +118,14 @@ class FlutterWhisperkit {
   ///
   /// Returns a success message when recording is stopped.
   /// If [loop] is false, also triggers transcription of the recorded audio.
-  Future<String?> stopRecording({bool loop = true}) {
-    return FlutterWhisperkitPlatform.instance.stopRecording(loop: loop);
+  Future<String?> stopRecording({bool loop = true}) async {
+    try {
+      return await FlutterWhisperkitPlatform.instance.stopRecording(loop: loop);
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Stream of real-time transcription results.
