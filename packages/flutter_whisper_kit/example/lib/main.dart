@@ -24,6 +24,40 @@ class _MyAppState extends State<MyApp> {
   String _fileTranscriptionText = '';
   bool _isTranscribingFile = false;
   TranscriptionResult? _fileTranscriptionResult;
+  
+  // Added state variables for model and language selection
+  String _selectedModel = 'large-v3';
+  String _selectedLanguage = 'en';
+  
+  // Model variants available for selection
+  final List<String> _modelVariants = [
+    'tiny-en',
+    'base',
+    'small',
+    'medium',
+    'large-v2',
+    'large-v3'
+  ];
+  
+  // Common languages available for selection
+  final List<String> _languages = [
+    'auto', // Auto-detect
+    'en',   // English
+    'ja',   // Japanese
+    'zh',   // Chinese
+    'de',   // German
+    'es',   // Spanish
+    'ru',   // Russian
+    'ko',   // Korean
+    'fr',   // French
+    'it',   // Italian
+    'pt',   // Portuguese
+    'tr',   // Turkish
+    'pl',   // Polish
+    'nl',   // Dutch
+    'ar',   // Arabic
+    'hi',   // Hindi
+  ];
 
   final _flutterWhisperkitPlugin = FlutterWhisperKit();
   StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
@@ -43,7 +77,7 @@ class _MyAppState extends State<MyApp> {
   Future<String> _loadModel() async {
     try {
       final result = await _flutterWhisperkitPlugin.loadModel(
-        'large-v3',
+        _selectedModel,
         redownload: true,
         modelRepo: 'argmaxinc/whisperkit-coreml',
       );
@@ -79,7 +113,7 @@ class _MyAppState extends State<MyApp> {
       final options = DecodingOptions(
         verbose: true,
         task: DecodingTask.transcribe,
-        language: 'en', // Default to English
+        language: _selectedLanguage == 'auto' ? null : _selectedLanguage, // Use selected language or null for auto-detection
         temperature: 0.0,
         temperatureFallbackCount: 5,
         wordTimestamps: true,
@@ -121,7 +155,7 @@ class _MyAppState extends State<MyApp> {
         final options = DecodingOptions(
           verbose: true,
           task: DecodingTask.transcribe,
-          language: 'en', // Default to English
+          language: _selectedLanguage == 'auto' ? null : _selectedLanguage, // Use selected language or null for auto-detection
           temperature: 0.0,
           temperatureFallbackCount: 5,
           wordTimestamps: true,
@@ -159,6 +193,81 @@ class _MyAppState extends State<MyApp> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 8.0,
             children: [
+              // Model selection dropdown
+              Row(
+                children: [
+                  const Text('Select Model: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Expanded(
+                    child: DropdownButton<String>(
+                      value: _selectedModel,
+                      isExpanded: true,
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _selectedModel = newValue;
+                            _isModelLoaded = false;
+                            _asyncLoadModel = _loadModel();
+                          });
+                        }
+                      },
+                      items: _modelVariants.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+              
+              // Language selection dropdown
+              Row(
+                children: [
+                  const Text('Select Language: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Expanded(
+                    child: DropdownButton<String>(
+                      value: _selectedLanguage,
+                      isExpanded: true,
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _selectedLanguage = newValue;
+                          });
+                        }
+                      },
+                      items: _languages.map<DropdownMenuItem<String>>((String value) {
+                        // Show language code and name for better readability
+                        String displayText = value;
+                        if (value == 'auto') displayText = 'auto (Auto-detect)';
+                        else if (value == 'en') displayText = 'en (English)';
+                        else if (value == 'ja') displayText = 'ja (Japanese)';
+                        else if (value == 'zh') displayText = 'zh (Chinese)';
+                        else if (value == 'de') displayText = 'de (German)';
+                        else if (value == 'es') displayText = 'es (Spanish)';
+                        else if (value == 'ru') displayText = 'ru (Russian)';
+                        else if (value == 'ko') displayText = 'ko (Korean)';
+                        else if (value == 'fr') displayText = 'fr (French)';
+                        else if (value == 'it') displayText = 'it (Italian)';
+                        else if (value == 'pt') displayText = 'pt (Portuguese)';
+                        else if (value == 'tr') displayText = 'tr (Turkish)';
+                        else if (value == 'pl') displayText = 'pl (Polish)';
+                        else if (value == 'nl') displayText = 'nl (Dutch)';
+                        else if (value == 'ar') displayText = 'ar (Arabic)';
+                        else if (value == 'hi') displayText = 'hi (Hindi)';
+                        
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(displayText),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 16),
+              
               FutureBuilder(
                 future: _asyncLoadModel,
                 builder: (context, snapshot) {
