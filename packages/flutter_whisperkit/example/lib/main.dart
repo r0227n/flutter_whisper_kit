@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
   bool _isModelLoaded = false;
   String _modelStatus = 'Model not loaded';
 
-  final _flutterWhisperkitPlugin = FlutterWhisperkit();
+  final _flutterWhisperkitPlugin = FlutterWhisperKit();
   StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
 
   @override

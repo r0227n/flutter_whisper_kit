@@ -9,7 +9,7 @@ import 'test_utils/mock_method_channel.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('FlutterWhisperkit Platform Tests', () {
+  group('FlutterWhisperKit Platform Tests', () {
     test('Platform can be set to mock implementation', () {
       final mockPlatform = setUpMockPlatform();
       expect(FlutterWhisperkitPlatform.instance, mockPlatform);

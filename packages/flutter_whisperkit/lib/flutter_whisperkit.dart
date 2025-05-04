@@ -18,7 +18,7 @@ export 'src/models/progress.dart';
 /// The class delegates platform-specific implementation details to the
 /// [FlutterWhisperkitPlatform] instance, ensuring consistent behavior
 /// across different platforms while abstracting away the platform-specific code.
-class FlutterWhisperkit {
+class FlutterWhisperKit {
   /// Loads a WhisperKit model.
   ///
   /// Downloads and initializes a WhisperKit model for speech recognition.
