@@ -126,8 +126,8 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
   /// - [hasProgressCallback]: Whether to provide a progress callback.
   ///   If true, the progress callback will be provided to the native code.
   ///
-  /// Returns a [Future] that completes with a success message when the model
-  /// is loaded successfully, or an error message if loading fails.
+  /// Returns the path to the model folder if the model is loaded successfully,
+  /// or an error message if loading fails.
   @override
   Future<String?> loadModel(
     String? variant, {

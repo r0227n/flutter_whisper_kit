@@ -33,8 +33,8 @@ class FlutterWhisperKit {
   /// - [onProgress]: A callback function that receives download progress updates.
   ///   This can be used to display a progress indicator to the user.
   ///
-  /// Returns a [Future] that completes with a success message when the model
-  /// is loaded successfully, or throws a [WhisperKitError] if loading fails.
+  /// Returns the path to the model folder if the model is loaded successfully,
+  /// or throws a [WhisperKitError] if loading fails.
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,

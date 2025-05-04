@@ -65,10 +65,8 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   /// - [hasProgressCallback]: Whether to provide a progress callback.
   ///   If true, the progress callback will be provided to the native code.
   ///
-  /// Returns a [Future] that completes with a success message when the model
-  /// is loaded successfully, or an error message if loading fails.
-  ///
-  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  /// Returns the path to the model folder if the model is loaded successfully,
+  /// or throws a [WhisperKitError] if loading fails.
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
