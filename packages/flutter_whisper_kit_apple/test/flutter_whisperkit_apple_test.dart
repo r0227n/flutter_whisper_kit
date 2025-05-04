@@ -1,10 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisper_kit/flutter_whisperkit_platform_interface.dart';
-import 'package:flutter_whisper_kit/src/model_loader.dart';
-import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
+import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
 
 import 'test_utils/mocks.dart';
-import 'test_utils/mock_method_channel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -17,8 +15,9 @@ void main() {
 
     test('loadModel returns success message', () async {
       // Arrange
-      final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
-      FlutterWhisperKitPlatform.instance = mockMethodChannel;
+      final mockPlatform = MockFlutterWhisperkitPlatform();
+      FlutterWhisperKitPlatform.instance =
+          mockPlatform as FlutterWhisperKitPlatform;
 
       // Act & Assert
       expect(
@@ -26,7 +25,7 @@ void main() {
           'tiny-en',
           modelRepo: 'argmaxinc/whisperkit-coreml',
         ),
-        'Model loaded successfully',
+        'Model loaded',
       );
     });
 
@@ -34,8 +33,9 @@ void main() {
       'modelProgressStream emits progress updates',
       () async {
         // Arrange
-        final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
-        FlutterWhisperKitPlatform.instance = mockMethodChannel;
+        final mockPlatform = MockFlutterWhisperkitPlatform();
+        FlutterWhisperKitPlatform.instance =
+            mockPlatform as FlutterWhisperKitPlatform;
 
         // Act
         final progressStream =

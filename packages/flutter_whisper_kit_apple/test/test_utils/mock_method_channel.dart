@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:flutter_whisper_kit/flutter_whisperkit_method_channel.dart';
-import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
+import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_method_channel.dart';
 
 /// A mock implementation of [MethodChannelFlutterWhisperKit] for testing.
 class MockMethodChannelFlutterWhisperkit

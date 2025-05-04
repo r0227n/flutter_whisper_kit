@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 /// Represents a progress object with information about an ongoing task.
 class Progress {
   const Progress({

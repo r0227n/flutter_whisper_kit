@@ -1,6 +1,5 @@
-import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
 
 void main() {
   group('DecodingOptions', () {

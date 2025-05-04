@@ -1,12 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisper_kit/flutter_whisperkit_platform_interface.dart';
-import 'package:flutter_whisper_kit/src/models.dart';
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
+import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
 
 /// Mock implementation of [FlutterWhisperKitPlatform] for testing.
-class MockFlutterWhisperkitPlatform
-    with MockPlatformInterfaceMixin
-    implements FlutterWhisperKitPlatform {
+class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
   @override
   Future<String?> loadModel(
     String? variant, {
