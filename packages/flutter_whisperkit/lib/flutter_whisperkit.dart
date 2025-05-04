@@ -35,7 +35,7 @@ class FlutterWhisperkit {
   /// [options] - Optional decoding options to customize the transcription process.
   ///
   /// Returns a JSON string containing the transcription result with segments and timing information.
-  Future<String?> transcribeFromFile(
+  Future<TranscriptionResult?> transcribeFromFile(
     String filePath, {
     DecodingOptions options = const DecodingOptions(
       verbose: true,

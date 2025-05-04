@@ -101,7 +101,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   }
 
   @override
-  Future<String?> transcribeFromFile(
+  Future<TranscriptionResult?> transcribeFromFile(
     String filePath, {
     DecodingOptions options = const DecodingOptions(
       verbose: true,
@@ -121,7 +121,11 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
   }) async {
-    return _whisperKitMessage.transcribeFromFile(filePath, options.toJson());
+    final result = await _whisperKitMessage.transcribeFromFile(
+      filePath,
+      options.toJson(),
+    );
+    return result != null ? TranscriptionResult.fromJsonString(result) : null;
   }
 
   @override

@@ -45,7 +45,7 @@ abstract class FlutterWhisperkitPlatform extends PlatformInterface {
   ///
   /// [filePath] - The path to the audio file to transcribe.
   /// [options] - Optional decoding options to customize the transcription process.
-  Future<String?> transcribeFromFile(
+  Future<TranscriptionResult?> transcribeFromFile(
     String filePath, {
     DecodingOptions options = const DecodingOptions(
       verbose: true,
