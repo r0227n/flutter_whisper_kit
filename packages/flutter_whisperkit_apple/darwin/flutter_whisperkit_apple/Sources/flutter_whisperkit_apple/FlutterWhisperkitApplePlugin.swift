@@ -9,6 +9,11 @@ import WhisperKit
   #error("Unsupported platform.")
 #endif
 
+/// Flutter WhisperKit Apple Plugin
+///
+/// This plugin provides WhisperKit functionality to Flutter applications on Apple platforms.
+/// It handles model loading, audio transcription, and real-time recording capabilities.
+
 private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_stream"
 private let modelProgressStreamChannelName = "flutter_whisperkit/model_progress_stream"
 
@@ -16,17 +21,37 @@ private let modelProgressStreamChannelName = "flutter_whisperkit/model_progress_
 private var flutterPluginRegistrar: FlutterPluginRegistrar?
 #endif
 
+/// Implementation of the WhisperKit API
+///
+/// This class handles all the core functionality of the plugin, including:
+/// - Loading and managing WhisperKit models
+/// - Transcribing audio from files
+/// - Real-time audio recording and transcription
+/// - Streaming transcription results back to Flutter
 private class WhisperKitApiImpl: WhisperKitMessage {
+  /// The WhisperKit instance used for transcription
   private var whisperKit: WhisperKit?
   
+  /// Flag indicating if recording is currently active
   private var isRecording: Bool = false
   
+  /// Task for handling real-time transcription
   private var transcriptionTask: Task<Void, Never>?
   
+  /// Stream handler for sending transcription results to Flutter
   public static var transcriptionStreamHandler: TranscriptionStreamHandler?
   
+  /// Stream handler for sending model download progress to Flutter
   public static var modelProgressStreamHandler: ModelProgressStreamHandler?
 
+  /// Loads a WhisperKit model
+  ///
+  /// - Parameters:
+  ///   - variant: The model variant to load (required)
+  ///   - modelRepo: The repository to download the model from (optional)
+  ///   - redownload: Whether to force redownload the model (optional)
+  ///   - modelDownloadPath: Custom path for model storage (optional)
+  ///   - completion: Callback with result of the operation
   func loadModel(
     variant: String?, modelRepo: String?, redownload: Bool?, modelDownloadPath: String?,
     completion: @escaping (Result<String?, Error>) -> Void
@@ -161,7 +186,12 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
+  /// Transcribes audio from a file
+  ///
+  /// - Parameters:
   ///   - filePath: Path to the audio file to transcribe
+  ///   - options: Transcription options
+  ///   - completion: Callback with result of the transcription
   func transcribeFromFile(
     filePath: String, options: [String: Any?],
     completion: @escaping (Result<String?, Error>) -> Void
@@ -261,7 +291,12 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
+  /// Transcribes audio samples
+  ///
+  /// - Parameters:
   ///   - samples: Array of float audio samples to transcribe
+  ///   - options: Decoding options for transcription
+  /// - Returns: Transcription result or nil if transcription failed
   func transcribeAudioSamples(_ samples: [Float], options: DecodingOptions?) async throws
     -> TranscriptionResult?
   {
@@ -366,6 +401,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     return mergedResults
   }
 
+  /// Gets the path to the WhisperKit models directory
+  ///
+  /// - Parameter path: Optional custom path for model storage
   /// - Returns: URL to the WhisperKit models directory
   private func getModelFolderPath(path: String?) -> URL {
     if path == nil {
@@ -390,11 +428,16 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
+  /// Gets the Documents directory
+  ///
   /// - Returns: URL to the Documents directory
   private func getDocumentsDirectory() -> URL {
     FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
   }
 
+  /// Gets the list of locally available models
+  ///
+  /// - Parameter path: Optional custom path for model storage
   /// - Returns: Array of model names that are available locally
   private func getLocalModels(path: String?) async -> [String] {
     let modelPath = getModelFolderPath(path: path)
@@ -412,6 +455,12 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     return WhisperKit.formatModelFiles(localModels)
   }
   
+  /// Starts recording audio for transcription
+  ///
+  /// - Parameters:
+  ///   - options: Recording and transcription options
+  ///   - loop: Whether to continuously transcribe in real-time
+  ///   - completion: Callback with result of the operation
   func startRecording(
     options: [String: Any?], loop: Bool,
     completion: @escaping (Result<String?, Error>) -> Void
@@ -458,6 +507,11 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
+  /// Stops recording audio
+  ///
+  /// - Parameters:
+  ///   - loop: Whether real-time transcription was active
+  ///   - completion: Callback with result of the operation
   func stopRecording(
     loop: Bool, completion: @escaping (Result<String?, Error>) -> Void
   ) {
@@ -491,7 +545,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
-  
+  /// Starts a loop for real-time transcription
+  ///
+  /// - Parameter options: Transcription options
   private func startRealtimeLoop(options: [String: Any?]) {
     transcriptionTask = Task {
       var lastTranscribedText = ""
@@ -521,11 +577,16 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
+  /// Stops the real-time transcription loop
   private func stopRealtimeTranscription() {
     transcriptionTask?.cancel()
     transcriptionTask = nil
   }
   
+  /// Transcribes the current audio buffer
+  ///
+  /// - Parameter options: Transcription options
+  /// - Returns: Transcription result or nil if transcription failed
   private func transcribeCurrentBufferInternal(options: [String: Any?]) async throws -> TranscriptionResult? {
     guard let whisperKit = whisperKit else { return nil }
     
@@ -548,6 +609,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     return mergeTranscriptionResults(transcriptionResults)
   }
   
+  /// Merges multiple transcription results into a single result
+  ///
+  /// - Parameter results: Array of transcription results to merge
+  /// - Returns: Merged transcription result or nil if input is empty
   private func mergeTranscriptionResults(_ results: [TranscriptionResult]) -> TranscriptionResult? {
     guard !results.isEmpty else { return nil }
     
@@ -573,6 +638,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   }
 }
 
+/// Handler for streaming transcription results to Flutter
 private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
   
@@ -586,6 +652,9 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
     return nil
   }
   
+  /// Sends a transcription result to the Flutter event sink
+  ///
+  /// - Parameter result: The transcription result to send
   func sendTranscription(_ result: TranscriptionResult?) {
     if let eventSink = eventSink {
       DispatchQueue.main.async {
@@ -611,6 +680,7 @@ private class TranscriptionStreamHandler: NSObject, FlutterStreamHandler {
   }
 }
 
+/// Handler for streaming model download progress to Flutter
 private class ModelProgressStreamHandler: NSObject, FlutterStreamHandler {
   private var eventSink: FlutterEventSink?
 
@@ -624,6 +694,9 @@ private class ModelProgressStreamHandler: NSObject, FlutterStreamHandler {
     return nil
   }
   
+  /// Sends download progress to the Flutter event sink
+  ///
+  /// - Parameter progress: The progress object to send
   func sendProgress(_ progress: Progress) {
     if let eventSink = eventSink {
       DispatchQueue.main.async {
@@ -641,7 +714,11 @@ private class ModelProgressStreamHandler: NSObject, FlutterStreamHandler {
   }
 }
 
+/// Main plugin class that registers with Flutter
 public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
+  /// Registers the plugin with the Flutter engine
+  ///
+  /// - Parameter registrar: The plugin registrar for the Flutter app
   public static func register(with registrar: FlutterPluginRegistrar) {
     #if os(iOS)
       let messenger = registrar.messenger()
@@ -668,6 +745,10 @@ public class FlutterWhisperkitApplePlugin: NSObject, FlutterPlugin {
   }
 }
 
+/// Resolves a Flutter asset path to a file system path
+///
+/// - Parameter assetPath: The asset path to resolve
+/// - Returns: The resolved file system path or nil if not found
 #if os(iOS)
 private func resolveAssetPath(assetPath: String) -> String? {
   guard let registrar = flutterPluginRegistrar else {
