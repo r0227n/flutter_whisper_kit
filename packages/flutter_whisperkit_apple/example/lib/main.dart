@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit/flutter_whisperkit.dart';
+import 'package:flutter_whisperkit/flutter_whisper_kit.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 void main() {
@@ -30,7 +30,7 @@ class _MyAppState extends State<MyApp> {
   StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
 
   // Use the proper plugin class instead of the generated message class
-  final _flutterWhisperkit = FlutterWhisperkit();
+  final _flutterWhisperkit = FlutterWhisperKit();
 
   // Use the model loader for a cleaner API
   final _modelLoader = WhisperKitModelLoader();

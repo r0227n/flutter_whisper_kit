@@ -2,7 +2,7 @@ import 'package:flutter_whisperkit/flutter_whisperkit_method_channel.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 class MockMethodChannelFlutterWhisperkit
-    extends MethodChannelFlutterWhisperkit {
+    extends MethodChannelFlutterWhisperKit {
   String? mockLoadModelResponse;
   TranscriptionResult? mockTranscribeResponse;
   String? mockStartRecordingResponse;

@@ -12,7 +12,7 @@ void main() {
     whisperKit = MockMethodChannelFlutterWhisperkit();
   });
 
-  group('MethodChannelFlutterWhisperkit', () {
+  group('MethodChannelFlutterWhisperKit', () {
     test('loadModel returns model path when successful', () async {
       const expectedPath = '/path/to/model';
       whisperKit.mockLoadModelResponse = expectedPath;

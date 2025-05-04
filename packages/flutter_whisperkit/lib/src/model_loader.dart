@@ -1,6 +1,6 @@
 import 'dart:async';
-
-import '../flutter_whisperkit.dart';
+import 'models.dart';
+import 'flutter_whisper_kit.dart';
 
 /// A class for loading and managing WhisperKit models.
 ///
@@ -10,12 +10,12 @@ import '../flutter_whisperkit.dart';
 class WhisperKitModelLoader {
   /// Creates a new WhisperKitModelLoader instance.
   ///
-  /// Initializes the loader with a new FlutterWhisperkit instance that will
+  /// Initializes the loader with a new FlutterWhisperKit instance that will
   /// be used for all model loading operations.
-  WhisperKitModelLoader() : _whisperkit = FlutterWhisperkit();
+  WhisperKitModelLoader() : _whisperkit = FlutterWhisperKit();
 
-  /// The internal FlutterWhisperkit instance used for model operations.
-  final FlutterWhisperkit _whisperkit;
+  /// The internal FlutterWhisperKit instance used for model operations.
+  final FlutterWhisperKit _whisperkit;
 
   /// Loads a WhisperKit model.
   ///

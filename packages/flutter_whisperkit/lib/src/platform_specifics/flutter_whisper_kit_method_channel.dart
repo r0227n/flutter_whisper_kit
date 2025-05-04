@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit/src/whisper_kit_message.g.dart';
-import 'src/models.dart';
 
-import 'flutter_whisperkit_platform_interface.dart';
+import 'whisper_kit_message.g.dart';
+import 'flutter_whisper_kit_platform_interface.dart';
+import '../models.dart';
 
-/// An implementation of [FlutterWhisperkitPlatform] that uses method channels.
+/// An implementation of [FlutterWhisperKitPlatform] that uses method channels.
 ///
 /// This class handles the communication between the Dart code and native platform
 /// code using Flutter's MethodChannel and EventChannel mechanisms. It manages
 /// the transcription and model loading processes by forwarding calls to the
 /// native WhisperKit implementation.
-class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
+class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
   /// The Pigeon-generated message interface for communicating with native code.
   final _whisperKitMessage = WhisperKitMessage();
 
@@ -54,7 +54,7 @@ class MethodChannelFlutterWhisperkit extends FlutterWhisperkitPlatform {
   /// Initializes the event channels for transcription results and model loading
   /// progress, and sets up listeners to forward events to the appropriate
   /// stream controllers.
-  MethodChannelFlutterWhisperkit() {
+  MethodChannelFlutterWhisperKit() {
     // Listen to the event channel and forward events to the stream controller
     transcriptionStreamChannel.receiveBroadcastStream().listen(
       (dynamic event) {

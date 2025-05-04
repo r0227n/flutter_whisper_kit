@@ -9,20 +9,20 @@ import 'test_utils/mock_method_channel.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('FlutterWhisperkit Platform Tests', () {
+  group('FlutterWhisperKit Platform Tests', () {
     test('Platform can be set to mock implementation', () {
       final mockPlatform = setUpMockPlatform();
-      expect(FlutterWhisperkitPlatform.instance, mockPlatform);
+      expect(FlutterWhisperKitPlatform.instance, mockPlatform);
     });
 
     test('loadModel returns success message', () async {
       // Arrange
       final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
-      FlutterWhisperkitPlatform.instance = mockMethodChannel;
+      FlutterWhisperKitPlatform.instance = mockMethodChannel;
 
       // Act & Assert
       expect(
-        await FlutterWhisperkitPlatform.instance.loadModel(
+        await FlutterWhisperKitPlatform.instance.loadModel(
           'tiny-en',
           modelRepo: 'argmaxinc/whisperkit-coreml',
         ),
@@ -35,14 +35,14 @@ void main() {
       () async {
         // Arrange
         final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
-        FlutterWhisperkitPlatform.instance = mockMethodChannel;
+        FlutterWhisperKitPlatform.instance = mockMethodChannel;
 
         // Act
         final progressStream =
-            FlutterWhisperkitPlatform.instance.modelProgressStream;
+            FlutterWhisperKitPlatform.instance.modelProgressStream;
 
         // Trigger model loading to generate progress updates
-        FlutterWhisperkitPlatform.instance.loadModel('tiny-en');
+        FlutterWhisperKitPlatform.instance.loadModel('tiny-en');
 
         // Assert
         expect(

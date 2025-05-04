@@ -9,19 +9,19 @@ import 'test_utils/mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  
-  group('FlutterWhisperkit', () {
-    final FlutterWhisperkitPlatform initialPlatform =
-        FlutterWhisperkitPlatform.instance;
 
-    test('$MethodChannelFlutterWhisperkit is the default instance', () {
-      expect(initialPlatform, isInstanceOf<MethodChannelFlutterWhisperkit>());
+  group('FlutterWhisperKit', () {
+    final FlutterWhisperKitPlatform initialPlatform =
+        FlutterWhisperKitPlatform.instance;
+
+    test('$MethodChannelFlutterWhisperKit is the default instance', () {
+      expect(initialPlatform, isInstanceOf<MethodChannelFlutterWhisperKit>());
     });
-    
-    test('FlutterWhisperkit is accessible', () {
-      expect(FlutterWhisperkit(), isNotNull);
+
+    test('FlutterWhisperKit is accessible', () {
+      expect(FlutterWhisperKit(), isNotNull);
     });
-    
+
     group('WhisperKitModelLoader', () {
       test('loads model and returns success message', () async {
         // Arrange

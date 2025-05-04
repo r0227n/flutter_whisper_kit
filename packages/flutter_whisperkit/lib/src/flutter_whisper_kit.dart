@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'flutter_whisperkit_platform_interface.dart';
-import 'src/models.dart';
 
-// Export model loader for public use
-export 'src/model_loader.dart';
-export 'src/models/progress.dart';
+import 'models.dart';
+import 'whisper_kit_error.dart';
+import 'platform_specifics/flutter_whisper_kit_platform_interface.dart';
 
 /// The main entry point for the Flutter WhisperKit plugin.
 ///
@@ -16,9 +14,9 @@ export 'src/models/progress.dart';
 /// recording and transcription.
 ///
 /// The class delegates platform-specific implementation details to the
-/// [FlutterWhisperkitPlatform] instance, ensuring consistent behavior
+/// [FlutterWhisperKitPlatform] instance, ensuring consistent behavior
 /// across different platforms while abstracting away the platform-specific code.
-class FlutterWhisperkit {
+class FlutterWhisperKit {
   /// Loads a WhisperKit model.
   ///
   /// Downloads and initializes a WhisperKit model for speech recognition.
@@ -45,7 +43,7 @@ class FlutterWhisperkit {
   }) async {
     try {
       // Delegate to the platform implementation
-      return await FlutterWhisperkitPlatform.instance.loadModel(
+      return await FlutterWhisperKitPlatform.instance.loadModel(
         variant,
         modelRepo: modelRepo,
         redownload: redownload,
@@ -98,7 +96,7 @@ class FlutterWhisperkit {
   }) async {
     try {
       // Delegate to the platform implementation
-      return await FlutterWhisperkitPlatform.instance.transcribeFromFile(
+      return await FlutterWhisperKitPlatform.instance.transcribeFromFile(
         filePath,
         options: options,
       );
@@ -147,7 +145,7 @@ class FlutterWhisperkit {
   }) async {
     try {
       // Delegate to the platform implementation
-      return await FlutterWhisperkitPlatform.instance.startRecording(
+      return await FlutterWhisperKitPlatform.instance.startRecording(
         options: options,
         loop: loop,
       );
@@ -175,7 +173,7 @@ class FlutterWhisperkit {
   Future<String?> stopRecording({bool loop = true}) async {
     try {
       // Delegate to the platform implementation
-      return await FlutterWhisperkitPlatform.instance.stopRecording(loop: loop);
+      return await FlutterWhisperKitPlatform.instance.stopRecording(loop: loop);
     } on PlatformException catch (e) {
       // Convert platform exceptions to WhisperKitError for better error handling
       throw WhisperKitError.fromPlatformException(e);
@@ -208,7 +206,7 @@ class FlutterWhisperkit {
   /// subscription.cancel();
   /// ```
   Stream<TranscriptionResult> get transcriptionStream =>
-      FlutterWhisperkitPlatform.instance.transcriptionStream;
+      FlutterWhisperKitPlatform.instance.transcriptionStream;
 
   /// Stream of model loading progress updates.
   ///
@@ -221,5 +219,5 @@ class FlutterWhisperkit {
   /// may take some time to download, allowing the application to provide
   /// feedback to the user about the download status.
   Stream<Progress> get modelProgressStream =>
-      FlutterWhisperkitPlatform.instance.modelProgressStream;
+      FlutterWhisperKitPlatform.instance.modelProgressStream;
 }

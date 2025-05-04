@@ -4,10 +4,10 @@ import 'package:flutter_whisperkit/src/models.dart';
 import 'package:flutter_whisperkit/src/whisper_kit_error.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-/// Mock implementation of [FlutterWhisperkitPlatform] for testing.
+/// Mock implementation of [FlutterWhisperKitPlatform] for testing.
 class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
-    implements FlutterWhisperkitPlatform {
+    implements FlutterWhisperKitPlatform {
   @override
   Future<String?> loadModel(
     String? variant, {
@@ -157,6 +157,6 @@ class MockFlutterWhisperkitPlatform
 /// Returns the mock platform instance.
 MockFlutterWhisperkitPlatform setUpMockPlatform() {
   final mockPlatform = MockFlutterWhisperkitPlatform();
-  FlutterWhisperkitPlatform.instance = mockPlatform;
+  FlutterWhisperKitPlatform.instance = mockPlatform;
   return mockPlatform;
 }
