@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'models.dart';
-import '../flutter_whisper_kit.dart' show FlutterWhisperKit;
+import 'flutter_whisper_kit.dart';
 
 /// A class for loading and managing WhisperKit models.
 ///
