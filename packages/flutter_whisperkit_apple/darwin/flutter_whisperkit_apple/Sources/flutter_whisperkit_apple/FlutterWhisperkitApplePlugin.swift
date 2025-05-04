@@ -18,9 +18,13 @@ private var flutterPluginRegistrar: FlutterPluginRegistrar?
 
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
+  
   private var isRecording: Bool = false
+  
   private var transcriptionTask: Task<Void, Never>?
+  
   public static var transcriptionStreamHandler: TranscriptionStreamHandler?
+  
   public static var modelProgressStreamHandler: ModelProgressStreamHandler?
 
   func loadModel(
