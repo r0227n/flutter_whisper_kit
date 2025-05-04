@@ -30,6 +30,8 @@ class FlutterWhisperKit {
   ///   This is the Hugging Face repository where the model files are hosted.
   /// - [redownload]: Whether to force redownload the model even if it exists locally.
   ///   Set to true to ensure you have the latest version of the model.
+  /// - [onProgress]: A callback function that receives download progress updates.
+  ///   This can be used to display a progress indicator to the user.
   /// - [modelDownloadPath]: Custom path where the model should be downloaded.
   ///   If not provided, the model will be stored in the default location.
   ///
@@ -39,9 +41,23 @@ class FlutterWhisperKit {
     String? variant, {
     String? modelRepo,
     bool? redownload,
+    Function(Progress progress)? onProgress,
     String? modelDownloadPath,
   }) async {
+    // Subscribe to the progress stream if a callback is provided
+    StreamSubscription<Progress>? progressSubscription;
+
     try {
+      if (onProgress != null) {
+        progressSubscription = FlutterWhisperKitPlatform
+            .instance
+            .modelProgressStream
+            .listen((progress) {
+              // Convert the Progress object to a simple double for the callback
+              onProgress(progress);
+            });
+      }
+
       // Delegate to the platform implementation
       return await FlutterWhisperKitPlatform.instance.loadModel(
         variant,
@@ -55,6 +71,9 @@ class FlutterWhisperKit {
     } catch (e) {
       // Rethrow other exceptions
       rethrow;
+    } finally {
+      // Ensure the progress subscription is cancelled to prevent memory leaks
+      progressSubscription?.cancel();
     }
   }
 
