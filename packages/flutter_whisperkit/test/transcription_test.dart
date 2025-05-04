@@ -10,7 +10,7 @@ void main() {
 
   group('File Transcription', () {
     late FlutterWhisperkitPlatform platform;
-    
+
     setUp(() {
       platform = setUpMockPlatform();
     });
@@ -18,17 +18,16 @@ void main() {
     group('transcribeFromFile', () {
       test('returns JSON string for valid file path', () async {
         // Act
-        final jsonString = await platform.transcribeFromFile('test.wav');
-        
+        final result = await platform.transcribeFromFile('test.wav');
+
         // Assert
-        expect(jsonString, isNotNull);
-        expect(jsonString, isA<String>());
-        
+        expect(result, isNotNull);
+        expect(result, isA<TranscriptionResult>());
+
         // Parse the JSON string to verify content
-        final result = TranscriptionResult.fromJsonString(jsonString!);
-        expect(result.text, 'Hello world. This is a test.');
-        expect(result.segments.length, 2);
-        expect(result.language, 'en');
+        expect(result?.text, 'Hello world. This is a test.');
+        expect(result?.segments.length, 2);
+        expect(result?.language, 'en');
       });
 
       test('with custom DecodingOptions returns JSON string', () async {
@@ -40,14 +39,14 @@ void main() {
         );
 
         // Act
-        final jsonString = await platform.transcribeFromFile(
+        final result = await platform.transcribeFromFile(
           'test.wav',
           options: options,
         );
-        
+
         // Assert
-        expect(jsonString, isNotNull);
-        expect(jsonString, isA<String>());
+        expect(result, isNotNull);
+        expect(result, isA<TranscriptionResult>());
       });
 
       test('throws InvalidArgumentsError with empty file path', () async {

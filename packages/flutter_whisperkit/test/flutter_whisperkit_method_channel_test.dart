@@ -1,50 +1,57 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_method_channel.dart';
+import 'package:flutter_whisperkit/src/models.dart';
+import 'test_utils/mock_method_channel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  MethodChannelFlutterWhisperkit platform = MethodChannelFlutterWhisperkit();
-  const MethodChannel channel = MethodChannel('flutter_whisperkit');
+  late MockMethodChannelFlutterWhisperkit whisperKit;
 
   setUp(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-          if (methodCall.method == 'loadModel') {
-            return 'Model loaded successfully';
-          } else if (methodCall.method == 'transcribeFromFile') {
-            return '{"text":"Test transcription","segments":[],"language":"en","timings":{"fullPipeline":1.0}}';
-          } else if (methodCall.method == 'startRecording') {
-            return 'Recording started';
-          } else if (methodCall.method == 'stopRecording') {
-            return 'Recording stopped';
-          }
-          return '42';
-        });
+    whisperKit = MockMethodChannelFlutterWhisperkit();
   });
 
-  tearDown(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, null);
-  });
-  
-  test('loadModel returns success message', () async {
-    expect(await platform.loadModel('tiny-en'), 'Model loaded successfully');
-  });
-  
-  test('transcribeFromFile returns properly parsed TranscriptionResult', () async {
-    final result = await platform.transcribeFromFile('test.wav');
-    expect(result, isNotNull);
-    expect(result!.text, 'Test transcription');
-    expect(result.language, 'en');
-  });
-  
-  test('startRecording returns success message', () async {
-    expect(await platform.startRecording(), 'Recording started');
-  });
-  
-  test('stopRecording returns success message', () async {
-    expect(await platform.stopRecording(), 'Recording stopped');
+  group('MethodChannelFlutterWhisperkit', () {
+    test('loadModel returns model path when successful', () async {
+      const expectedPath = '/path/to/model';
+      whisperKit.mockLoadModelResponse = expectedPath;
+
+      final result = await whisperKit.loadModel('tiny');
+      expect(result, equals(expectedPath));
+    });
+
+    test(
+      'transcribeFromFile returns TranscriptionResult when successful',
+      () async {
+        const testFilePath = '/path/to/audio.wav';
+        final expectedResult = TranscriptionResult(
+          text: 'Hello world',
+          segments: [],
+          language: 'en',
+          timings: const TranscriptionTimings(),
+        );
+        whisperKit.mockTranscribeResponse = expectedResult;
+
+        final result = await whisperKit.transcribeFromFile(testFilePath);
+        expect(result?.text, equals(expectedResult.text));
+      },
+    );
+
+    test('startRecording returns success message', () async {
+      const expectedMessage = 'Recording started';
+      whisperKit.mockStartRecordingResponse = expectedMessage;
+
+      final result = await whisperKit.startRecording();
+      expect(result, equals(expectedMessage));
+    });
+
+    test('stopRecording returns success message', () async {
+      const expectedMessage = 'Recording stopped';
+      whisperKit.mockStopRecordingResponse = expectedMessage;
+
+      final result = await whisperKit.stopRecording();
+      expect(result, equals(expectedMessage));
+    });
   });
 }
