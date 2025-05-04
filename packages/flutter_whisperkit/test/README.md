@@ -58,7 +58,7 @@ To run a specific test file:
 
 ```bash
 cd packages/flutter_whisperkit
-fvm flutter test test/file_name_test.dart
+fvm flutter test test/file_name_test.dart # Replace 'file_name_test.dart' with the actual test file name
 ```
 
 ## Test Coverage
