@@ -14,18 +14,18 @@ class FlutterWhisperkit {
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
   /// [modelRepo] - The repository to download the model from (default: 'argmaxinc/whisperkit-coreml').
   /// [redownload] - Whether to force redownload the model even if it exists locally.
-  /// [storageLocation] - Where to store the model (ModelStorageLocation.packageDirectory or ModelStorageLocation.userFolder).
+  /// [modelDownloadPath] - The path to download the model to.
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    ModelStorageLocation storageLocation = ModelStorageLocation.packageDirectory,
+    String? modelDownloadPath,
   }) {
     return FlutterWhisperkitPlatform.instance.loadModel(
       variant,
       modelRepo: modelRepo,
       redownload: redownload,
-      storageLocation: storageLocation,
+      modelDownloadPath: modelDownloadPath,
     );
   }
 
@@ -100,9 +100,7 @@ class FlutterWhisperkit {
   /// Returns a success message when recording is stopped.
   /// If [loop] is false, also triggers transcription of the recorded audio.
   Future<String?> stopRecording({bool loop = true}) {
-    return FlutterWhisperkitPlatform.instance.stopRecording(
-      loop: loop,
-    );
+    return FlutterWhisperkitPlatform.instance.stopRecording(loop: loop);
   }
 
   /// Stream of real-time transcription results.
@@ -125,7 +123,7 @@ class FlutterWhisperkit {
   /// ```
   Stream<TranscriptionResult> get transcriptionStream =>
       FlutterWhisperkitPlatform.instance.transcriptionStream;
-      
+
   /// Stream of model loading progress updates.
   ///
   /// This stream emits Progress objects containing information about the ongoing task,

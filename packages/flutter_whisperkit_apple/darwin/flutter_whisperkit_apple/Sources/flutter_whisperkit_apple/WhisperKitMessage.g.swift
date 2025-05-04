@@ -88,7 +88,7 @@ class WhisperKitMessagePigeonCodec: FlutterStandardMessageCodec, @unchecked Send
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WhisperKitMessage {
-  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?, completion: @escaping (Result<String?, Error>) -> Void)
+  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, modelDownloadPath: String?, completion: @escaping (Result<String?, Error>) -> Void)
   func transcribeFromFile(filePath: String, options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
   func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
@@ -107,8 +107,8 @@ class WhisperKitMessageSetup {
         let variantArg: String? = nilOrValue(args[0])
         let modelRepoArg: String? = nilOrValue(args[1])
         let redownloadArg: Bool? = nilOrValue(args[2])
-        let storageLocationArg: Int64? = nilOrValue(args[3])
-        api.loadModel(variant: variantArg, modelRepo: modelRepoArg, redownload: redownloadArg, storageLocation: storageLocationArg) { result in
+        let modelDownloadPathArg: String? = nilOrValue(args[3])
+        api.loadModel(variant: variantArg, modelRepo: modelRepoArg, redownload: redownloadArg, modelDownloadPath: modelDownloadPathArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))

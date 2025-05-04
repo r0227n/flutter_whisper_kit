@@ -12,7 +12,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('FlutterWhisperkitApple', () {
-    final FlutterWhisperkitPlatform initialPlatform = FlutterWhisperkitPlatform.instance;
+    final FlutterWhisperkitPlatform initialPlatform =
+        FlutterWhisperkitPlatform.instance;
 
     test('FlutterWhisperkitApple extends FlutterWhisperkitPlatform', () {
       expect(FlutterWhisperkitApple(), isA<FlutterWhisperkitPlatform>());
@@ -22,13 +23,13 @@ void main() {
       // Arrange
       final mockWhisperKitMessage = MockWhisperKitMessage();
       final methodChannel = MethodChannelFlutterWhisperkitApple(
-        whisperKitMessage: mockWhisperKitMessage
+        whisperKitMessage: mockWhisperKitMessage,
       );
       final flutterWhisperkitApplePlugin = FlutterWhisperkitApple(
-        methodChannel: methodChannel
+        methodChannel: methodChannel,
       );
       setUpMockPlatform();
-      
+
       // Act & Assert
       expect(
         await flutterWhisperkitApplePlugin.loadModel(
@@ -46,22 +47,7 @@ void main() {
         final modelLoader = WhisperKitModelLoader();
 
         // Act & Assert
-        expect(
-          await modelLoader.loadModel(variant: 'tiny-en'),
-          'Model loaded',
-        );
-      });
-
-      test('can change storage location', () async {
-        // Arrange
-        setUpMockPlatform();
-        final modelLoader = WhisperKitModelLoader();
-        
-        // Act
-        modelLoader.setStorageLocation(ModelStorageLocation.userFolder);
-        
-        // Assert
-        expect(modelLoader.storageLocation, ModelStorageLocation.userFolder);
+        expect(await modelLoader.loadModel(variant: 'tiny-en'), 'Model loaded');
       });
     });
   });
