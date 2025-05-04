@@ -4,15 +4,12 @@ import 'package:flutter_whisperkit/src/model_loader.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 import 'test_utils/mocks.dart';
-import 'test_utils/mock_whisper_kit_message.dart';
 import 'test_utils/mock_method_channel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('FlutterWhisperkit Platform Tests', () {
-    final FlutterWhisperkitPlatform initialPlatform =
-        FlutterWhisperkitPlatform.instance;
 
     test('Platform can be set to mock implementation', () {
       final mockPlatform = setUpMockPlatform();

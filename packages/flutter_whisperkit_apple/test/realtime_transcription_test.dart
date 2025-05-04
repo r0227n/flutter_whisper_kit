@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
-import 'test_utils/mocks.dart';
 import 'test_utils/mock_method_channel.dart';
 
 void main() {
