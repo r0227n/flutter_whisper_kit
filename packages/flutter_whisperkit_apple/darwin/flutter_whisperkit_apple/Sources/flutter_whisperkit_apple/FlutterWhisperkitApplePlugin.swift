@@ -161,6 +161,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
+  ///   - filePath: Path to the audio file to transcribe
   func transcribeFromFile(
     filePath: String, options: [String: Any?],
     completion: @escaping (Result<String?, Error>) -> Void
@@ -260,6 +261,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
+  ///   - samples: Array of float audio samples to transcribe
   func transcribeAudioSamples(_ samples: [Float], options: DecodingOptions?) async throws
     -> TranscriptionResult?
   {
@@ -364,6 +366,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     return mergedResults
   }
 
+  /// - Returns: URL to the WhisperKit models directory
   private func getModelFolderPath(path: String?) -> URL {
     if path == nil {
       if let appSupport = FileManager.default.urls(
@@ -387,10 +390,12 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
 
+  /// - Returns: URL to the Documents directory
   private func getDocumentsDirectory() -> URL {
     FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
   }
 
+  /// - Returns: Array of model names that are available locally
   private func getLocalModels(path: String?) async -> [String] {
     let modelPath = getModelFolderPath(path: path)
     var localModels: [String] = []
