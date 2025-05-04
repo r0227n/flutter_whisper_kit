@@ -7,7 +7,6 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperkitPlatform {
-  
   @override
   Future<String?> loadModel(
     String? variant, {
@@ -19,7 +18,7 @@ class MockFlutterWhisperkitPlatform
     // and report progress through the modelProgressStream
     return Future.value('Model loaded');
   }
-  
+
   /// Stream of model loading progress updates
   @override
   Stream<Progress> get modelProgressStream => Stream<Progress>.fromIterable([
@@ -32,7 +31,7 @@ class MockFlutterWhisperkitPlatform
   ]);
 
   @override
-  Future<String?> transcribeFromFile(
+  Future<TranscriptionResult?> transcribeFromFile(
     String filePath, {
     DecodingOptions options = const DecodingOptions(
       verbose: true,
@@ -53,9 +52,7 @@ class MockFlutterWhisperkitPlatform
     ),
   }) {
     if (filePath.isEmpty) {
-      throw InvalidArgumentsError(
-        message: 'File path cannot be empty',
-      );
+      throw InvalidArgumentsError(message: 'File path cannot be empty');
     }
 
     // Mock JSON response for a successful transcription
@@ -102,7 +99,7 @@ class MockFlutterWhisperkitPlatform
     }
     ''';
 
-    return Future.value(mockJson);
+    return Future.value(TranscriptionResult.fromJsonString(mockJson));
   }
 
   @override
@@ -127,12 +124,13 @@ class MockFlutterWhisperkitPlatform
   }) => Future.value('Recording started');
 
   @override
-  Future<String?> stopRecording({bool loop = true}) => 
+  Future<String?> stopRecording({bool loop = true}) =>
       Future.value('Recording stopped');
 
   @override
-  Stream<TranscriptionResult> get transcriptionStream => Stream<TranscriptionResult>.fromIterable([
-    TranscriptionResult.fromJsonString('''
+  Stream<TranscriptionResult> get transcriptionStream =>
+      Stream<TranscriptionResult>.fromIterable([
+        TranscriptionResult.fromJsonString('''
       {
         "text": "Test transcription",
         "segments": [
@@ -154,12 +152,12 @@ class MockFlutterWhisperkitPlatform
           "fullPipeline": 1.0
         }
       }
-    ''')
-  ]);
+    '''),
+      ]);
 }
 
 /// Sets up a mock platform for testing.
-/// 
+///
 /// Returns the mock platform instance.
 MockFlutterWhisperkitPlatform setUpMockPlatform() {
   final mockPlatform = MockFlutterWhisperkitPlatform();
