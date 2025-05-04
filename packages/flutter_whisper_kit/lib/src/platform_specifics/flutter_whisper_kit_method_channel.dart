@@ -123,7 +123,6 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
   /// - [variant]: The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
   /// - [modelRepo]: The repository to download the model from.
   /// - [redownload]: Whether to force redownload the model even if it exists locally.
-  /// - [modelDownloadPath]: Custom path where the model should be downloaded.
   /// - [hasProgressCallback]: Whether to provide a progress callback.
   ///   If true, the progress callback will be provided to the native code.
   ///
@@ -134,14 +133,12 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
     String? variant, {
     String? modelRepo,
     bool redownload = false,
-    String? modelDownloadPath,
     bool hasProgressCallback = false,
   }) async {
     return _whisperKitMessage.loadModel(
       variant,
       modelRepo,
       redownload,
-      modelDownloadPath,
       hasProgressCallback,
     );
   }

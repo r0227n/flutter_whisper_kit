@@ -43,8 +43,8 @@ class MockMethodChannelFlutterWhisperkit
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
-    bool? redownload,
-    String? modelDownloadPath,
+    bool redownload = false,
+    bool hasProgressCallback = false,
   }) async {
     // Simulate progress updates through the stream
     for (int i = 0; i <= 10; i++) {

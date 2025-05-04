@@ -62,8 +62,6 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   ///   This is the Hugging Face repository where the model files are hosted.
   /// - [redownload]: Whether to force redownload the model even if it exists locally.
   ///   Set to true to ensure you have the latest version of the model.
-  /// - [modelDownloadPath]: Custom path where the model should be downloaded.
-  ///   If not provided, the model will be stored in the default location.
   /// - [hasProgressCallback]: Whether to provide a progress callback.
   ///   If true, the progress callback will be provided to the native code.
   ///
@@ -75,7 +73,6 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
     String? variant, {
     String? modelRepo,
     bool redownload = false,
-    String? modelDownloadPath,
     bool hasProgressCallback = false,
   }) {
     throw UnimplementedError('loadModel() has not been implemented.');
