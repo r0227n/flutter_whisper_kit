@@ -14,7 +14,7 @@ abstract class WhisperKitMessage {
   String? loadModel(
     String? variant,
     String? modelRepo,
-    bool? redownload,
+    bool redownload,
     String? modelDownloadPath,
     bool hasProgressCallback,
   );

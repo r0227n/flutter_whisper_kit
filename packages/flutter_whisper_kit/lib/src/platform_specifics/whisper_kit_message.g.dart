@@ -50,7 +50,7 @@ class WhisperKitMessage {
 
   final String pigeonVar_messageChannelSuffix;
 
-  Future<String?> loadModel(String? variant, String? modelRepo, bool? redownload, String? modelDownloadPath, bool hasProgressCallback) async {
+  Future<String?> loadModel(String? variant, String? modelRepo, bool redownload, String? modelDownloadPath, bool hasProgressCallback) async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_whisper_kit.WhisperKitMessage.loadModel$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,

@@ -40,7 +40,7 @@ class FlutterWhisperKit {
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
-    bool? redownload,
+    bool redownload = false,
     Function(Progress progress)? onProgress,
     String? modelDownloadPath,
   }) async {

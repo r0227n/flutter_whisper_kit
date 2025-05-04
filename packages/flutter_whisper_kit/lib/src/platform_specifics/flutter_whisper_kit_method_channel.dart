@@ -133,7 +133,7 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
-    bool? redownload,
+    bool redownload = false,
     String? modelDownloadPath,
     bool hasProgressCallback = false,
   }) async {

@@ -74,7 +74,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
-    bool? redownload,
+    bool redownload = false,
     String? modelDownloadPath,
     bool hasProgressCallback = false,
   }) {

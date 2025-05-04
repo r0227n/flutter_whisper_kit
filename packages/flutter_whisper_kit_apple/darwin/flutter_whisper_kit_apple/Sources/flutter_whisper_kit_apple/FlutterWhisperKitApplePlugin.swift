@@ -49,12 +49,12 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   /// - Parameters:
   ///   - variant: The model variant to load (required)
   ///   - modelRepo: The repository to download the model from (optional)
-  ///   - redownload: Whether to force redownload the model (optional)
+  ///   - redownload: Whether to force redownload the model (required)
   ///   - modelDownloadPath: Custom path for model storage (optional)
-  ///   - hasProgressCallback: Indicates whether to enable progress updates during model download (optional)
+  ///   - hasProgressCallback: Indicates whether to enable progress updates during model download (required)
   ///   - completion: Callback with result of the operation
   func loadModel(
-    variant: String?, modelRepo: String?, redownload: Bool?, modelDownloadPath: String?, hasProgressCallback: Bool,
+    variant: String?, modelRepo: String?, redownload: Bool, modelDownloadPath: String?, hasProgressCallback: Bool,
     completion: @escaping (Result<String?, Error>) -> Void
   ) {
     guard let variant = variant else {
@@ -110,7 +110,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         var modelFolder: URL?
         let localModels = await getLocalModels(path: modelDownloadPath)
 
-        if localModels.contains(variant) && !(redownload ?? false) {
+        if localModels.contains(variant) && !redownload {
           modelFolder = modelDirURL.appendingPathComponent(variant)
         } else {
           let downloadDestination = modelDirURL.appendingPathComponent(variant)

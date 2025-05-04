@@ -88,7 +88,7 @@ class WhisperKitMessagePigeonCodec: FlutterStandardMessageCodec, @unchecked Send
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol WhisperKitMessage {
-  func loadModel(variant: String?, modelRepo: String?, redownload: Bool?, modelDownloadPath: String?, hasProgressCallback: Bool, completion: @escaping (Result<String?, Error>) -> Void)
+  func loadModel(variant: String?, modelRepo: String?, redownload: Bool, modelDownloadPath: String?, hasProgressCallback: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func transcribeFromFile(filePath: String, options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
   func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
@@ -106,7 +106,7 @@ class WhisperKitMessageSetup {
         let args = message as! [Any?]
         let variantArg: String? = nilOrValue(args[0])
         let modelRepoArg: String? = nilOrValue(args[1])
-        let redownloadArg: Bool? = nilOrValue(args[2])
+        let redownloadArg = args[2] as! Bool
         let modelDownloadPathArg: String? = nilOrValue(args[3])
         let hasProgressCallbackArg = args[4] as! Bool
         api.loadModel(variant: variantArg, modelRepo: modelRepoArg, redownload: redownloadArg, modelDownloadPath: modelDownloadPathArg, hasProgressCallback: hasProgressCallbackArg) { result in
