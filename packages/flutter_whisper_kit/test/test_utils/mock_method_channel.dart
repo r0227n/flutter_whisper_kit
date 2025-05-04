@@ -11,9 +11,9 @@ class MockMethodChannelFlutterWhisperkit
   @override
   Future<String?> loadModel(
     String? modelName, {
-    String? modelDownloadPath,
     String? modelRepo,
-    bool? redownload,
+    bool redownload = false,
+    bool hasProgressCallback = false,
   }) async {
     return mockLoadModelResponse;
   }

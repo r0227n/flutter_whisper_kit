@@ -123,25 +123,22 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
   /// - [variant]: The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
   /// - [modelRepo]: The repository to download the model from.
   /// - [redownload]: Whether to force redownload the model even if it exists locally.
-  /// - [modelDownloadPath]: Custom path where the model should be downloaded.
   /// - [hasProgressCallback]: Whether to provide a progress callback.
   ///   If true, the progress callback will be provided to the native code.
   ///
-  /// Returns a [Future] that completes with a success message when the model
-  /// is loaded successfully, or an error message if loading fails.
+  /// Returns the path to the model folder if the model is loaded successfully,
+  /// or an error message if loading fails.
   @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
-    bool? redownload,
-    String? modelDownloadPath,
+    bool redownload = false,
     bool hasProgressCallback = false,
   }) async {
     return _whisperKitMessage.loadModel(
       variant,
       modelRepo,
       redownload,
-      modelDownloadPath,
       hasProgressCallback,
     );
   }

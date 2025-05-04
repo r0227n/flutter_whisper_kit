@@ -8,11 +8,9 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
-    bool? redownload,
-    String? modelDownloadPath,
+    bool redownload = false,
+    bool hasProgressCallback = false,
   }) {
-    // In a real implementation, we would use the modelDownloadPath parameter
-    // and report progress through the modelProgressStream
     return Future.value('Model loaded');
   }
 

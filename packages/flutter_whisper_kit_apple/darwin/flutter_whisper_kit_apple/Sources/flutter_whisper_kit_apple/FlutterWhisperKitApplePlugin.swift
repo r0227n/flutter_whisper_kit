@@ -49,12 +49,11 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   /// - Parameters:
   ///   - variant: The model variant to load (required)
   ///   - modelRepo: The repository to download the model from (optional)
-  ///   - redownload: Whether to force redownload the model (optional)
-  ///   - modelDownloadPath: Custom path for model storage (optional)
-  ///   - hasProgressCallback: Indicates whether to enable progress updates during model download (optional)
+  ///   - redownload: Whether to force redownload the model (required)
+  ///   - hasProgressCallback: Indicates whether to enable progress updates during model download (required)
   ///   - completion: Callback with result of the operation
   func loadModel(
-    variant: String?, modelRepo: String?, redownload: Bool?, modelDownloadPath: String?, hasProgressCallback: Bool,
+    variant: String?, modelRepo: String?, redownload: Bool, hasProgressCallback: Bool,
     completion: @escaping (Result<String?, Error>) -> Void
   ) {
     guard let variant = variant else {
@@ -68,26 +67,6 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
     Task {
       do {
-        let modelDirURL = getModelFolderPath(path: modelDownloadPath)
-
-        do {
-          if !FileManager.default.fileExists(atPath: modelDirURL.path) {
-            try FileManager.default.createDirectory(
-              at: modelDirURL, withIntermediateDirectories: true, attributes: nil)
-          }
-
-          let testFile = modelDirURL.appendingPathComponent("test_write_permission.txt")
-          try "test".write(to: testFile, atomically: true, encoding: .utf8)
-          try FileManager.default.removeItem(at: testFile)
-        } catch {
-          throw NSError(
-            domain: "WhisperKitError", code: 4001,
-            userInfo: [
-              NSLocalizedDescriptionKey:
-                "Cannot write to model directory: \(error.localizedDescription)"
-            ])
-        }
-
         if whisperKit == nil {
           let config = WhisperKitConfig(
             verbose: true,
@@ -108,9 +87,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         }
 
         var modelFolder: URL?
-        let localModels = await getLocalModels(path: modelDownloadPath)
+        let localModels = await getLocalModels()
+        let modelDirURL = getModelFolderPath()
 
-        if localModels.contains(variant) && !(redownload ?? false) {
+        if localModels.contains(variant) && !redownload {
           modelFolder = modelDirURL.appendingPathComponent(variant)
         } else {
           let downloadDestination = modelDirURL.appendingPathComponent(variant)
@@ -172,7 +152,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           
           try await whisperKit.loadModels()
           
-          completion(.success("Model \(variant) loaded successfully"))
+          completion(.success(folder.path))
         } else {
           throw NSError(
             domain: "WhisperKitError", code: 1003,
@@ -404,29 +384,15 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
   /// Gets the path to the WhisperKit models directory
   ///
-  /// - Parameter path: Optional custom path for model storage
   /// - Returns: URL to the WhisperKit models directory
-  private func getModelFolderPath(path: String?) -> URL {
-    if path == nil {
-      if let appSupport = FileManager.default.urls(
-        for: .applicationSupportDirectory, in: .userDomainMask
-      ).first {
-        return appSupport.appendingPathComponent("WhisperKitModels")
-      }
-      return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
-    } else {
-      let userPath = URL(fileURLWithPath: path!)
-      let testFile = userPath.appendingPathComponent("whisperkit_write_test.txt")
-      do {
-        try "test".write(to: testFile, atomically: true, encoding: .utf8)
-        try FileManager.default.removeItem(at: testFile)
-        return userPath.appendingPathComponent("WhisperKitModels")
-      } catch {
-        print("Cannot write to custom directory: \(error.localizedDescription)")
-      }
-      
-      return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
+  private func getModelFolderPath() -> URL {
+    if let appSupport = FileManager.default.urls(
+      for: .applicationSupportDirectory, in: .userDomainMask
+    ).first {
+      return appSupport.appendingPathComponent("WhisperKitModels")
     }
+
+    return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
   }
 
   /// Gets the Documents directory
@@ -438,10 +404,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
 
   /// Gets the list of locally available models
   ///
-  /// - Parameter path: Optional custom path for model storage
   /// - Returns: Array of model names that are available locally
-  private func getLocalModels(path: String?) async -> [String] {
-    let modelPath = getModelFolderPath(path: path)
+  private func getLocalModels() async -> [String] {
+    let modelPath = getModelFolderPath()
     var localModels: [String] = []
 
     do {

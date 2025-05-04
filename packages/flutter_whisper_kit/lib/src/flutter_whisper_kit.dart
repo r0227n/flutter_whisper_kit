@@ -32,17 +32,14 @@ class FlutterWhisperKit {
   ///   Set to true to ensure you have the latest version of the model.
   /// - [onProgress]: A callback function that receives download progress updates.
   ///   This can be used to display a progress indicator to the user.
-  /// - [modelDownloadPath]: Custom path where the model should be downloaded.
-  ///   If not provided, the model will be stored in the default location.
   ///
-  /// Returns a [Future] that completes with a success message when the model
-  /// is loaded successfully, or throws a [WhisperKitError] if loading fails.
+  /// Returns the path to the model folder if the model is loaded successfully,
+  /// or throws a [WhisperKitError] if loading fails.
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
-    bool? redownload,
+    bool redownload = false,
     Function(Progress progress)? onProgress,
-    String? modelDownloadPath,
   }) async {
     // Subscribe to the progress stream if a callback is provided
     StreamSubscription<Progress>? progressSubscription;
@@ -63,7 +60,6 @@ class FlutterWhisperKit {
         variant,
         modelRepo: modelRepo,
         redownload: redownload,
-        modelDownloadPath: modelDownloadPath,
         hasProgressCallback: onProgress != null,
       );
     } on PlatformException catch (e) {

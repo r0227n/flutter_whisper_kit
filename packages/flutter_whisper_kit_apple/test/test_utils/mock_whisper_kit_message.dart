@@ -7,12 +7,10 @@ class MockWhisperKitMessage extends FlutterWhisperKitPlatform {
   @override
   Future<String?> loadModel(
     String? variant, {
-    String? modelDownloadPath,
     String? modelRepo,
-    bool? redownload,
+    bool redownload = false,
+    bool hasProgressCallback = false,
   }) async {
-    // In a real implementation, we would use the modelDownloadPath parameter
-    // and report progress through the event channel
     return 'Model loaded successfully';
   }
 
