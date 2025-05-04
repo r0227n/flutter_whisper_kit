@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisper_kit/flutter_whisperkit_platform_interface.dart';
+
 import 'package:flutter_whisper_kit/src/models.dart';
 
 import 'test_utils/mocks.dart';
@@ -8,7 +8,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('Model Progress Streaming', () {
-    late FlutterWhisperKitPlatform platform;
+    late MockFlutterWhisperkitPlatform platform;
 
     setUp(() {
       platform = setUpMockPlatform();
