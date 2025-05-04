@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit/src/whisper_kit_message.g.dart';
-import 'src/models.dart';
 
+import 'whisper_kit_message.g.dart';
 import 'flutter_whisperkit_platform_interface.dart';
+import '../models.dart';
 
 /// An implementation of [FlutterWhisperKitPlatform] that uses method channels.
 ///

@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'flutter_whisperkit_platform_interface.dart';
+
 import 'src/models.dart';
+import 'src/platform_specifics/flutter_whisperkit_platform_interface.dart';
 
 // Export model loader for public use
 export 'src/model_loader.dart';
