@@ -43,7 +43,8 @@ class _MyAppState extends State<MyApp> {
   Future<String> _loadModel() async {
     try {
       final result = await _flutterWhisperkitPlugin.loadModel(
-        'tiny',
+        'large-v3',
+        redownload: true,
         modelRepo: 'argmaxinc/whisperkit-coreml',
       );
 
@@ -295,29 +296,6 @@ class _MyAppState extends State<MyApp> {
                 child: Text(
                   _isRecording ? 'Stop Recording' : 'Start Recording',
                 ),
-              ),
-
-              // Model information section
-              const Text(
-                'Model Information',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-
-              const Text(
-                'This example demonstrates the following FlutterWhisperKit features:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-
-              const Text('• Model loading with progress tracking'),
-              const Text('• File transcription with custom options'),
-              const Text('• Real-time transcription with streaming results'),
-              const Text(
-                '• Detailed transcription results with segments and timing information',
-              ),
-
-              const Text(
-                'Note: The file transcription feature uses a placeholder path "<mp3 file path>" and will not actually transcribe a file when running this example.',
-                style: TextStyle(fontStyle: FontStyle.italic),
               ),
             ],
           ),
