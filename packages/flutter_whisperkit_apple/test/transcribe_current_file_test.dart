@@ -8,15 +8,15 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('File Transcription', () {
-    late FlutterWhisperkitPlatform plugin;
+    late FlutterWhisperKitPlatform plugin;
 
     setUp(() {
       // Create a mock method channel that provides test functionality
       final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
 
       // Set the mock method channel as the platform instance
-      FlutterWhisperkitPlatform.instance = mockMethodChannel;
-      plugin = FlutterWhisperkitPlatform.instance;
+      FlutterWhisperKitPlatform.instance = mockMethodChannel;
+      plugin = FlutterWhisperKitPlatform.instance;
     });
 
     group('transcribeFromFile', () {

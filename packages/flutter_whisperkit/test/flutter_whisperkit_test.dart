@@ -11,11 +11,11 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('FlutterWhisperKit', () {
-    final FlutterWhisperkitPlatform initialPlatform =
-        FlutterWhisperkitPlatform.instance;
+    final FlutterWhisperKitPlatform initialPlatform =
+        FlutterWhisperKitPlatform.instance;
 
-    test('$MethodChannelFlutterWhisperkit is the default instance', () {
-      expect(initialPlatform, isInstanceOf<MethodChannelFlutterWhisperkit>());
+    test('$MethodChannelFlutterWhisperKit is the default instance', () {
+      expect(initialPlatform, isInstanceOf<MethodChannelFlutterWhisperKit>());
     });
 
     test('FlutterWhisperKit is accessible', () {

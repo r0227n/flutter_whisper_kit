@@ -9,7 +9,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('File Transcription', () {
-    late FlutterWhisperkitPlatform platform;
+    late FlutterWhisperKitPlatform platform;
 
     setUp(() {
       platform = setUpMockPlatform();

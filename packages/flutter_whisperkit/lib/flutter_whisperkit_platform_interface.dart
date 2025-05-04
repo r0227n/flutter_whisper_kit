@@ -14,37 +14,37 @@ import 'flutter_whisperkit_method_channel.dart';
 /// This abstract class defines the API contract for the WhisperKit plugin
 /// across all supported platforms, ensuring consistent behavior regardless
 /// of the underlying platform implementation.
-abstract class FlutterWhisperkitPlatform extends PlatformInterface {
-  /// Constructs a FlutterWhisperkitPlatform.
+abstract class FlutterWhisperKitPlatform extends PlatformInterface {
+  /// Constructs a FlutterWhisperKitPlatform.
   ///
   /// This constructor is protected and should only be used by subclasses.
   /// It initializes the platform interface with a token for verification.
-  FlutterWhisperkitPlatform() : super(token: _token);
+  FlutterWhisperKitPlatform() : super(token: _token);
 
   /// The token used to verify that implementations extend rather than implement this class.
   static final Object _token = Object();
 
   /// The default implementation instance of the platform interface.
-  static FlutterWhisperkitPlatform _instance = MethodChannelFlutterWhisperkit();
+  static FlutterWhisperKitPlatform _instance = MethodChannelFlutterWhisperKit();
 
-  /// The default instance of [FlutterWhisperkitPlatform] to use.
+  /// The default instance of [FlutterWhisperKitPlatform] to use.
   ///
-  /// Defaults to [MethodChannelFlutterWhisperkit], which uses method channels
+  /// Defaults to [MethodChannelFlutterWhisperKit], which uses method channels
   /// to communicate with the native platform code.
   ///
   /// This getter provides access to the current platform implementation,
   /// allowing the plugin to delegate method calls to the appropriate
   /// platform-specific code.
-  static FlutterWhisperkitPlatform get instance => _instance;
+  static FlutterWhisperKitPlatform get instance => _instance;
 
   /// Platform-specific implementations should set this with their own
-  /// platform-specific class that extends [FlutterWhisperkitPlatform] when
+  /// platform-specific class that extends [FlutterWhisperKitPlatform] when
   /// they register themselves.
   ///
   /// This setter allows platform-specific implementations to register
   /// themselves as the current implementation. It verifies that the provided
   /// instance extends this class using the token system.
-  static set instance(FlutterWhisperkitPlatform instance) {
+  static set instance(FlutterWhisperKitPlatform instance) {
     PlatformInterface.verifyToken(instance, _token);
     _instance = instance;
   }

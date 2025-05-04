@@ -8,8 +8,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('Model Progress Streaming', () {
-    late FlutterWhisperkitPlatform platform;
-    
+    late FlutterWhisperKitPlatform platform;
+
     setUp(() {
       platform = setUpMockPlatform();
     });
@@ -17,14 +17,19 @@ void main() {
     test('modelProgressStream emits progress updates', () async {
       // Act
       final stream = platform.modelProgressStream;
-      
+
       // Assert
-      expect(stream, emitsThrough(predicate<Progress>(
-        (progress) => 
-            progress.totalUnitCount == 100 && 
-            progress.completedUnitCount == 50 &&
-            progress.fractionCompleted == 0.5,
-      )));
+      expect(
+        stream,
+        emitsThrough(
+          predicate<Progress>(
+            (progress) =>
+                progress.totalUnitCount == 100 &&
+                progress.completedUnitCount == 50 &&
+                progress.fractionCompleted == 0.5,
+          ),
+        ),
+      );
     });
   });
 }

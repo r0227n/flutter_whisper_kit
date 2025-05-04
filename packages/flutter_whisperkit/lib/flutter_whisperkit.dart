@@ -16,7 +16,7 @@ export 'src/models/progress.dart';
 /// recording and transcription.
 ///
 /// The class delegates platform-specific implementation details to the
-/// [FlutterWhisperkitPlatform] instance, ensuring consistent behavior
+/// [FlutterWhisperKitPlatform] instance, ensuring consistent behavior
 /// across different platforms while abstracting away the platform-specific code.
 class FlutterWhisperKit {
   /// Loads a WhisperKit model.
@@ -45,7 +45,7 @@ class FlutterWhisperKit {
   }) async {
     try {
       // Delegate to the platform implementation
-      return await FlutterWhisperkitPlatform.instance.loadModel(
+      return await FlutterWhisperKitPlatform.instance.loadModel(
         variant,
         modelRepo: modelRepo,
         redownload: redownload,
@@ -98,7 +98,7 @@ class FlutterWhisperKit {
   }) async {
     try {
       // Delegate to the platform implementation
-      return await FlutterWhisperkitPlatform.instance.transcribeFromFile(
+      return await FlutterWhisperKitPlatform.instance.transcribeFromFile(
         filePath,
         options: options,
       );
@@ -147,7 +147,7 @@ class FlutterWhisperKit {
   }) async {
     try {
       // Delegate to the platform implementation
-      return await FlutterWhisperkitPlatform.instance.startRecording(
+      return await FlutterWhisperKitPlatform.instance.startRecording(
         options: options,
         loop: loop,
       );
@@ -175,7 +175,7 @@ class FlutterWhisperKit {
   Future<String?> stopRecording({bool loop = true}) async {
     try {
       // Delegate to the platform implementation
-      return await FlutterWhisperkitPlatform.instance.stopRecording(loop: loop);
+      return await FlutterWhisperKitPlatform.instance.stopRecording(loop: loop);
     } on PlatformException catch (e) {
       // Convert platform exceptions to WhisperKitError for better error handling
       throw WhisperKitError.fromPlatformException(e);
@@ -208,7 +208,7 @@ class FlutterWhisperKit {
   /// subscription.cancel();
   /// ```
   Stream<TranscriptionResult> get transcriptionStream =>
-      FlutterWhisperkitPlatform.instance.transcriptionStream;
+      FlutterWhisperKitPlatform.instance.transcriptionStream;
 
   /// Stream of model loading progress updates.
   ///
@@ -221,5 +221,5 @@ class FlutterWhisperKit {
   /// may take some time to download, allowing the application to provide
   /// feedback to the user about the download status.
   Stream<Progress> get modelProgressStream =>
-      FlutterWhisperkitPlatform.instance.modelProgressStream;
+      FlutterWhisperKitPlatform.instance.modelProgressStream;
 }

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter_whisperkit/flutter_whisperkit_method_channel.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
-/// A mock implementation of [MethodChannelFlutterWhisperkit] for testing.
+/// A mock implementation of [MethodChannelFlutterWhisperKit] for testing.
 class MockMethodChannelFlutterWhisperkit
-    extends MethodChannelFlutterWhisperkit {
+    extends MethodChannelFlutterWhisperKit {
   /// Stream controller for test transcription results
   final StreamController<TranscriptionResult> _testStreamController =
       StreamController<TranscriptionResult>.broadcast();
