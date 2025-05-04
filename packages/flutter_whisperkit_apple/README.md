@@ -1,4 +1,4 @@
-# Flutter WhisperKit Apple
+# flutter_whisperkit_apple
 
 A Flutter plugin that provides Apple platform (iOS and macOS) implementation for the flutter_whisperkit package.
 

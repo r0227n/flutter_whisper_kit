@@ -1,5 +1,8 @@
 # Flutter WhisperKit
 
+[DeepWiki](https://deepwiki.com/r0227n/flutter_whisperkit)
+
+
 A monorepo for Flutter WhisperKit packages that enable on-device speech recognition in Flutter applications using WhisperKit.
 
 ## Overview

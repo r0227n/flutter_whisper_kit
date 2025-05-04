@@ -1,4 +1,4 @@
-# Flutter WhisperKit
+# flutter_whisperkit
 
 A Flutter plugin that provides on-device speech recognition capabilities using WhisperKit.
 
