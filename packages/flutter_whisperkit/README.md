@@ -80,53 +80,12 @@ final finalTranscription = await whisperKit.stopRecording();
 print('Final transcription: $finalTranscription');
 ```
 
-## Model Management
-
-WhisperKit requires models to perform speech recognition. The plugin provides functionality to load these models:
-
-```dart
-import 'package:flutter_whisperkit/flutter_whisperkit.dart';
-
-// Create an instance of the plugin
-final whisperKit = FlutterWhisperKit();
-
-// Set storage location (optional)
-whisperKit.setModelStorageLocation(ModelStorageLocation.packageDirectory);
-
-// Load a model with progress tracking
-await whisperKit.loadModel(
-  variant: 'tiny-en',
-  modelRepo: 'argmaxinc/whisperkit-coreml',
-  redownload: false,
-  onProgress: (progress) {
-    print('Download progress: ${(progress * 100).toStringAsFixed(1)}%');
-  },
-);
-```
-
-## Available Models
-
-WhisperKit supports various model sizes:
-
-- `tiny-en`: Smallest model, English only
-- `tiny`: Small model, multilingual
-- `base-en`: Base model, English only
-- `base`: Base model, multilingual
-- `small-en`: Small model, English only
-- `small`: Small model, multilingual
-- `medium-en`: Medium model, English only
-- `medium`: Medium model, multilingual
-- `large-v2`: Large model, multilingual
-- `large-v3`: Latest large model, multilingual
-
-Smaller models are faster but less accurate, while larger models are more accurate but require more resources.
-
 ## Platform Support
 
 Currently, Flutter WhisperKit supports:
 
-- iOS
-- macOS
+- iOS 16.0+
+- macOS 13.0+
 
 Android support is planned for future releases.
 
