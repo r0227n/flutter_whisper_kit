@@ -24,7 +24,7 @@ Flutter WhisperKit Apple プラグインを `pubspec.yaml` ファイルに追加
 
 ```yaml
 dependencies:
-  flutter_whisperkit_apple: ^0.0.1
+  flutter_whisper_kit_apple: ^0.0.1
 ```
 
 `flutter pub get` を実行してプラグインをインストールします。
@@ -67,7 +67,7 @@ macOS アプリケーションの場合、`Info.plist` に以下を追加しま�
 プラグインをインポートして WhisperKit を初期化します：
 
 ```dart
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
+import 'package:flutter_whisper_kit_apple/flutter_whisper_kit_apple.dart';
 
 // プラグインのインスタンスを作成
 final flutterWhisperkitApple = FlutterWhisperkitApple();

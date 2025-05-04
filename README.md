@@ -14,7 +14,7 @@ Flutter WhisperKit is a wrapper package that enables the use of WhisperKit withi
 This repository is organized as a monorepo containing the following packages:
 
 - **flutter_whisperkit**: The main package that provides a platform-agnostic API for using WhisperKit in Flutter applications.
-- **flutter_whisperkit_apple**: The platform implementation for Apple devices (iOS and macOS).
+- **flutter_whisper_kit_apple**: The platform implementation for Apple devices (iOS and macOS).
 
 ## Features
 
@@ -37,7 +37,7 @@ dependencies:
 For detailed usage instructions, refer to the documentation in the individual package directories:
 
 - [flutter_whisperkit](packages/flutter_whisperkit/README.md)
-- [flutter_whisperkit_apple](packages/flutter_whisperkit_apple/README.md)
+- [flutter_whisper_kit_apple](packages/flutter_whisper_kit_apple/README.md)
 
 ## License
 
