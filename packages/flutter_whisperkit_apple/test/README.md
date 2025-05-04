@@ -71,7 +71,7 @@ The tests cover the following plugin functionality:
 3. **Real-time Transcription**
    - Starting and stopping audio recording
    - Configuring transcription parameters
-   - Streaming transcription results in real-time
+   - Streaming transcription results in real-time, including edge cases and parameter configurations, beyond the basic functionality tested in `realtime_transcription_test.dart`
    - Handling microphone permissions
    - Testing loop and non-loop recording modes
    - Verifying transcription result format and content
