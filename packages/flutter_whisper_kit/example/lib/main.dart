@@ -16,6 +16,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Future<String> _asyncLoadModel;
+  List<TranscriptionSegment> _transcriptionResult = [];
   String _transcriptionText = '';
   bool _isRecording = false;
   bool _isModelLoaded = false;
@@ -125,6 +126,7 @@ class _MyAppState extends State<MyApp> {
     if (!_isModelLoaded) {
       setState(() {
         _transcriptionText = 'Please wait for the model to load first.';
+        _transcriptionResult = [];
       });
       return;
     }
@@ -154,6 +156,16 @@ class _MyAppState extends State<MyApp> {
             .listen((result) {
               setState(() {
                 _transcriptionText = result.text;
+                // Only add segments that don't already exist in the result
+                for (final segment in result.segments) {
+                  if (!_transcriptionResult.any(
+                    (existing) =>
+                        existing.id == segment.id &&
+                        existing.text == segment.text,
+                  )) {
+                    _transcriptionResult.add(segment);
+                  }
+                }
               });
             });
       }
@@ -164,6 +176,7 @@ class _MyAppState extends State<MyApp> {
     } catch (e) {
       setState(() {
         _transcriptionText = 'Error: $e';
+        _transcriptionResult = [];
       });
     }
   }
@@ -173,79 +186,73 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('Flutter WhisperKit Example')),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: 8.0,
-            children: [
-              // Model and language selection
-              Row(
-                spacing: 16.0,
-                children: [
-                  Expanded(
-                    flex: 8,
-                    child: ModelSelectionDropdown(
-                      selectedModel: _selectedModel,
-                      modelVariants: _modelVariants,
-                      onModelChanged: (newModel) {
-                        setState(() {
-                          _selectedModel = newModel;
-                          _isModelLoaded = false;
-                        });
-                      },
-                    ),
+        body: ListView(
+          padding: EdgeInsets.all(16.0),
+          children: [
+            // Model and language selection
+            Row(
+              spacing: 16.0,
+              children: [
+                Expanded(
+                  flex: 8,
+                  child: ModelSelectionDropdown(
+                    selectedModel: _selectedModel,
+                    modelVariants: _modelVariants,
+                    onModelChanged: (newModel) {
+                      setState(() {
+                        _selectedModel = newModel;
+                        _isModelLoaded = false;
+                      });
+                    },
                   ),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _asyncLoadModel = _loadModel();
-                        });
-                      },
-                      child: const Text('Load Model'),
-                    ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _asyncLoadModel = _loadModel();
+                      });
+                    },
+                    child: const Text('Load Model'),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
 
-              LanguageSelectionDropdown(
-                selectedLanguage: _selectedLanguage,
-                onLanguageChanged: (newLanguage) {
-                  setState(() {
-                    _selectedLanguage = newLanguage;
-                  });
-                },
-              ),
+            LanguageSelectionDropdown(
+              selectedLanguage: _selectedLanguage,
+              onLanguageChanged: (newLanguage) {
+                setState(() {
+                  _selectedLanguage = newLanguage;
+                });
+              },
+            ),
 
-              const SizedBox(height: 16),
+            // Model loading indicator
+            ModelLoadingIndicator(
+              asyncLoadModel: _asyncLoadModel,
+              modelProgressStream: _flutterWhisperkitPlugin.modelProgressStream,
+            ),
 
-              // Model loading indicator
-              ModelLoadingIndicator(
-                asyncLoadModel: _asyncLoadModel,
-                modelProgressStream:
-                    _flutterWhisperkitPlugin.modelProgressStream,
-              ),
+            // File transcription section
+            FileTranscriptionSection(
+              isModelLoaded: _isModelLoaded,
+              isTranscribingFile: _isTranscribingFile,
+              fileTranscriptionText: _fileTranscriptionText,
+              fileTranscriptionResult: _fileTranscriptionResult,
+              onTranscribePressed: _transcribeFromFile,
+            ),
 
-              // File transcription section
-              FileTranscriptionSection(
-                isModelLoaded: _isModelLoaded,
-                isTranscribingFile: _isTranscribingFile,
-                fileTranscriptionText: _fileTranscriptionText,
-                fileTranscriptionResult: _fileTranscriptionResult,
-                onTranscribePressed: _transcribeFromFile,
-              ),
-
-              // Real-time transcription section
-              RealTimeTranscriptionSection(
-                isModelLoaded: _isModelLoaded,
-                isRecording: _isRecording,
-                transcriptionText: _transcriptionText,
-                onRecordPressed: _toggleRecording,
-              ),
-            ],
-          ),
+            // Real-time transcription section
+            RealTimeTranscriptionSection(
+              isModelLoaded: _isModelLoaded,
+              isRecording: _isRecording,
+              transcriptionText: _transcriptionText,
+              segments: _transcriptionResult,
+              onRecordPressed: _toggleRecording,
+            ),
+          ],
         ),
       ),
     );
@@ -526,11 +533,13 @@ class RealTimeTranscriptionSection extends StatelessWidget {
     required this.isModelLoaded,
     required this.isRecording,
     required this.transcriptionText,
+    required this.segments,
     required this.onRecordPressed,
   });
 
   final bool isModelLoaded;
   final bool isRecording;
+  final List<TranscriptionSegment> segments;
   final String transcriptionText;
   final VoidCallback onRecordPressed;
 
@@ -538,10 +547,31 @@ class RealTimeTranscriptionSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 16.0,
       children: [
         const Text(
           'Real-time Transcription',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+
+        Container(
+          height: 200,
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child:
+              segments.isNotEmpty
+                  ? ListView.builder(
+                    itemCount: segments.length,
+                    itemBuilder: (context, index) {
+                      return Text(
+                        '[${segments[index].start.toStringAsFixed(2)}s - ${segments[index].end.toStringAsFixed(2)}s]: ${segments[index].text}',
+                      );
+                    },
+                  )
+                  : const Text('No segments'),
         ),
 
         Container(
