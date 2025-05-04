@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit/flutter_whisper_kit.dart';
-import 'package:flutter_whisperkit/src/models.dart';
+import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
+import 'package:flutter_whisper_kit/src/models.dart';
 
 void main() {
   runApp(const MyApp());

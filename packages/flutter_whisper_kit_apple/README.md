@@ -1,10 +1,10 @@
 # flutter_whisper_kit_apple
 
-A Flutter plugin that provides Apple platform (iOS and macOS) implementation for the flutter_whisperkit package.
+A Flutter plugin that provides Apple platform (iOS and macOS) implementation for the flutter_whisper_kit package.
 
 ## Overview
 
-This package is part of the flutter_whisperkit plugin system and provides the Apple-specific implementation for WhisperKit integration. It is not intended for direct use by application developers but serves as a platform implementation for the main flutter_whisperkit package.
+This package is part of the flutter_whisper_kit plugin system and provides the Apple-specific implementation for WhisperKit integration. It is not intended for direct use by application developers but serves as a platform implementation for the main flutter_whisper_kit package.
 
 ## Platform Support
 

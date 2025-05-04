@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit/src/models.dart';
-import 'package:flutter_whisperkit/src/whisper_kit_message.g.dart';
+import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/src/whisper_kit_message.g.dart';
 
 /// A mock implementation of [WhisperKitMessage] for testing.
 class MockWhisperKitMessage implements WhisperKitMessage {
@@ -30,9 +30,7 @@ class MockWhisperKitMessage implements WhisperKitMessage {
     Map<String, Object?> options,
   ) async {
     if (filePath.isEmpty) {
-      throw InvalidArgumentsError(
-        message: 'File path cannot be empty',
-      );
+      throw InvalidArgumentsError(message: 'File path cannot be empty');
     }
 
     // Mock JSON response for a successful transcription

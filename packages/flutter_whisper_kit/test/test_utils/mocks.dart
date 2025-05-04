@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 /// Mock implementation of [FlutterWhisperKitPlatform] for testing.
@@ -13,22 +14,7 @@ class MockFlutterWhisperkitPlatform
     String? modelRepo,
     bool? redownload,
     String? modelDownloadPath,
-  }) {
-    // In a real implementation, we would use the modelDownloadPath parameter
-    // and report progress through the modelProgressStream
-    return Future.value('Model loaded');
-  }
-
-  /// Stream of model loading progress updates
-  @override
-  Stream<Progress> get modelProgressStream => Stream<Progress>.fromIterable([
-    Progress(
-      completedUnitCount: 10,
-      totalUnitCount: 10,
-      fractionCompleted: 1.0,
-      isIndeterminate: false,
-    ),
-  ]);
+  }) => Future.value('Model loaded');
 
   @override
   Future<TranscriptionResult?> transcribeFromFile(
@@ -70,23 +56,7 @@ class MockFlutterWhisperkitPlatform
           "temperature": 1.0,
           "avgLogprob": -0.5,
           "compressionRatio": 1.2,
-          "noSpeechProb": 0.1,
-          "words": [
-            {
-              "word": "Hello",
-              "tokens": [1],
-              "start": 0.0,
-              "end": 1.0,
-              "probability": 0.9
-            },
-            {
-              "word": "world",
-              "tokens": [2],
-              "start": 1.0,
-              "end": 2.0,
-              "probability": 0.8
-            }
-          ]
+          "noSpeechProb": 0.1
         },
         {
           "id": 1,
@@ -98,37 +68,7 @@ class MockFlutterWhisperkitPlatform
           "temperature": 1.0,
           "avgLogprob": -0.4,
           "compressionRatio": 1.3,
-          "noSpeechProb": 0.05,
-          "words": [
-            {
-              "word": "This",
-              "tokens": [4],
-              "start": 2.0,
-              "end": 2.5,
-              "probability": 0.9
-            },
-            {
-              "word": "is",
-              "tokens": [5],
-              "start": 2.5,
-              "end": 3.0,
-              "probability": 0.8
-            },
-            {
-              "word": "a",
-              "tokens": [6],
-              "start": 3.0,
-              "end": 3.5,
-              "probability": 0.7
-            },
-            {
-              "word": "test",
-              "tokens": [7],
-              "start": 3.5,
-              "end": 4.0,
-              "probability": 0.9
-            }
-          ]
+          "noSpeechProb": 0.05
         }
       ],
       "language": "en",
@@ -200,6 +140,16 @@ class MockFlutterWhisperkitPlatform
       }
     '''),
       ]);
+
+  @override
+  Stream<Progress> get modelProgressStream => Stream<Progress>.fromIterable([
+    const Progress(
+      totalUnitCount: 100,
+      completedUnitCount: 50,
+      fractionCompleted: 0.5,
+      isIndeterminate: false,
+    ),
+  ]);
 }
 
 /// Sets up a mock platform for testing.

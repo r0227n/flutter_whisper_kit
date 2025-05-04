@@ -14,8 +14,8 @@ import WhisperKit
 /// This plugin provides WhisperKit functionality to Flutter applications on Apple platforms.
 /// It handles model loading, audio transcription, and real-time recording capabilities.
 
-private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_stream"
-private let modelProgressStreamChannelName = "flutter_whisperkit/model_progress_stream"
+private let transcriptionStreamChannelName = "flutter_whisper_kit/transcription_stream"
+private let modelProgressStreamChannelName = "flutter_whisper_kit/model_progress_stream"
 
 #if os(iOS)
 private var flutterPluginRegistrar: FlutterPluginRegistrar?
