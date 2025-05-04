@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_whisperkit/flutter_whisperkit.dart';
+import 'package:flutter_whisperkit/flutter_whisper_kit.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 void main() {

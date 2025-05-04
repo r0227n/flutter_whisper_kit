@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'whisper_kit_message.g.dart';
-import 'flutter_whisperkit_platform_interface.dart';
+import 'flutter_whisper_kit_platform_interface.dart';
 import '../models.dart';
 
 /// An implementation of [FlutterWhisperKitPlatform] that uses method channels.
