@@ -1,6 +1,6 @@
 # Flutter WhisperKit
 
-[DeepWiki](https://deepwiki.com/r0227n/flutter_whisperkit)
+[DeepWiki](https://deepwiki.com/r0227n/flutter_whisper_kit)
 
 
 A monorepo for Flutter WhisperKit packages that enable on-device speech recognition in Flutter applications using WhisperKit.
@@ -13,7 +13,7 @@ Flutter WhisperKit is a wrapper package that enables the use of WhisperKit withi
 
 This repository is organized as a monorepo containing the following packages:
 
-- **flutter_whisperkit**: The main package that provides a platform-agnostic API for using WhisperKit in Flutter applications.
+- **flutter_whisper_kit**: The main package that provides a platform-agnostic API for using WhisperKit in Flutter applications.
 - **flutter_whisper_kit_apple**: The platform implementation for Apple devices (iOS and macOS).
 
 ## Features
@@ -31,12 +31,12 @@ To use Flutter WhisperKit in your Flutter application, add the following depende
 
 ```yaml
 dependencies:
-  flutter_whisperkit: latest
+  flutter_whisper_kit: latest
 ```
 
 For detailed usage instructions, refer to the documentation in the individual package directories:
 
-- [flutter_whisperkit](packages/flutter_whisperkit/README.md)
+- [flutter_whisper_kit](packages/flutter_whisper_kit/README.md)
 - [flutter_whisper_kit_apple](packages/flutter_whisper_kit_apple/README.md)
 
 ## License

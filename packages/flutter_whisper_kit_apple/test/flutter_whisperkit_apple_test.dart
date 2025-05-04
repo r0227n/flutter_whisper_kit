@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
-import 'package:flutter_whisperkit/src/model_loader.dart';
-import 'package:flutter_whisperkit/src/models.dart';
+import 'package:flutter_whisper_kit/flutter_whisperkit_platform_interface.dart';
+import 'package:flutter_whisper_kit/src/model_loader.dart';
+import 'package:flutter_whisper_kit/src/models.dart';
 
 import 'test_utils/mocks.dart';
 import 'test_utils/mock_method_channel.dart';
