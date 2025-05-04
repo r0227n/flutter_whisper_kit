@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisper_kit/flutter_whisperkit_platform_interface.dart';
-import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
+import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
 
 import 'test_utils/mock_method_channel.dart';
 
@@ -15,7 +15,8 @@ void main() {
       final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
 
       // Set the mock method channel as the platform instance
-      FlutterWhisperKitPlatform.instance = mockMethodChannel;
+      FlutterWhisperKitPlatform.instance =
+          mockMethodChannel as FlutterWhisperKitPlatform;
       plugin = FlutterWhisperKitPlatform.instance;
     });
 
