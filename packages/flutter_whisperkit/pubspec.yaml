@@ -26,6 +26,6 @@ flutter:
   plugin:
     platforms:
       ios:
-        default_package: flutter_whisperkit_apple
+        default_package: flutter_whisper_kit_apple
       macos:
-        default_package: flutter_whisperkit_apple
+        default_package: flutter_whisper_kit_apple
