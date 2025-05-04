@@ -1,4 +1,5 @@
 # Flutter WhisperKit
+[![DeepWiki](https://deepwiki.com/r0227n/flutter_whisperkit/badge)](https://deepwiki.com/r0227n/flutter_whisperkit)
 
 Flutter WhisperKit is a Flutter plugin that provides integration with [WhisperKit](https://github.com/argmaxinc/WhisperKit), an on-device speech recognition framework. This plugin enables Flutter developers to incorporate high-quality speech transcription capabilities in their applications without writing native code.
 
