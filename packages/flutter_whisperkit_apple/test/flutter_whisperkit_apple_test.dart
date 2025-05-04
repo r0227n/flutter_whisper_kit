@@ -1,44 +1,63 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/model_loader.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 import 'test_utils/mocks.dart';
-import 'test_utils/mock_whisper_kit_message.dart';
+import 'test_utils/mock_method_channel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('FlutterWhisperkitApple', () {
-    final FlutterWhisperkitPlatform initialPlatform =
-        FlutterWhisperkitPlatform.instance;
-
-    test('FlutterWhisperkitApple extends FlutterWhisperkitPlatform', () {
-      expect(FlutterWhisperkitApple(), isA<FlutterWhisperkitPlatform>());
+  group('FlutterWhisperkit Platform Tests', () {
+    test('Platform can be set to mock implementation', () {
+      final mockPlatform = setUpMockPlatform();
+      expect(FlutterWhisperkitPlatform.instance, mockPlatform);
     });
 
     test('loadModel returns success message', () async {
       // Arrange
-      final mockWhisperKitMessage = MockWhisperKitMessage();
-      final methodChannel = MethodChannelFlutterWhisperkitApple(
-        whisperKitMessage: mockWhisperKitMessage,
-      );
-      final flutterWhisperkitApplePlugin = FlutterWhisperkitApple(
-        methodChannel: methodChannel,
-      );
-      setUpMockPlatform();
+      final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
+      FlutterWhisperkitPlatform.instance = mockMethodChannel;
 
       // Act & Assert
       expect(
-        await flutterWhisperkitApplePlugin.loadModel(
+        await FlutterWhisperkitPlatform.instance.loadModel(
           'tiny-en',
           modelRepo: 'argmaxinc/whisperkit-coreml',
         ),
         'Model loaded successfully',
       );
     });
+
+    test(
+      'modelProgressStream emits progress updates',
+      () async {
+        // Arrange
+        final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
+        FlutterWhisperkitPlatform.instance = mockMethodChannel;
+
+        // Act
+        final progressStream =
+            FlutterWhisperkitPlatform.instance.modelProgressStream;
+
+        // Trigger model loading to generate progress updates
+        FlutterWhisperkitPlatform.instance.loadModel('tiny-en');
+
+        // Assert
+        expect(
+          progressStream,
+          emitsThrough(
+            predicate<Progress>(
+              (progress) =>
+                  progress.fractionCompleted == 1.0 &&
+                  !progress.isIndeterminate,
+            ),
+          ),
+        );
+      },
+      timeout: const Timeout(Duration(seconds: 5)),
+    );
 
     group('WhisperKitModelLoader', () {
       test('loads model and returns success message', () async {

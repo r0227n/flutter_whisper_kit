@@ -7,17 +7,31 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperkitPlatform {
-  
   @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    ModelStorageLocation? storageLocation,
-  }) => Future.value('Model loaded');
+    String? modelDownloadPath,
+  }) {
+    // In a real implementation, we would use the modelDownloadPath parameter
+    // and report progress through the modelProgressStream
+    return Future.value('Model loaded');
+  }
+
+  /// Stream of model loading progress updates
+  @override
+  Stream<Progress> get modelProgressStream => Stream<Progress>.fromIterable([
+    Progress(
+      completedUnitCount: 10,
+      totalUnitCount: 10,
+      fractionCompleted: 1.0,
+      isIndeterminate: false,
+    ),
+  ]);
 
   @override
-  Future<String?> transcribeFromFile(
+  Future<TranscriptionResult?> transcribeFromFile(
     String filePath, {
     DecodingOptions options = const DecodingOptions(
       verbose: true,
@@ -38,10 +52,7 @@ class MockFlutterWhisperkitPlatform
     ),
   }) {
     if (filePath.isEmpty) {
-      throw WhisperKitError(
-        code: WhisperKitErrorCode.invalidArguments,
-        message: 'File path cannot be empty',
-      );
+      throw InvalidArgumentsError(message: 'File path cannot be empty');
     }
 
     // Mock JSON response for a successful transcription
@@ -59,7 +70,23 @@ class MockFlutterWhisperkitPlatform
           "temperature": 1.0,
           "avgLogprob": -0.5,
           "compressionRatio": 1.2,
-          "noSpeechProb": 0.1
+          "noSpeechProb": 0.1,
+          "words": [
+            {
+              "word": "Hello",
+              "tokens": [1],
+              "start": 0.0,
+              "end": 1.0,
+              "probability": 0.9
+            },
+            {
+              "word": "world",
+              "tokens": [2],
+              "start": 1.0,
+              "end": 2.0,
+              "probability": 0.8
+            }
+          ]
         },
         {
           "id": 1,
@@ -71,7 +98,37 @@ class MockFlutterWhisperkitPlatform
           "temperature": 1.0,
           "avgLogprob": -0.4,
           "compressionRatio": 1.3,
-          "noSpeechProb": 0.05
+          "noSpeechProb": 0.05,
+          "words": [
+            {
+              "word": "This",
+              "tokens": [4],
+              "start": 2.0,
+              "end": 2.5,
+              "probability": 0.9
+            },
+            {
+              "word": "is",
+              "tokens": [5],
+              "start": 2.5,
+              "end": 3.0,
+              "probability": 0.8
+            },
+            {
+              "word": "a",
+              "tokens": [6],
+              "start": 3.0,
+              "end": 3.5,
+              "probability": 0.7
+            },
+            {
+              "word": "test",
+              "tokens": [7],
+              "start": 3.5,
+              "end": 4.0,
+              "probability": 0.9
+            }
+          ]
         }
       ],
       "language": "en",
@@ -88,7 +145,7 @@ class MockFlutterWhisperkitPlatform
     }
     ''';
 
-    return Future.value(mockJson);
+    return Future.value(TranscriptionResult.fromJsonString(mockJson));
   }
 
   @override
@@ -113,12 +170,13 @@ class MockFlutterWhisperkitPlatform
   }) => Future.value('Recording started');
 
   @override
-  Future<String?> stopRecording({bool loop = true}) => 
+  Future<String?> stopRecording({bool loop = true}) =>
       Future.value('Recording stopped');
 
   @override
-  Stream<TranscriptionResult> get transcriptionStream => Stream<TranscriptionResult>.fromIterable([
-    TranscriptionResult.fromJsonString('''
+  Stream<TranscriptionResult> get transcriptionStream =>
+      Stream<TranscriptionResult>.fromIterable([
+        TranscriptionResult.fromJsonString('''
       {
         "text": "Test transcription",
         "segments": [
@@ -140,12 +198,12 @@ class MockFlutterWhisperkitPlatform
           "fullPipeline": 1.0
         }
       }
-    ''')
-  ]);
+    '''),
+      ]);
 }
 
 /// Sets up a mock platform for testing.
-/// 
+///
 /// Returns the mock platform instance.
 MockFlutterWhisperkitPlatform setUpMockPlatform() {
   final mockPlatform = MockFlutterWhisperkitPlatform();

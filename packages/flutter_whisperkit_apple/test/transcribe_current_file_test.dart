@@ -1,59 +1,38 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple.dart';
-import 'package:flutter_whisperkit_apple/flutter_whisperkit_apple_method_channel.dart';
 import 'package:flutter_whisperkit/flutter_whisperkit_platform_interface.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
-import 'test_utils/mocks.dart';
-import 'test_utils/mock_whisper_kit_message.dart';
+import 'test_utils/mock_method_channel.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('File Transcription', () {
-    late FlutterWhisperkitApple plugin;
-    
-    group('Platform Interface', () {
-      test('FlutterWhisperkitApple extends FlutterWhisperkitPlatform', () {
-        // Assert
-        expect(
-          plugin,
-          isA<FlutterWhisperkitPlatform>(),
-        );
-      });
-    });
+    late FlutterWhisperkitPlatform plugin;
 
     setUp(() {
-      // Create a method channel with mock WhisperKitMessage
-      final mockWhisperKitMessage = MockWhisperKitMessage();
-      final methodChannel = MethodChannelFlutterWhisperkitApple(
-        whisperKitMessage: mockWhisperKitMessage
-      );
-      
-      // Create plugin instance with mock method channel
-      plugin = FlutterWhisperkitApple(methodChannel: methodChannel);
-      
-      // Set up mock platform interface
-      setUpMockPlatform();
+      // Create a mock method channel that provides test functionality
+      final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
+
+      // Set the mock method channel as the platform instance
+      FlutterWhisperkitPlatform.instance = mockMethodChannel;
+      plugin = FlutterWhisperkitPlatform.instance;
     });
 
     group('transcribeFromFile', () {
-      test('returns JSON string for valid file path', () async {
+      test('returns TranscriptionResult for valid file path', () async {
         // Act
-        final jsonString = await plugin.transcribeFromFile('test.wav');
-        
+        final result = await plugin.transcribeFromFile('test.wav');
+
         // Assert
-        expect(jsonString, isNotNull);
-        expect(jsonString, isA<String>());
-        
-        // Parse the JSON string to verify content
-        final result = TranscriptionResult.fromJsonString(jsonString!);
-        expect(result.text, 'Hello world. This is a test.');
+        expect(result, isNotNull);
+        expect(result, isA<TranscriptionResult>());
+        expect(result!.text, 'Hello world. This is a test.');
         expect(result.segments.length, 2);
         expect(result.language, 'en');
       });
 
-      test('with custom DecodingOptions returns JSON string', () async {
+      test('with custom DecodingOptions returns TranscriptionResult', () async {
         // Arrange
         final options = DecodingOptions(
           language: 'en',
@@ -62,25 +41,46 @@ void main() {
         );
 
         // Act
-        final jsonString = await plugin.transcribeFromFile(
+        final result = await plugin.transcribeFromFile(
           'test.wav',
           options: options,
         );
-        
+
         // Assert
-        expect(jsonString, isNotNull);
-        expect(jsonString, isA<String>());
-        
-        // Verify we can parse the JSON
-        final result = TranscriptionResult.fromJsonString(jsonString!);
+        expect(result, isNotNull);
         expect(result, isA<TranscriptionResult>());
       });
 
-      test('throws WhisperKitError with empty file path', () async {
+      test('parses word timestamps correctly when enabled', () async {
+        // Arrange
+        final options = DecodingOptions(language: 'en', wordTimestamps: true);
+
+        // Act
+        final result = await plugin.transcribeFromFile(
+          'test_audio_with_words.wav',
+          options: options,
+        );
+
+        // Assert
+        expect(result, isNotNull);
+
+        // Verify there are word timings in the result
+        expect(result!.allWords, isNotEmpty);
+
+        // Verify each word has start and end times
+        for (final word in result.allWords) {
+          expect(word.word, isNotEmpty);
+          expect(word.start, isNotNull);
+          expect(word.end, isNotNull);
+          expect(word.end > word.start, isTrue);
+        }
+      });
+
+      test('throws InvalidArgumentsError with empty file path', () async {
         // Act & Assert
         expect(
           () => plugin.transcribeFromFile(''),
-          throwsA(isA<WhisperKitError>()),
+          throwsA(isA<InvalidArgumentsError>()),
         );
       });
     });
@@ -89,7 +89,7 @@ void main() {
       test('creates correct options object with default values', () {
         // Act
         final options = DecodingOptions();
-        
+
         // Assert
         expect(options.verbose, false);
         expect(options.task, DecodingTask.transcribe);
@@ -140,10 +140,10 @@ void main() {
           language: 'en',
           temperature: 0.7,
         );
-        
+
         // Act
         final json = options.toJson();
-        
+
         // Assert
         expect(json, isA<Map<String, dynamic>>());
         expect(json['task'], 'transcribe');

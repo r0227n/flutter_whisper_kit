@@ -57,16 +57,24 @@ The tests cover the following plugin functionality:
 1. **Model Loading**
    - Loading WhisperKit models with various configurations
    - Managing model storage locations
+   - Tracking and reporting download progress
+   - Testing model prewarming behavior
+   - Handling errors during model loading
 
 2. **File Transcription**
    - Transcribing audio files with default and custom options
    - Handling of invalid file paths
    - Parsing and validating transcription results
+   - Testing word-level timestamp accuracy
+   - Verifying segment information in transcription results
 
 3. **Real-time Transcription**
    - Starting and stopping audio recording
    - Configuring transcription parameters
-   - Streaming transcription results
+   - Streaming transcription results in real-time, including edge cases and parameter configurations, beyond the basic functionality tested in `realtime_transcription_test.dart`
+   - Handling microphone permissions
+   - Testing loop and non-loop recording modes
+   - Verifying transcription result format and content
 
 4. **Configuration Options**
    - Creating and customizing DecodingOptions

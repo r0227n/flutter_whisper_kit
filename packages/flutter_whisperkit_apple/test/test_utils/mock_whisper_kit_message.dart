@@ -16,8 +16,10 @@ class MockWhisperKitMessage implements WhisperKitMessage {
     String? variant,
     String? modelRepo,
     bool? redownload,
-    int? storageLocation,
+    String? modelDownloadPath,
   ) async {
+    // In a real implementation, we would use the modelDownloadPath parameter
+    // and report progress through the event channel
     return 'Model loaded successfully';
   }
 
@@ -28,8 +30,7 @@ class MockWhisperKitMessage implements WhisperKitMessage {
     Map<String, Object?> options,
   ) async {
     if (filePath.isEmpty) {
-      throw WhisperKitError(
-        code: WhisperKitErrorCode.invalidArguments,
+      throw InvalidArgumentsError(
         message: 'File path cannot be empty',
       );
     }
