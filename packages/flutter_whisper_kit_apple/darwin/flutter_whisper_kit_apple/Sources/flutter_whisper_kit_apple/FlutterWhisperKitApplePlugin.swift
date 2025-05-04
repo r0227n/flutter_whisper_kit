@@ -51,9 +51,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   ///   - modelRepo: The repository to download the model from (optional)
   ///   - redownload: Whether to force redownload the model (optional)
   ///   - modelDownloadPath: Custom path for model storage (optional)
+  ///   - hasProgressCallback: Indicates whether to enable progress updates during model download (optional)
   ///   - completion: Callback with result of the operation
   func loadModel(
-    variant: String?, modelRepo: String?, redownload: Bool?, modelDownloadPath: String?,
+    variant: String?, modelRepo: String?, redownload: Bool?, modelDownloadPath: String?, hasProgressCallback: Bool,
     completion: @escaping (Result<String?, Error>) -> Void
   ) {
     guard let variant = variant else {
@@ -123,11 +124,11 @@ private class WhisperKitApiImpl: WhisperKitMessage {
             modelFolder = try await WhisperKit.download(
               variant: variant,
               from: modelRepo ?? "argmaxinc/whisperkit-coreml",
-              progressCallback: { progress in
+              progressCallback: hasProgressCallback ? { progress in
                 if let streamHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
                   streamHandler.sendProgress(progress)
                 }
-              }
+              } : nil,
             )
             // Save the downloaded model folder to the specified model directory
             if let downloadedFolder = modelFolder {

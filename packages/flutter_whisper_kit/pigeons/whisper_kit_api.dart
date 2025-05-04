@@ -16,6 +16,7 @@ abstract class WhisperKitMessage {
     String? modelRepo,
     bool? redownload,
     String? modelDownloadPath,
+    bool hasProgressCallback,
   );
   @async
   String? transcribeFromFile(String filePath, Map<String, Object?> options);

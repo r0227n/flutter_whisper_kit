@@ -64,6 +64,8 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   ///   Set to true to ensure you have the latest version of the model.
   /// - [modelDownloadPath]: Custom path where the model should be downloaded.
   ///   If not provided, the model will be stored in the default location.
+  /// - [hasProgressCallback]: Whether to provide a progress callback.
+  ///   If true, the progress callback will be provided to the native code.
   ///
   /// Returns a [Future] that completes with a success message when the model
   /// is loaded successfully, or an error message if loading fails.
@@ -74,6 +76,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
     String? modelRepo,
     bool? redownload,
     String? modelDownloadPath,
+    bool hasProgressCallback = false,
   }) {
     throw UnimplementedError('loadModel() has not been implemented.');
   }
