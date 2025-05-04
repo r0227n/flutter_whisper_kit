@@ -31,12 +31,12 @@ abstract class FlutterWhisperkitPlatform extends PlatformInterface {
   /// [variant] - The model variant to load (e.g., 'tiny-en', 'base', 'small', 'medium', 'large-v2').
   /// [modelRepo] - The repository to download the model from (default: 'argmaxinc/whisperkit-coreml').
   /// [redownload] - Whether to force redownload the model even if it exists locally.
-  /// [storageLocation] - Where to store the model (ModelStorageLocation.packageDirectory or ModelStorageLocation.userFolder).
+  /// [modelDownloadPath] - The path to download the model to.
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
     bool? redownload,
-    ModelStorageLocation? storageLocation,
+    String? modelDownloadPath,
   }) {
     throw UnimplementedError('loadModel() has not been implemented.');
   }
@@ -106,7 +106,7 @@ abstract class FlutterWhisperkitPlatform extends PlatformInterface {
   Stream<TranscriptionResult> get transcriptionStream {
     throw UnimplementedError('transcriptionStream has not been implemented.');
   }
-  
+
   /// Stream of model loading progress updates.
   Stream<Progress> get modelProgressStream {
     throw UnimplementedError('modelProgressStream has not been implemented.');

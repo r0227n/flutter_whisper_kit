@@ -9,11 +9,6 @@ import WhisperKit
   #error("Unsupported platform.")
 #endif
 
-enum ModelStorageLocation: Int64 {
-  case packageDirectory = 0
-  case userFolder = 1
-}
-
 private let transcriptionStreamChannelName = "flutter_whisperkit/transcription_stream"
 private let modelProgressStreamChannelName = "flutter_whisperkit/model_progress_stream"
 
@@ -23,14 +18,13 @@ private var flutterPluginRegistrar: FlutterPluginRegistrar?
 
 private class WhisperKitApiImpl: WhisperKitMessage {
   private var whisperKit: WhisperKit?
-  private var modelStorageLocation: ModelStorageLocation = .packageDirectory
   private var isRecording: Bool = false
   private var transcriptionTask: Task<Void, Never>?
   public static var transcriptionStreamHandler: TranscriptionStreamHandler?
   public static var modelProgressStreamHandler: ModelProgressStreamHandler?
 
   func loadModel(
-    variant: String?, modelRepo: String?, redownload: Bool?, storageLocation: Int64?,
+    variant: String?, modelRepo: String?, redownload: Bool?, modelDownloadPath: String?,
     completion: @escaping (Result<String?, Error>) -> Void
   ) {
     guard let variant = variant else {
@@ -42,15 +36,9 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       return
     }
 
-    if let storageLocation = storageLocation,
-      let location = ModelStorageLocation(rawValue: storageLocation)
-    {
-      modelStorageLocation = location
-    }
-
     Task {
       do {
-        let modelDirURL = getModelFolderPath()
+        let modelDirURL = getModelFolderPath(path: modelDownloadPath)
 
         do {
           if !FileManager.default.fileExists(atPath: modelDirURL.path) {
@@ -90,7 +78,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         }
 
         var modelFolder: URL?
-        let localModels = await getLocalModels()
+        let localModels = await getLocalModels(path: modelDownloadPath)
 
         if localModels.contains(variant) && !(redownload ?? false) {
           modelFolder = modelDirURL.appendingPathComponent(variant)
@@ -372,26 +360,24 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     return mergedResults
   }
 
-  private func getModelFolderPath() -> URL {
-    switch modelStorageLocation {
-    case .packageDirectory:
+  private func getModelFolderPath(path: String?) -> URL {
+    if path == nil {
       if let appSupport = FileManager.default.urls(
         for: .applicationSupportDirectory, in: .userDomainMask
       ).first {
         return appSupport.appendingPathComponent("WhisperKitModels")
       }
       return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
-
-    case .userFolder:
-      let userPath = URL(fileURLWithPath: "<path_to_your_custom_directory>")
-        let testFile = userPath.appendingPathComponent("whisperkit_write_test.txt")
-        do {
-          try "test".write(to: testFile, atomically: true, encoding: .utf8)
-          try FileManager.default.removeItem(at: testFile)
-          return userPath.appendingPathComponent("WhisperKitModels")
-        } catch {
-          print("Cannot write to custom directory: \(error.localizedDescription)")
-        }
+    } else {
+      let userPath = URL(fileURLWithPath: path!)
+      let testFile = userPath.appendingPathComponent("whisperkit_write_test.txt")
+      do {
+        try "test".write(to: testFile, atomically: true, encoding: .utf8)
+        try FileManager.default.removeItem(at: testFile)
+        return userPath.appendingPathComponent("WhisperKitModels")
+      } catch {
+        print("Cannot write to custom directory: \(error.localizedDescription)")
+      }
       
       return getDocumentsDirectory().appendingPathComponent("WhisperKitModels")
     }
@@ -401,8 +387,8 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
   }
 
-  private func getLocalModels() async -> [String] {
-    let modelPath = getModelFolderPath()
+  private func getLocalModels(path: String?) async -> [String] {
+    let modelPath = getModelFolderPath(path: path)
     var localModels: [String] = []
 
     do {
