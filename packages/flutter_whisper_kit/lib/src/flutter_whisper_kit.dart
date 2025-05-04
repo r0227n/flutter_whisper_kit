@@ -64,6 +64,7 @@ class FlutterWhisperKit {
         modelRepo: modelRepo,
         redownload: redownload,
         modelDownloadPath: modelDownloadPath,
+        hasProgressCallback: onProgress != null,
       );
     } on PlatformException catch (e) {
       // Convert platform exceptions to WhisperKitError for better error handling

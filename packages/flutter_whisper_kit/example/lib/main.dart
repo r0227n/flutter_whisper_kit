@@ -19,6 +19,7 @@ class _MyAppState extends State<MyApp> {
   bool _isRecording = false;
   bool _isModelLoaded = false;
   String _modelStatus = 'Model not loaded';
+  double _modelLoadProgress = 0.0;
 
   final _flutterWhisperkitPlugin = FlutterWhisperKit();
   StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
@@ -45,6 +46,11 @@ class _MyAppState extends State<MyApp> {
         'tiny',
         modelRepo: 'argmaxinc/whisperkit-coreml',
         redownload: true,
+        onProgress: (progress) {
+          setState(() {
+            _modelLoadProgress = progress.fractionCompleted;
+          });
+        },
       );
 
       setState(() {
@@ -102,6 +108,11 @@ class _MyAppState extends State<MyApp> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (_modelLoadProgress > 0 && _modelLoadProgress < 1) ...[
+                const SizedBox(height: 8),
+                LinearProgressIndicator(value: _modelLoadProgress),
+                Text('${(_modelLoadProgress * 100).toStringAsFixed(1)}%'),
+              ],
               Text(_modelStatus),
               const SizedBox(height: 16),
               Expanded(
