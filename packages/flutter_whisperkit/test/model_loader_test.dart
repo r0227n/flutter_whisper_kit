@@ -34,7 +34,6 @@ void main() {
           variant: 'base',
           modelRepo: 'argmaxinc/whisperkit-coreml',
           redownload: true,
-          storageLocation: ModelStorageLocation.applicationSupport,
         ),
         'Model loaded',
       );
