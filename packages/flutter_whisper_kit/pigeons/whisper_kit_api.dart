@@ -11,12 +11,7 @@ import 'package:pigeon/pigeon.dart';
 @HostApi()
 abstract class WhisperKitMessage {
   @async
-  String? loadModel(
-    String? variant,
-    String? modelRepo,
-    bool redownload,
-    bool hasProgressCallback,
-  );
+  String? loadModel(String? variant, String? modelRepo, bool redownload);
   @async
   String? transcribeFromFile(String filePath, Map<String, Object?> options);
   @async

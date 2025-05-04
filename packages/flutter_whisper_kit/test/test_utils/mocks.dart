@@ -12,7 +12,6 @@ class MockFlutterWhisperkitPlatform
     String? variant, {
     String? modelRepo,
     bool redownload = false,
-    bool hasProgressCallback = false,
   }) => Future.value('Model loaded');
 
   @override
