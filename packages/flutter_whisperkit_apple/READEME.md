@@ -113,29 +113,6 @@ The plugin uses the following error code system to report errors:
 | **5000-5999** | **Configuration and Parameters** | **Errors related to configuration and input parameters** |
 | 5001 | Parameters | File path is required |
 
-### Error Handling Example
-
-```dart
-try {
-  final result = await whisperKitApple.transcribeFromFile(filePath);
-  print('Transcription: $result');
-} catch (e) {
-  if (e is PlatformException) {
-    final code = e.code;
-    if (code.startsWith('1')) {
-      print('Model error: ${e.message}');
-      // Handle model errors
-    } else if (code.startsWith('2')) {
-      print('Transcription error: ${e.message}');
-      // Handle transcription errors
-    } else if (code.startsWith('4')) {
-      print('File system error: ${e.message}');
-      // Handle file errors
-    }
-  }
-}
-```
-
 ## Implementation Details
 
 The model loading functionality is implemented in Swift for optimal performance and direct access to WhisperKit's APIs. The implementation:
