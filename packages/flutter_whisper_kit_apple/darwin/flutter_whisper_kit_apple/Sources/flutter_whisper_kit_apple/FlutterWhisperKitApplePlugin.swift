@@ -51,6 +51,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   ///   - modelRepo: The repository to download the model from (optional)
   ///   - redownload: Whether to force redownload the model (optional)
   ///   - modelDownloadPath: Custom path for model storage (optional)
+  ///   - hasProgressCallback: Indicates whether to enable progress updates during model download (optional)
   ///   - completion: Callback with result of the operation
   func loadModel(
     variant: String?, modelRepo: String?, redownload: Bool?, modelDownloadPath: String?, hasProgressCallback: Bool,
