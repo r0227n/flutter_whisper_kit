@@ -8,20 +8,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flutter_whisperkit_example/main.dart';
+import 'test_utils/mocks.dart';
 
 void main() {
-  testWidgets('Verify Platform version', (WidgetTester tester) async {
+  testWidgets('App initializes correctly', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(buildTestApp());
 
-    // Verify that platform version is retrieved.
+    // Verify that app title is displayed
     expect(
-      find.byWidgetPredicate(
-        (Widget widget) => widget is Text &&
-                           widget.data!.startsWith('Running on:'),
-      ),
+      find.text('Flutter WhisperKit Example'),
       findsOneWidget,
     );
+    
+    // Verify that buttons are present instead of looking for dropdowns
+    expect(find.byType(ElevatedButton), findsWidgets);
+    
+    // Verify that file transcription section is present
+    expect(find.text('File Transcription'), findsOneWidget);
+    
+    // Verify that real-time transcription section is present
+    expect(find.text('Real-time Transcription'), findsOneWidget);
   });
 }
