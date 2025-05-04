@@ -14,7 +14,7 @@ Flutter WhisperKit Apple プラグインは、Flutter アプリケーション�
 2. **プラットフォームチャネル通信**: Dart コードとネイティブ Apple プラットフォームコードの間のブリッジ
 3. **ネイティブ実装**: WhisperKit フレームワークとインターフェースする iOS/macOS Swift コード
 
-![アーキテクチャ図](https://github.com/r0227n/flutter_whisperkit/raw/doc/docs/images/architecture.png)
+![アーキテクチャ図](https://github.com/r0227n/flutter_whisper_kit/raw/doc/docs/images/architecture.png)
 
 ## 統合手順
 
@@ -203,5 +203,5 @@ try {
 ## リソース
 
 - [WhisperKit GitHub リポジトリ](https://github.com/argmaxinc/WhisperKit)
-- [Flutter WhisperKit Apple プラグイン](https://github.com/r0227n/flutter_whisperkit)
+- [Flutter WhisperKit Apple プラグイン](https://github.com/r0227n/flutter_whisper_kit)
 - [HuggingFace の WhisperKit モデル](https://huggingface.co/argmaxinc/whisperkit-coreml)

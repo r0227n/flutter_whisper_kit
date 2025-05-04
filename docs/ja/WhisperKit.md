@@ -121,7 +121,7 @@ Flutter アプリケーションで WhisperKit を使用するには：
 2. Dart コードでプラグインをインポート
 3. プラグインを初期化し、その API を使用して文字起こしを実行
 
-Flutter プラグインの使用に関する詳細情報については、[Flutter WhisperKit Apple ドキュメント](https://github.com/r0227n/flutter_whisperkit)を参照してください。
+Flutter プラグインの使用に関する詳細情報については、[Flutter WhisperKit Apple ドキュメント](https://github.com/r0227n/flutter_whisper_kit)を参照してください。
 
 ## 追加リソース
 
