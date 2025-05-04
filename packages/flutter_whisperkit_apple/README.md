@@ -49,17 +49,32 @@ The native implementation:
 4. Processes real-time audio from the microphone
 5. Streams transcription results back to Flutter
 
-### Error Handling
+### Error Codes
 
-The plugin uses a structured error code system to report issues back to Flutter:
+The plugin uses the following error code system to report errors:
 
-| Error Code Range | Category |
-|------------------|----------|
-| 1000-1999 | Model Initialization and Loading |
-| 2000-2999 | Transcription and Processing |
-| 3000-3999 | Recording and Audio Capture |
-| 4000-4999 | File System and Permissions |
-| 5000-5999 | Configuration and Parameters |
+| Error Code | Category | Description |
+|------------|----------|-------------|
+| **1000-1999** | **Model Initialization and Loading** | **Errors related to model initialization and loading** |
+| 1001 | Model Initialization | Model variant is required |
+| 1002 | Model Initialization | Failed to initialize WhisperKit |
+| 1003 | Model Loading | Failed to get model folder |
+| 1005 | Model Loading | Failed to download model |
+| **2000-2999** | **Transcription and Processing** | **Errors related to audio transcription and processing** |
+| 2001 | Transcription | WhisperKit instance not initialized. Call loadModel first |
+| 2002 | Transcription | Failed to serialize transcription result |
+| 2003 | Transcription | Failed to create JSON string from transcription result |
+| 2004 | Transcription | Transcription result is nil |
+| **3000-3999** | **Recording and Audio Capture** | **Errors related to recording functionality** |
+| 3001 | Recording | WhisperKit instance not initialized. Call loadModel first |
+| 3002 | Recording | Microphone access was not granted |
+| 3003 | Recording | Not enough audio data for transcription |
+| **4000-4999** | **File System and Permissions** | **Errors related to file access and permissions** |
+| 4001 | File System | Cannot write to model directory |
+| 4002 | File System | Audio file does not exist at specified path |
+| 4003 | File System | No read permission for audio file at specified path |
+| **5000-5999** | **Configuration and Parameters** | **Errors related to configuration and input parameters** |
+| 5001 | Parameters | File path is required |
 
 ## References
 
