@@ -9,11 +9,11 @@ void main() {
 
   group('File Transcription', () {
     late FlutterWhisperkitPlatform plugin;
-    
+
     setUp(() {
       // Create a mock method channel that provides test functionality
       final mockMethodChannel = MockMethodChannelFlutterWhisperkit();
-      
+
       // Set the mock method channel as the platform instance
       FlutterWhisperkitPlatform.instance = mockMethodChannel;
       plugin = FlutterWhisperkitPlatform.instance;
@@ -23,7 +23,7 @@ void main() {
       test('returns TranscriptionResult for valid file path', () async {
         // Act
         final result = await plugin.transcribeFromFile('test.wav');
-        
+
         // Assert
         expect(result, isNotNull);
         expect(result, isA<TranscriptionResult>());
@@ -45,31 +45,28 @@ void main() {
           'test.wav',
           options: options,
         );
-        
+
         // Assert
         expect(result, isNotNull);
         expect(result, isA<TranscriptionResult>());
       });
-      
+
       test('parses word timestamps correctly when enabled', () async {
         // Arrange
-        final options = DecodingOptions(
-          language: 'en',
-          wordTimestamps: true,
-        );
+        final options = DecodingOptions(language: 'en', wordTimestamps: true);
 
         // Act
         final result = await plugin.transcribeFromFile(
           'test_audio_with_words.wav',
           options: options,
         );
-        
+
         // Assert
         expect(result, isNotNull);
-        
+
         // Verify there are word timings in the result
         expect(result!.allWords, isNotEmpty);
-        
+
         // Verify each word has start and end times
         for (final word in result.allWords) {
           expect(word.word, isNotEmpty);
@@ -92,7 +89,7 @@ void main() {
       test('creates correct options object with default values', () {
         // Act
         final options = DecodingOptions();
-        
+
         // Assert
         expect(options.verbose, false);
         expect(options.task, DecodingTask.transcribe);
@@ -143,10 +140,10 @@ void main() {
           language: 'en',
           temperature: 0.7,
         );
-        
+
         // Act
         final json = options.toJson();
-        
+
         // Assert
         expect(json, isA<Map<String, dynamic>>());
         expect(json['task'], 'transcribe');

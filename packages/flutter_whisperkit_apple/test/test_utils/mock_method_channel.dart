@@ -3,11 +3,12 @@ import 'package:flutter_whisperkit/flutter_whisperkit_method_channel.dart';
 import 'package:flutter_whisperkit/src/models.dart';
 
 /// A mock implementation of [MethodChannelFlutterWhisperkit] for testing.
-class MockMethodChannelFlutterWhisperkit extends MethodChannelFlutterWhisperkit {
+class MockMethodChannelFlutterWhisperkit
+    extends MethodChannelFlutterWhisperkit {
   /// Stream controller for test transcription results
   final StreamController<TranscriptionResult> _testStreamController =
       StreamController<TranscriptionResult>.broadcast();
-      
+
   /// Stream controller for model progress updates
   final StreamController<Progress> _modelProgressStreamController =
       StreamController<Progress>.broadcast();
@@ -29,12 +30,14 @@ class MockMethodChannelFlutterWhisperkit extends MethodChannelFlutterWhisperkit 
 
   /// Override the transcription stream to return our test stream
   @override
-  Stream<TranscriptionResult> get transcriptionStream => _testStreamController.stream;
-  
+  Stream<TranscriptionResult> get transcriptionStream =>
+      _testStreamController.stream;
+
   /// Override the model progress stream to return our test stream
   @override
-  Stream<Progress> get modelProgressStream => _modelProgressStreamController.stream;
-  
+  Stream<Progress> get modelProgressStream =>
+      _modelProgressStreamController.stream;
+
   /// Override loadModel to support progress tracking
   @override
   Future<String?> loadModel(
@@ -55,10 +58,10 @@ class MockMethodChannelFlutterWhisperkit extends MethodChannelFlutterWhisperkit 
       );
       await Future.delayed(Duration(milliseconds: 10));
     }
-    
+
     return 'Model loaded successfully';
   }
-  
+
   /// Override transcribeFromFile to return a mock result
   @override
   Future<TranscriptionResult?> transcribeFromFile(
@@ -66,11 +69,9 @@ class MockMethodChannelFlutterWhisperkit extends MethodChannelFlutterWhisperkit 
     DecodingOptions options = const DecodingOptions(),
   }) async {
     if (filePath.isEmpty) {
-      throw InvalidArgumentsError(
-        message: 'File path cannot be empty',
-      );
+      throw InvalidArgumentsError(message: 'File path cannot be empty');
     }
-    
+
     // Return a mock transcription result
     return TranscriptionResult.fromJsonString('''
     {
@@ -88,8 +89,20 @@ class MockMethodChannelFlutterWhisperkit extends MethodChannelFlutterWhisperkit 
           "compressionRatio": 1.2,
           "noSpeechProb": 0.1,
           "words": [
-            {"word": "Hello", "start": 0.0, "end": 0.5},
-            {"word": "world", "start": 0.5, "end": 1.0}
+            {
+              "word": "Hello",
+              "tokens": [1],
+              "start": 0.0,
+              "end": 1.0,
+              "probability": 0.9
+            },
+            {
+              "word": "world",
+              "tokens": [2],
+              "start": 1.0,
+              "end": 2.0,
+              "probability": 0.8
+            }
           ]
         },
         {
@@ -104,21 +117,52 @@ class MockMethodChannelFlutterWhisperkit extends MethodChannelFlutterWhisperkit 
           "compressionRatio": 1.3,
           "noSpeechProb": 0.05,
           "words": [
-            {"word": "This", "start": 2.0, "end": 2.3},
-            {"word": "is", "start": 2.3, "end": 2.5},
-            {"word": "a", "start": 2.5, "end": 2.7},
-            {"word": "test", "start": 2.7, "end": 3.0}
+            {
+              "word": "This",
+              "tokens": [4],
+              "start": 2.0,
+              "end": 2.5,
+              "probability": 0.9
+            },
+            {
+              "word": "is",
+              "tokens": [5],
+              "start": 2.5,
+              "end": 3.0,
+              "probability": 0.8
+            },
+            {
+              "word": "a",
+              "tokens": [6],
+              "start": 3.0,
+              "end": 3.5,
+              "probability": 0.7
+            },
+            {
+              "word": "test",
+              "tokens": [7],
+              "start": 3.5,
+              "end": 4.0,
+              "probability": 0.9
+            }
           ]
         }
       ],
       "language": "en",
       "timings": {
+        "pipelineStart": 0.0,
+        "firstTokenTime": 0.4,
+        "inputAudioSeconds": 4.0,
+        "audioLoading": 0.1,
+        "audioProcessing": 0.2,
+        "encoding": 0.3,
+        "decodingLoop": 0.5,
         "fullPipeline": 1.0
       }
     }
     ''');
   }
-  
+
   /// Override startRecording to support custom options
   @override
   Future<String?> startRecording({
@@ -131,7 +175,8 @@ class MockMethodChannelFlutterWhisperkit extends MethodChannelFlutterWhisperkit 
   }) async {
     // Emit a test result to the stream after a short delay
     Future.delayed(Duration(milliseconds: 500), () {
-      _testStreamController.add(TranscriptionResult.fromJsonString('''
+      _testStreamController.add(
+        TranscriptionResult.fromJsonString('''
         {
           "text": "Test transcription",
           "segments": [
@@ -153,12 +198,13 @@ class MockMethodChannelFlutterWhisperkit extends MethodChannelFlutterWhisperkit 
             "fullPipeline": 1.0
           }
         }
-      '''));
+      '''),
+      );
     });
-    
+
     return 'Recording started';
   }
-  
+
   /// Override stopRecording
   @override
   Future<String?> stopRecording({bool loop = true}) async {

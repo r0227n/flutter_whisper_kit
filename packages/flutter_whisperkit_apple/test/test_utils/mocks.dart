@@ -70,7 +70,23 @@ class MockFlutterWhisperkitPlatform
           "temperature": 1.0,
           "avgLogprob": -0.5,
           "compressionRatio": 1.2,
-          "noSpeechProb": 0.1
+          "noSpeechProb": 0.1,
+          "words": [
+            {
+              "word": "Hello",
+              "tokens": [1],
+              "start": 0.0,
+              "end": 1.0,
+              "probability": 0.9
+            },
+            {
+              "word": "world",
+              "tokens": [2],
+              "start": 1.0,
+              "end": 2.0,
+              "probability": 0.8
+            }
+          ]
         },
         {
           "id": 1,
@@ -82,7 +98,37 @@ class MockFlutterWhisperkitPlatform
           "temperature": 1.0,
           "avgLogprob": -0.4,
           "compressionRatio": 1.3,
-          "noSpeechProb": 0.05
+          "noSpeechProb": 0.05,
+          "words": [
+            {
+              "word": "This",
+              "tokens": [4],
+              "start": 2.0,
+              "end": 2.5,
+              "probability": 0.9
+            },
+            {
+              "word": "is",
+              "tokens": [5],
+              "start": 2.5,
+              "end": 3.0,
+              "probability": 0.8
+            },
+            {
+              "word": "a",
+              "tokens": [6],
+              "start": 3.0,
+              "end": 3.5,
+              "probability": 0.7
+            },
+            {
+              "word": "test",
+              "tokens": [7],
+              "start": 3.5,
+              "end": 4.0,
+              "probability": 0.9
+            }
+          ]
         }
       ],
       "language": "en",
