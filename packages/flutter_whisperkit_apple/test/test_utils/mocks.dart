@@ -53,8 +53,7 @@ class MockFlutterWhisperkitPlatform
     ),
   }) {
     if (filePath.isEmpty) {
-      throw WhisperKitError(
-        code: WhisperKitErrorCode.invalidArguments,
+      throw InvalidArgumentsError(
         message: 'File path cannot be empty',
       );
     }
