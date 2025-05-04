@@ -193,223 +193,356 @@ class _MyAppState extends State<MyApp> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 8.0,
             children: [
-              // Model selection dropdown
-              Row(
-                children: [
-                  const Text('Select Model: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                  Expanded(
-                    child: DropdownButton<String>(
-                      value: _selectedModel,
-                      isExpanded: true,
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            _selectedModel = newValue;
-                            _isModelLoaded = false;
-                            _asyncLoadModel = _loadModel();
-                          });
-                        }
-                      },
-                      items: _modelVariants.map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
+              // Model and language selection
+              ModelSelectionDropdown(
+                selectedModel: _selectedModel,
+                modelVariants: _modelVariants,
+                onModelChanged: (newModel) {
+                  setState(() {
+                    _selectedModel = newModel;
+                    _isModelLoaded = false;
+                    _asyncLoadModel = _loadModel();
+                  });
+                },
               ),
               
-              // Language selection dropdown
-              Row(
-                children: [
-                  const Text('Select Language: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                  Expanded(
-                    child: DropdownButton<String>(
-                      value: _selectedLanguage,
-                      isExpanded: true,
-                      onChanged: (String? newValue) {
-                        if (newValue != null) {
-                          setState(() {
-                            _selectedLanguage = newValue;
-                          });
-                        }
-                      },
-                      items: _languages.map<DropdownMenuItem<String>>((String value) {
-                        // Show language code and name for better readability
-                        String displayText = value;
-                        if (value == 'auto') displayText = 'auto (Auto-detect)';
-                        else if (value == 'en') displayText = 'en (English)';
-                        else if (value == 'ja') displayText = 'ja (Japanese)';
-                        else if (value == 'zh') displayText = 'zh (Chinese)';
-                        else if (value == 'de') displayText = 'de (German)';
-                        else if (value == 'es') displayText = 'es (Spanish)';
-                        else if (value == 'ru') displayText = 'ru (Russian)';
-                        else if (value == 'ko') displayText = 'ko (Korean)';
-                        else if (value == 'fr') displayText = 'fr (French)';
-                        else if (value == 'it') displayText = 'it (Italian)';
-                        else if (value == 'pt') displayText = 'pt (Portuguese)';
-                        else if (value == 'tr') displayText = 'tr (Turkish)';
-                        else if (value == 'pl') displayText = 'pl (Polish)';
-                        else if (value == 'nl') displayText = 'nl (Dutch)';
-                        else if (value == 'ar') displayText = 'ar (Arabic)';
-                        else if (value == 'hi') displayText = 'hi (Hindi)';
-                        
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(displayText),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
+              LanguageSelectionDropdown(
+                selectedLanguage: _selectedLanguage,
+                languages: _languages,
+                onLanguageChanged: (newLanguage) {
+                  setState(() {
+                    _selectedLanguage = newLanguage;
+                  });
+                },
               ),
               
               const SizedBox(height: 16),
               
-              FutureBuilder(
-                future: _asyncLoadModel,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Error loading model: ${snapshot.error}');
-                  } else if (snapshot.hasData) {
-                    return Text('Model loaded successfully');
-                  }
-
-                  return StreamBuilder(
-                    stream: _flutterWhisperkitPlugin.modelProgressStream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error loading model: ${snapshot.error}');
-                      }
-
-                      if (snapshot.data?.fractionCompleted == 1.0) {
-                        return const Center(
-                          child: Column(
-                            spacing: 16.0,
-                            children: [
-                              CircularProgressIndicator(),
-                              Text('Model loaded'),
-                            ],
-                          ),
-                        );
-                      }
-
-                      return Column(
-                        spacing: 16.0,
-                        children: [
-                          LinearProgressIndicator(
-                            value: snapshot.data?.fractionCompleted,
-                          ),
-                          Text(
-                            '${(snapshot.data?.fractionCompleted ?? 0) * 100}%',
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
+              // Model loading indicator
+              ModelLoadingIndicator(
+                asyncLoadModel: _asyncLoadModel,
+                modelProgressStream: _flutterWhisperkitPlugin.modelProgressStream,
               ),
 
               // File transcription section
-              const Text(
-                'File Transcription',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-
-              ElevatedButton(
-                onPressed: _isModelLoaded ? _transcribeFromFile : null,
-                child: Text(
-                  _isTranscribingFile
-                      ? 'Transcribing...'
-                      : 'Transcribe from File',
-                ),
-              ),
-
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _fileTranscriptionText.isEmpty
-                          ? 'Press the button to transcribe a file'
-                          : _fileTranscriptionText,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    if (_fileTranscriptionResult != null) ...[
-                      const Text(
-                        'Detected Language:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(_fileTranscriptionResult?.language ?? 'Unknown'),
-
-                      const Text(
-                        'Segments:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      ...(_fileTranscriptionResult?.segments ?? []).map(
-                        (segment) => Padding(
-                          padding: const EdgeInsets.only(bottom: 4.0),
-                          child: Text(
-                            '[${segment.start.toStringAsFixed(2)}s - ${segment.end.toStringAsFixed(2)}s]: ${segment.text}',
-                          ),
-                        ),
-                      ),
-
-                      const Text(
-                        'Performance:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'Real-time factor: ${_fileTranscriptionResult?.timings.realTimeFactor.toStringAsFixed(2)}x',
-                      ),
-                      Text(
-                        'Processing time: ${_fileTranscriptionResult?.timings.fullPipeline.toStringAsFixed(2)}s',
-                      ),
-                    ],
-                  ],
-                ),
+              FileTranscriptionSection(
+                isModelLoaded: _isModelLoaded,
+                isTranscribingFile: _isTranscribingFile,
+                fileTranscriptionText: _fileTranscriptionText,
+                fileTranscriptionResult: _fileTranscriptionResult,
+                onTranscribePressed: _transcribeFromFile,
               ),
 
               // Real-time transcription section
-              const Text(
-                'Real-time Transcription',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-
-              Container(
-                height: 200,
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: SingleChildScrollView(
-                  child: Text(
-                    _transcriptionText.isEmpty
-                        ? 'Press the button to start recording'
-                        : _transcriptionText,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-
-              ElevatedButton(
-                onPressed: _isModelLoaded ? _toggleRecording : null,
-                child: Text(
-                  _isRecording ? 'Stop Recording' : 'Start Recording',
-                ),
+              RealTimeTranscriptionSection(
+                isModelLoaded: _isModelLoaded,
+                isRecording: _isRecording,
+                transcriptionText: _transcriptionText,
+                onRecordPressed: _toggleRecording,
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Widget for model selection dropdown
+class ModelSelectionDropdown extends StatelessWidget {
+  final String selectedModel;
+  final List<String> modelVariants;
+  final Function(String) onModelChanged;
+
+  const ModelSelectionDropdown({
+    super.key,
+    required this.selectedModel,
+    required this.modelVariants,
+    required this.onModelChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Text('Select Model: ', style: TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(
+          child: DropdownButton<String>(
+            value: selectedModel,
+            isExpanded: true,
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                onModelChanged(newValue);
+              }
+            },
+            items: modelVariants.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Widget for language selection dropdown
+class LanguageSelectionDropdown extends StatelessWidget {
+  final String selectedLanguage;
+  final List<String> languages;
+  final Function(String) onLanguageChanged;
+
+  const LanguageSelectionDropdown({
+    super.key,
+    required this.selectedLanguage,
+    required this.languages,
+    required this.onLanguageChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Text('Select Language: ', style: TextStyle(fontWeight: FontWeight.bold)),
+        Expanded(
+          child: DropdownButton<String>(
+            value: selectedLanguage,
+            isExpanded: true,
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                onLanguageChanged(newValue);
+              }
+            },
+            items: languages.map<DropdownMenuItem<String>>((String value) {
+              // Show language code and name for better readability
+              String displayText = value;
+              if (value == 'auto') displayText = 'auto (Auto-detect)';
+              else if (value == 'en') displayText = 'en (English)';
+              else if (value == 'ja') displayText = 'ja (Japanese)';
+              else if (value == 'zh') displayText = 'zh (Chinese)';
+              else if (value == 'de') displayText = 'de (German)';
+              else if (value == 'es') displayText = 'es (Spanish)';
+              else if (value == 'ru') displayText = 'ru (Russian)';
+              else if (value == 'ko') displayText = 'ko (Korean)';
+              else if (value == 'fr') displayText = 'fr (French)';
+              else if (value == 'it') displayText = 'it (Italian)';
+              else if (value == 'pt') displayText = 'pt (Portuguese)';
+              else if (value == 'tr') displayText = 'tr (Turkish)';
+              else if (value == 'pl') displayText = 'pl (Polish)';
+              else if (value == 'nl') displayText = 'nl (Dutch)';
+              else if (value == 'ar') displayText = 'ar (Arabic)';
+              else if (value == 'hi') displayText = 'hi (Hindi)';
+              
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(displayText),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Widget for model loading indicator
+class ModelLoadingIndicator extends StatelessWidget {
+  final Future<String> asyncLoadModel;
+  final Stream<Progress> modelProgressStream;
+
+  const ModelLoadingIndicator({
+    super.key,
+    required this.asyncLoadModel,
+    required this.modelProgressStream,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: asyncLoadModel,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error loading model: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          return Text('Model loaded successfully');
+        }
+
+        return StreamBuilder(
+          stream: modelProgressStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error loading model: ${snapshot.error}');
+            }
+
+            if (snapshot.data?.fractionCompleted == 1.0) {
+              return const Center(
+                child: Column(
+                  spacing: 16.0,
+                  children: [
+                    CircularProgressIndicator(),
+                    Text('Model loaded'),
+                  ],
+                ),
+              );
+            }
+
+            return Column(
+              spacing: 16.0,
+              children: [
+                LinearProgressIndicator(
+                  value: snapshot.data?.fractionCompleted,
+                ),
+                Text(
+                  '${(snapshot.data?.fractionCompleted ?? 0) * 100}%',
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+/// Widget for file transcription section
+class FileTranscriptionSection extends StatelessWidget {
+  final bool isModelLoaded;
+  final bool isTranscribingFile;
+  final String fileTranscriptionText;
+  final TranscriptionResult? fileTranscriptionResult;
+  final VoidCallback onTranscribePressed;
+
+  const FileTranscriptionSection({
+    super.key,
+    required this.isModelLoaded,
+    required this.isTranscribingFile,
+    required this.fileTranscriptionText,
+    required this.fileTranscriptionResult,
+    required this.onTranscribePressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'File Transcription',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        
+        ElevatedButton(
+          onPressed: isModelLoaded ? onTranscribePressed : null,
+          child: Text(
+            isTranscribingFile ? 'Transcribing...' : 'Transcribe from File',
+          ),
+        ),
+        
+        Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                fileTranscriptionText.isEmpty
+                    ? 'Press the button to transcribe a file'
+                    : fileTranscriptionText,
+                style: const TextStyle(fontSize: 16),
+              ),
+              if (fileTranscriptionResult != null) ...[
+                const Text(
+                  'Detected Language:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(fileTranscriptionResult?.language ?? 'Unknown'),
+
+                const Text(
+                  'Segments:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                ...(fileTranscriptionResult?.segments ?? []).map(
+                  (segment) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4.0),
+                    child: Text(
+                      '[${segment.start.toStringAsFixed(2)}s - ${segment.end.toStringAsFixed(2)}s]: ${segment.text}',
+                    ),
+                  ),
+                ),
+
+                const Text(
+                  'Performance:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Real-time factor: ${fileTranscriptionResult?.timings.realTimeFactor.toStringAsFixed(2)}x',
+                ),
+                Text(
+                  'Processing time: ${fileTranscriptionResult?.timings.fullPipeline.toStringAsFixed(2)}s',
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Widget for real-time transcription section
+class RealTimeTranscriptionSection extends StatelessWidget {
+  final bool isModelLoaded;
+  final bool isRecording;
+  final String transcriptionText;
+  final VoidCallback onRecordPressed;
+
+  const RealTimeTranscriptionSection({
+    super.key,
+    required this.isModelLoaded,
+    required this.isRecording,
+    required this.transcriptionText,
+    required this.onRecordPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Real-time Transcription',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        
+        Container(
+          height: 200,
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: SingleChildScrollView(
+            child: Text(
+              transcriptionText.isEmpty
+                  ? 'Press the button to start recording'
+                  : transcriptionText,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ),
+        
+        ElevatedButton(
+          onPressed: isModelLoaded ? onRecordPressed : null,
+          child: Text(
+            isRecording ? 'Stop Recording' : 'Start Recording',
+          ),
+        ),
+      ],
     );
   }
 }
