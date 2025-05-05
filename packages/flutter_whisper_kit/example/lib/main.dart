@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
-
+import 'package:flutter/material.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
+import 'package:file_picker/file_picker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,15 +15,31 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late Future<String> _asyncLoadModel;
+  List<TranscriptionSegment> _transcriptionResult = [];
   String _transcriptionText = '';
   bool _isRecording = false;
   bool _isModelLoaded = false;
-  String _modelStatus = 'Model not loaded';
-  double _modelLoadProgress = 0.0;
+
   // Added state variables for file transcription
   String _fileTranscriptionText = '';
   bool _isTranscribingFile = false;
   TranscriptionResult? _fileTranscriptionResult;
+
+  // Added state variables for model and language selection
+  String _selectedModel = 'tiny';
+  String _selectedLanguage = 'en';
+
+  // Model variants available for selection
+  final List<String> _modelVariants = [
+    'tiny',
+    'tiny-en',
+    'base',
+    'small',
+    'medium',
+    'large-v2',
+    'large-v3',
+  ];
 
   final _flutterWhisperkitPlugin = FlutterWhisperKit();
   StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
@@ -31,7 +47,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _loadModel();
+    _asyncLoadModel = _loadModel();
   }
 
   @override
@@ -40,31 +56,21 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  Future<void> _loadModel() async {
+  Future<String> _loadModel() async {
     try {
-      setState(() {
-        _modelStatus = 'Loading model...';
-      });
-
       final result = await _flutterWhisperkitPlugin.loadModel(
-        'tiny',
-        modelRepo: 'argmaxinc/whisperkit-coreml',
+        _selectedModel,
         redownload: true,
-        onProgress: (progress) {
-          setState(() {
-            _modelLoadProgress = progress.fractionCompleted;
-          });
-        },
+        modelRepo: 'argmaxinc/whisperkit-coreml',
       );
 
       setState(() {
         _isModelLoaded = true;
-        _modelStatus = 'Model loaded: $result';
       });
+
+      return 'Model loaded: $result';
     } catch (e) {
-      setState(() {
-        _modelStatus = 'Error loading model: $e';
-      });
+      return 'Error loading model: $e';
     }
   }
 
@@ -82,14 +88,25 @@ class _MyAppState extends State<MyApp> {
     });
 
     try {
-      // Use a placeholder as specified in the task
-      const filePath = '<mp3 file path>';
-      
+      final filePath = await FilePicker.platform.pickFiles().then(
+        (file) => file?.files.firstOrNull?.path,
+      );
+
+      if (filePath == null) {
+        setState(() {
+          _fileTranscriptionText = 'No file picked';
+        });
+        return;
+      }
+
       // Create custom decoding options
       final options = DecodingOptions(
         verbose: true,
         task: DecodingTask.transcribe,
-        language: 'en', // Default to English
+        language:
+            _selectedLanguage == 'auto'
+                ? null
+                : _selectedLanguage, // Use selected language or null for auto-detection
         temperature: 0.0,
         temperatureFallbackCount: 5,
         wordTimestamps: true,
@@ -118,6 +135,7 @@ class _MyAppState extends State<MyApp> {
     if (!_isModelLoaded) {
       setState(() {
         _transcriptionText = 'Please wait for the model to load first.';
+        _transcriptionResult = [];
       });
       return;
     }
@@ -131,19 +149,32 @@ class _MyAppState extends State<MyApp> {
         final options = DecodingOptions(
           verbose: true,
           task: DecodingTask.transcribe,
-          language: 'en', // Default to English
+          language:
+              _selectedLanguage == 'auto'
+                  ? null
+                  : _selectedLanguage, // Use selected language or null for auto-detection
           temperature: 0.0,
           temperatureFallbackCount: 5,
           wordTimestamps: true,
           chunkingStrategy: ChunkingStrategy.vad,
         );
-        
+
         await _flutterWhisperkitPlugin.startRecording(options: options);
         _transcriptionSubscription = _flutterWhisperkitPlugin
             .transcriptionStream
             .listen((result) {
               setState(() {
                 _transcriptionText = result.text;
+                // Only add segments that don't already exist in the result
+                for (final segment in result.segments) {
+                  if (!_transcriptionResult.any(
+                    (existing) =>
+                        existing.id == segment.id &&
+                        existing.text == segment.text,
+                  )) {
+                    _transcriptionResult.add(segment);
+                  }
+                }
               });
             });
       }
@@ -154,6 +185,7 @@ class _MyAppState extends State<MyApp> {
     } catch (e) {
       setState(() {
         _transcriptionText = 'Error: $e';
+        _transcriptionResult = [];
       });
     }
   }
@@ -162,133 +194,421 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('Flutter WhisperKit Example')),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+        appBar: AppBar(
+          title: const Text('Flutter WhisperKit Example'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  _transcriptionResult = [];
+                  _transcriptionText = '';
+                  _fileTranscriptionResult = null;
+                  _fileTranscriptionText = '';
+                });
+              },
+              icon: const Icon(Icons.delete),
+            ),
+          ],
+        ),
+        body: ListView(
+          padding: EdgeInsets.all(16.0),
+          children: [
+            // Model and language selection
+            ModelSelectionDropdown(
+              selectedModel: _selectedModel,
+              modelVariants: _modelVariants,
+              onModelChanged: (newModel) {
+                setState(() {
+                  _selectedModel = newModel;
+                  _isModelLoaded = false;
+                });
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _asyncLoadModel = _loadModel();
+                });
+              },
+              child: const Text('Load Model'),
+            ),
+
+            LanguageSelectionDropdown(
+              selectedLanguage: _selectedLanguage,
+              onLanguageChanged: (newLanguage) {
+                setState(() {
+                  _selectedLanguage = newLanguage;
+                });
+              },
+            ),
+
+            // Model loading indicator
+            ModelLoadingIndicator(
+              asyncLoadModel: _asyncLoadModel,
+              modelProgressStream: _flutterWhisperkitPlugin.modelProgressStream,
+            ),
+
+            // File transcription section
+            FileTranscriptionSection(
+              isModelLoaded: _isModelLoaded,
+              isTranscribingFile: _isTranscribingFile,
+              fileTranscriptionText: _fileTranscriptionText,
+              fileTranscriptionResult: _fileTranscriptionResult,
+              onTranscribePressed: _transcribeFromFile,
+            ),
+
+            // Real-time transcription section
+            RealTimeTranscriptionSection(
+              isModelLoaded: _isModelLoaded,
+              isRecording: _isRecording,
+              transcriptionText: _transcriptionText,
+              segments: _transcriptionResult,
+              onRecordPressed: _toggleRecording,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Widget for model selection dropdown
+class ModelSelectionDropdown extends StatelessWidget {
+  const ModelSelectionDropdown({
+    super.key,
+    required this.selectedModel,
+    required this.modelVariants,
+    required this.onModelChanged,
+  });
+
+  final String selectedModel;
+  final List<String> modelVariants;
+  final Function(String) onModelChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Text(
+          'Select Model: ',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Expanded(
+          child: DropdownButton<String>(
+            value: selectedModel,
+            isExpanded: true,
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                onModelChanged(newValue);
+              }
+            },
+            items:
+                modelVariants.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Widget for language selection dropdown
+class LanguageSelectionDropdown extends StatelessWidget {
+  const LanguageSelectionDropdown({
+    super.key,
+    required this.selectedLanguage,
+    required this.onLanguageChanged,
+  }) : _languages = const [
+         'auto', // Auto-detect
+         'en', // English
+         'ja', // Japanese
+         'zh', // Chinese
+         'de', // German
+         'es', // Spanish
+         'ru', // Russian
+         'ko', // Korean
+         'fr', // French
+         'it', // Italian
+         'pt', // Portuguese
+         'tr', // Turkish
+         'pl', // Polish
+         'nl', // Dutch
+         'ar', // Arabic
+         'hi', // Hindi
+       ];
+
+  final String selectedLanguage;
+  final List<String> _languages;
+  final Function(String) onLanguageChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Text(
+          'Select Language: ',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Expanded(
+          child: DropdownButton<String>(
+            value: selectedLanguage,
+            isExpanded: true,
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                onLanguageChanged(newValue);
+              }
+            },
+            items:
+                _languages.map<DropdownMenuItem<String>>((String value) {
+                  // Show language code and name for better readability
+                  String displayText = switch (value) {
+                    'auto' => 'auto (Auto-detect)',
+                    'en' => 'en (English)',
+                    'ja' => 'ja (Japanese)',
+                    'zh' => 'zh (Chinese)',
+                    'de' => 'de (German)',
+                    'es' => 'es (Spanish)',
+                    'ru' => 'ru (Russian)',
+                    'ko' => 'ko (Korean)',
+                    'fr' => 'fr (French)',
+                    'it' => 'it (Italian)',
+                    'pt' => 'pt (Portuguese)',
+                    'tr' => 'tr (Turkish)',
+                    'pl' => 'pl (Polish)',
+                    'nl' => 'nl (Dutch)',
+                    'ar' => 'ar (Arabic)',
+                    'hi' => 'hi (Hindi)',
+                    _ => throw UnimplementedError(),
+                  };
+
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(displayText),
+                  );
+                }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Widget for model loading indicator
+class ModelLoadingIndicator extends StatelessWidget {
+  const ModelLoadingIndicator({
+    super.key,
+    required this.asyncLoadModel,
+    required this.modelProgressStream,
+  });
+
+  final Future<String> asyncLoadModel;
+  final Stream<Progress> modelProgressStream;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: asyncLoadModel,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error loading model: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          return Text('Model loaded successfully');
+        }
+
+        return StreamBuilder(
+          stream: modelProgressStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Text('Error loading model: ${snapshot.error}');
+            }
+
+            if (snapshot.data?.fractionCompleted == 1.0) {
+              return const Center(
+                child: Column(
+                  spacing: 16.0,
+                  children: [CircularProgressIndicator(), Text('Model loaded')],
+                ),
+              );
+            }
+
+            return Column(
+              spacing: 16.0,
               children: [
-                // Model loading section
-                Text('Model Status: $_modelStatus'),
-                if (_modelLoadProgress > 0 && _modelLoadProgress < 1) ...[
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(value: _modelLoadProgress),
-                  Text('${(_modelLoadProgress * 100).toStringAsFixed(1)}%'),
-                ],
-                const SizedBox(height: 16),
-                
-                // File transcription section
+                LinearProgressIndicator(
+                  value: snapshot.data?.fractionCompleted,
+                ),
+                Text('${(snapshot.data?.fractionCompleted ?? 0) * 100}%'),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+/// Widget for file transcription section
+class FileTranscriptionSection extends StatelessWidget {
+  const FileTranscriptionSection({
+    super.key,
+    required this.isModelLoaded,
+    required this.isTranscribingFile,
+    required this.fileTranscriptionText,
+    required this.fileTranscriptionResult,
+    required this.onTranscribePressed,
+  });
+
+  final bool isModelLoaded;
+  final bool isTranscribingFile;
+  final String fileTranscriptionText;
+  final TranscriptionResult? fileTranscriptionResult;
+  final VoidCallback onTranscribePressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'File Transcription',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+
+        ElevatedButton(
+          onPressed: isModelLoaded ? onTranscribePressed : null,
+          child: Text(
+            isTranscribingFile ? 'Transcribing...' : 'Transcribe from File',
+          ),
+        ),
+
+        Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                fileTranscriptionText.isEmpty
+                    ? 'Press the button to transcribe a file'
+                    : fileTranscriptionText,
+                style: const TextStyle(fontSize: 16),
+              ),
+              if (fileTranscriptionResult != null) ...[
                 const Text(
-                  'File Transcription',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  'Detected Language:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: _isModelLoaded ? _transcribeFromFile : null,
-                  child: Text(_isTranscribingFile 
-                      ? 'Transcribing...' 
-                      : 'Transcribe from File'),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _fileTranscriptionText.isEmpty
-                            ? 'Press the button to transcribe a file'
-                            : _fileTranscriptionText,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      if (_fileTranscriptionResult != null) ...[
-                        const SizedBox(height: 8),
-                        const Text('Detected Language:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(_fileTranscriptionResult?.language ?? 'Unknown'),
-                        const SizedBox(height: 8),
-                        const Text('Segments:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        ...(_fileTranscriptionResult?.segments ?? []).map(
-                          (segment) => Padding(
-                            padding: const EdgeInsets.only(bottom: 4.0),
-                            child: Text(
-                              '[${segment.start.toStringAsFixed(2)}s - ${segment.end.toStringAsFixed(2)}s]: ${segment.text}',
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text('Performance:',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('Real-time factor: ${_fileTranscriptionResult?.timings.realTimeFactor.toStringAsFixed(2)}x'),
-                        Text('Processing time: ${_fileTranscriptionResult?.timings.fullPipeline.toStringAsFixed(2)}s'),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                
-                // Real-time transcription section
+                Text(fileTranscriptionResult?.language ?? 'Unknown'),
+
                 const Text(
-                  'Real-time Transcription',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  'Segments:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
-                Container(
-                  height: 200,
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: SingleChildScrollView(
+                ...(fileTranscriptionResult?.segments ?? []).map(
+                  (segment) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4.0),
                     child: Text(
-                      _transcriptionText.isEmpty
-                          ? 'Press the button to start recording'
-                          : _transcriptionText,
-                      style: const TextStyle(fontSize: 16),
+                      '[${segment.start.toStringAsFixed(2)}s - ${segment.end.toStringAsFixed(2)}s]: ${segment.text}',
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _isModelLoaded ? _toggleRecording : null,
-                  child: Text(
-                    _isRecording ? 'Stop Recording' : 'Start Recording',
-                  ),
-                ),
-                
-                // Model information section
-                const SizedBox(height: 24),
+
                 const Text(
-                  'Model Information',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'This example demonstrates the following FlutterWhisperKit features:',
+                  'Performance:',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 4),
-                const Text('• Model loading with progress tracking'),
-                const Text('• File transcription with custom options'),
-                const Text('• Real-time transcription with streaming results'),
-                const Text('• Detailed transcription results with segments and timing information'),
-                const SizedBox(height: 8),
-                const Text(
-                  'Note: The file transcription feature uses a placeholder path "<mp3 file path>" and will not actually transcribe a file when running this example.',
-                  style: TextStyle(fontStyle: FontStyle.italic),
+                Text(
+                  'Real-time factor: ${fileTranscriptionResult?.timings.realTimeFactor.toStringAsFixed(2)}x',
+                ),
+                Text(
+                  'Processing time: ${fileTranscriptionResult?.timings.fullPipeline.toStringAsFixed(2)}s',
                 ),
               ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Widget for real-time transcription section
+class RealTimeTranscriptionSection extends StatelessWidget {
+  const RealTimeTranscriptionSection({
+    super.key,
+    required this.isModelLoaded,
+    required this.isRecording,
+    required this.transcriptionText,
+    required this.segments,
+    required this.onRecordPressed,
+  });
+
+  final bool isModelLoaded;
+  final bool isRecording;
+  final List<TranscriptionSegment> segments;
+  final String transcriptionText;
+  final VoidCallback onRecordPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 16.0,
+      children: [
+        const Text(
+          'Real-time Transcription',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+
+        Container(
+          height: 200,
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child:
+              segments.isNotEmpty
+                  ? ListView.builder(
+                    itemCount: segments.length,
+                    itemBuilder: (context, index) {
+                      return Text(
+                        '[${segments[index].start.toStringAsFixed(2)}s - ${segments[index].end.toStringAsFixed(2)}s]: ${segments[index].text}',
+                      );
+                    },
+                  )
+                  : const Text('No segments'),
+        ),
+
+        Container(
+          height: 200,
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: SingleChildScrollView(
+            child: Text(
+              transcriptionText.isEmpty
+                  ? 'Press the button to start recording'
+                  : transcriptionText,
+              style: const TextStyle(fontSize: 16),
             ),
           ),
         ),
-      ),
+
+        ElevatedButton(
+          onPressed: isModelLoaded ? onRecordPressed : null,
+          child: Text(isRecording ? 'Stop Recording' : 'Start Recording'),
+        ),
+      ],
     );
   }
 }
