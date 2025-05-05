@@ -88,17 +88,6 @@ class _MyAppState extends State<MyApp> {
     });
 
     try {
-      // final filePath = await switch (Platform.operatingSystem) {
-      //   'ios' => FilePicker.platform.pickFiles().then(
-      //     (file) => file?.files.firstOrNull?.path,
-      //   ),
-      //   'macos' => pickFiles().then((file) => file?.files.firstOrNull?.path),
-      //   _ =>
-      //     throw UnsupportedError(
-      //       'Unsupported platform: ${Platform.operatingSystem}',
-      //     ),
-      // };
-
       final filePath = await FilePicker.platform.pickFiles().then(
         (file) => file?.files.firstOrNull?.path,
       );
@@ -205,39 +194,43 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('Flutter WhisperKit Example')),
+        appBar: AppBar(
+          title: const Text('Flutter WhisperKit Example'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  _transcriptionResult = [];
+                  _transcriptionText = '';
+                  _fileTranscriptionResult = null;
+                  _fileTranscriptionText = '';
+                });
+              },
+              icon: const Icon(Icons.delete),
+            ),
+          ],
+        ),
         body: ListView(
           padding: EdgeInsets.all(16.0),
           children: [
             // Model and language selection
-            Row(
-              spacing: 16.0,
-              children: [
-                Expanded(
-                  flex: 8,
-                  child: ModelSelectionDropdown(
-                    selectedModel: _selectedModel,
-                    modelVariants: _modelVariants,
-                    onModelChanged: (newModel) {
-                      setState(() {
-                        _selectedModel = newModel;
-                        _isModelLoaded = false;
-                      });
-                    },
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _asyncLoadModel = _loadModel();
-                      });
-                    },
-                    child: const Text('Load Model'),
-                  ),
-                ),
-              ],
+            ModelSelectionDropdown(
+              selectedModel: _selectedModel,
+              modelVariants: _modelVariants,
+              onModelChanged: (newModel) {
+                setState(() {
+                  _selectedModel = newModel;
+                  _isModelLoaded = false;
+                });
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _asyncLoadModel = _loadModel();
+                });
+              },
+              child: const Text('Load Model'),
             ),
 
             LanguageSelectionDropdown(
