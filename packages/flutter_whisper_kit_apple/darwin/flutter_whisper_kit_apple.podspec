@@ -5,13 +5,13 @@
 Pod::Spec.new do |s|
   s.name             = 'flutter_whisper_kit_apple'
   s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.summary          = 'iOS and macOS implementation of the flutter_whisper_kit plugin for on-device speech recognition.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+iOS and macOS implementation of the flutter_whisper_kit plugin, providing on-device speech recognition and transcription capabilities using WhisperKit.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/r0227n/flutter_whisper_kit/tree/main/flutter_whisper_kit_apple'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Ryo24' }
 
   s.source           = { :path => '.' }
   s.source_files = 'flutter_whisper_kit_apple/Sources/flutter_whisper_kit_apple/**/*'
