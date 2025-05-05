@@ -15,7 +15,6 @@ dependencies:
     path: ../
 
   cupertino_icons: ^1.0.8
-  file_picker_desktop: ^1.2.0
   file_picker: ^10.1.2
 
 dev_dependencies:

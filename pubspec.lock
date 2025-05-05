@@ -161,14 +161,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "10.1.2"
-  file_picker_desktop:
-    dependency: transitive
-    description:
-      name: file_picker_desktop
-      sha256: "6e84f4cd3056fa189cea62d231b121fe7f5003744f3ab822e1cbb29d071df570"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   fixnum:
     dependency: transitive
     description:

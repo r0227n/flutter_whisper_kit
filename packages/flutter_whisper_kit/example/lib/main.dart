@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
-
+import 'package:flutter/material.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
+import 'package:file_picker/file_picker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,11 +27,12 @@ class _MyAppState extends State<MyApp> {
   TranscriptionResult? _fileTranscriptionResult;
 
   // Added state variables for model and language selection
-  String _selectedModel = 'large-v3';
+  String _selectedModel = 'tiny';
   String _selectedLanguage = 'en';
 
   // Model variants available for selection
   final List<String> _modelVariants = [
+    'tiny',
     'tiny-en',
     'base',
     'small',
@@ -87,8 +88,27 @@ class _MyAppState extends State<MyApp> {
     });
 
     try {
-      // Use a placeholder as specified in the task
-      const filePath = '<mp3 file path>';
+      // final filePath = await switch (Platform.operatingSystem) {
+      //   'ios' => FilePicker.platform.pickFiles().then(
+      //     (file) => file?.files.firstOrNull?.path,
+      //   ),
+      //   'macos' => pickFiles().then((file) => file?.files.firstOrNull?.path),
+      //   _ =>
+      //     throw UnsupportedError(
+      //       'Unsupported platform: ${Platform.operatingSystem}',
+      //     ),
+      // };
+
+      final filePath = await FilePicker.platform.pickFiles().then(
+        (file) => file?.files.firstOrNull?.path,
+      );
+
+      if (filePath == null) {
+        setState(() {
+          _fileTranscriptionText = 'No file picked';
+        });
+        return;
+      }
 
       // Create custom decoding options
       final options = DecodingOptions(
