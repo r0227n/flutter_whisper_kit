@@ -11,7 +11,6 @@ The tests are organized into the following files:
 - **flutter_whisperkit_apple_test.dart**: Tests the main plugin interface and verifies that the plugin correctly delegates calls to the platform interface.
   - Validates that the default platform implementation is the method channel implementation
   - Tests the model loading functionality
-  - Tests the WhisperKitModelLoader utility class
 
 - **flutter_whisperkit_apple_method_channel_test.dart**: Tests the method channel implementation that communicates with the native code.
   - Verifies that the method channel correctly handles method calls and returns expected values

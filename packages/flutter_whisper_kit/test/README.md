@@ -17,10 +17,6 @@ The tests are organized into the following files:
 
 ### Feature Tests
 
-- **model_loader_test.dart**: Tests the model loading functionality.
-  - Verifies that models can be loaded with default and custom options
-  - Tests the WhisperKitModelLoader utility class
-
 - **transcription_test.dart**: Tests the file transcription functionality.
   - Verifies that audio files can be transcribed with default and custom options
   - Tests handling of invalid file paths
