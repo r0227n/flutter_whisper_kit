@@ -12,6 +12,10 @@ A Flutter plugin that provides on-device speech recognition capabilities using W
 - Progress tracking for model downloads
 - Configurable transcription options
 
+## Demo
+
+https://github.com/user-attachments/assets/4a405460-2eb9-4485-a467-24b8ebf6bee7
+
 ## Installation
 
 Add the following to your `pubspec.yaml`:
