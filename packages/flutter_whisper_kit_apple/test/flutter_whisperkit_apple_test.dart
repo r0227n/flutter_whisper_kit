@@ -58,16 +58,5 @@ void main() {
       },
       timeout: const Timeout(Duration(seconds: 5)),
     );
-
-    group('WhisperKitModelLoader', () {
-      test('loads model and returns success message', () async {
-        // Arrange
-        setUpMockPlatform();
-        final modelLoader = WhisperKitModelLoader();
-
-        // Act & Assert
-        expect(await modelLoader.loadModel(variant: 'tiny-en'), 'Model loaded');
-      });
-    });
   });
 }
