@@ -15,11 +15,13 @@ dependencies:
     sdk: flutter
   flutter_whisper_kit:
     path: ../flutter_whisper_kit
+  ffi: 2.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  ffigen: 18.1.0
 
 flutter:
   uses-material-design: true
