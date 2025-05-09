@@ -513,13 +513,14 @@ class TranscriptionResult {
                   Map<String, dynamic>.from(e as Map),
                 ),
               )
-              .toList() ?? [],
+              .toList() ??
+          [],
       language: json['language'] as String? ?? 'en',
       timings:
           json['timings'] != null
               ? TranscriptionTimings.fromJson(
-                  Map<String, dynamic>.from(json['timings'] as Map),
-                )
+                Map<String, dynamic>.from(json['timings'] as Map),
+              )
               : const TranscriptionTimings(),
       seekTime:
           json['seekTime'] != null
