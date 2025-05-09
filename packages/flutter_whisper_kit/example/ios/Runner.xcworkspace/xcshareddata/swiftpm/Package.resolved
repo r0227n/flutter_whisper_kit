@@ -1,0 +1,105 @@
+{
+  "originHash" : "4a644beaf0294ee4f613a85f2c44b532b1f54f58402fe11c11e193d1572276f4",
+  "pins" : [
+    {
+      "identity" : "dkcamera",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/zhangao0086/DKCamera",
+      "state" : {
+        "branch" : "master",
+        "revision" : "5c691d11014b910aff69f960475d70e65d9dcc96"
+      }
+    },
+    {
+      "identity" : "dkimagepickercontroller",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/zhangao0086/DKImagePickerController",
+      "state" : {
+        "branch" : "4.3.9",
+        "revision" : "0bdfeacefa308545adde07bef86e349186335915"
+      }
+    },
+    {
+      "identity" : "dkphotogallery",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/zhangao0086/DKPhotoGallery",
+      "state" : {
+        "branch" : "master",
+        "revision" : "311c1bc7a94f1538f82773a79c84374b12a2ef3d"
+      }
+    },
+    {
+      "identity" : "jinja",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/johnmai-dev/Jinja",
+      "state" : {
+        "revision" : "bbddb92fc51ae420b87300298370fd1dfc308f73",
+        "version" : "1.1.1"
+      }
+    },
+    {
+      "identity" : "sdwebimage",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/SDWebImage",
+      "state" : {
+        "revision" : "cac9a55a3ae92478a2c95042dcc8d9695d2129ca",
+        "version" : "5.21.0"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "state" : {
+        "revision" : "41982a3656a71c768319979febd796c6fd111d5c",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections.git",
+      "state" : {
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
+      }
+    },
+    {
+      "identity" : "swift-transformers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/huggingface/swift-transformers.git",
+      "state" : {
+        "revision" : "8a83416cc00ab07a5de9991e6ad817a9b8588d20",
+        "version" : "0.1.15"
+      }
+    },
+    {
+      "identity" : "swiftygif",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kirualex/SwiftyGif.git",
+      "state" : {
+        "revision" : "4430cbc148baa3907651d40562d96325426f409a",
+        "version" : "5.4.5"
+      }
+    },
+    {
+      "identity" : "tocropviewcontroller",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/TimOliver/TOCropViewController",
+      "state" : {
+        "revision" : "a634cb7cdfd580006e79a6e74e64417fe9e9783b",
+        "version" : "2.7.4"
+      }
+    },
+    {
+      "identity" : "whisperkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/argmaxinc/WhisperKit.git",
+      "state" : {
+        "revision" : "6a509d6181da1f71517159425d6ec9d94d424f55",
+        "version" : "0.12.0"
+      }
+    }
+  ],
+  "version" : 3
+}

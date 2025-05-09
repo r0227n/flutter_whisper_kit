@@ -1,0 +1,10 @@
+name: workspace
+publish_to: none 
+
+environment:
+  sdk: ^3.7.2
+
+workspace:
+  - packages/flutter_whisper_kit
+  - packages/flutter_whisper_kit/example
+  - packages/flutter_whisper_kit_apple
