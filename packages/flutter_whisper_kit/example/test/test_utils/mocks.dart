@@ -6,9 +6,11 @@ import 'package:flutter_whisper_kit_example/main.dart';
 class MockFlutterWhisperKit extends FlutterWhisperKit {
   bool modelLoaded = false;
   String? loadedModelVariant;
-  final StreamController<Progress> _modelProgressController = StreamController<Progress>.broadcast();
-  final StreamController<TranscriptionResult> _transcriptionController = StreamController<TranscriptionResult>.broadcast();
-  
+  final StreamController<Progress> _modelProgressController =
+      StreamController<Progress>.broadcast();
+  final StreamController<TranscriptionResult> _transcriptionController =
+      StreamController<TranscriptionResult>.broadcast();
+
   @override
   Future<String?> loadModel(
     String? variant, {
@@ -18,7 +20,7 @@ class MockFlutterWhisperKit extends FlutterWhisperKit {
   }) async {
     loadedModelVariant = variant;
     modelLoaded = true;
-    
+
     // Simulate progress updates
     final progress50 = const Progress(
       totalUnitCount: 100,
@@ -26,29 +28,29 @@ class MockFlutterWhisperKit extends FlutterWhisperKit {
       fractionCompleted: 0.5,
       isIndeterminate: false,
     );
-    
+
     _modelProgressController.add(progress50);
     if (onProgress != null) {
       onProgress(progress50);
     }
-    
+
     await Future.delayed(const Duration(milliseconds: 100));
-    
+
     final progress100 = const Progress(
       totalUnitCount: 100,
       completedUnitCount: 100,
       fractionCompleted: 1.0,
       isIndeterminate: false,
     );
-    
+
     _modelProgressController.add(progress100);
     if (onProgress != null) {
       onProgress(progress100);
     }
-    
+
     return 'Model loaded: $variant';
   }
-  
+
   @override
   Future<TranscriptionResult?> transcribeFromFile(
     String filePath, {
@@ -57,7 +59,7 @@ class MockFlutterWhisperKit extends FlutterWhisperKit {
     if (!modelLoaded) {
       throw Exception('Model not loaded');
     }
-    
+
     return TranscriptionResult(
       text: 'This is a mock transcription result',
       segments: [
@@ -75,12 +77,10 @@ class MockFlutterWhisperKit extends FlutterWhisperKit {
         ),
       ],
       language: options.language ?? 'en',
-      timings: const TranscriptionTimings(
-        fullPipeline: 1.0,
-      ),
+      timings: const TranscriptionTimings(fullPipeline: 1.0),
     );
   }
-  
+
   @override
   Future<String?> startRecording({
     DecodingOptions options = const DecodingOptions(),
@@ -89,7 +89,7 @@ class MockFlutterWhisperKit extends FlutterWhisperKit {
     if (!modelLoaded) {
       throw Exception('Model not loaded');
     }
-    
+
     // Simulate transcription stream
     _transcriptionController.add(
       TranscriptionResult(
@@ -109,26 +109,25 @@ class MockFlutterWhisperKit extends FlutterWhisperKit {
           ),
         ],
         language: options.language ?? 'en',
-        timings: const TranscriptionTimings(
-          fullPipeline: 1.0,
-        ),
+        timings: const TranscriptionTimings(fullPipeline: 1.0),
       ),
     );
-    
+
     return 'Recording started';
   }
-  
+
   @override
   Future<String?> stopRecording({bool loop = false}) async {
     return 'Recording stopped';
   }
-  
+
   @override
   Stream<Progress> get modelProgressStream => _modelProgressController.stream;
-  
+
   @override
-  Stream<TranscriptionResult> get transcriptionStream => _transcriptionController.stream;
-  
+  Stream<TranscriptionResult> get transcriptionStream =>
+      _transcriptionController.stream;
+
   void dispose() {
     _modelProgressController.close();
     _transcriptionController.close();
@@ -137,9 +136,7 @@ class MockFlutterWhisperKit extends FlutterWhisperKit {
 
 // Helper function to build test widget
 Widget buildTestApp() {
-  return const MaterialApp(
-    home: MyApp(),
-  );
+  return const MaterialApp(home: MyApp());
 }
 
 // Custom ModelLoadingIndicator for testing that accepts Future<String?>

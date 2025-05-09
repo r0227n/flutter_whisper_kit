@@ -16,17 +16,14 @@ void main() {
     await tester.pumpWidget(buildTestApp());
 
     // Verify that app title is displayed
-    expect(
-      find.text('Flutter WhisperKit Example'),
-      findsOneWidget,
-    );
-    
+    expect(find.text('Flutter WhisperKit Example'), findsOneWidget);
+
     // Verify that buttons are present instead of looking for dropdowns
     expect(find.byType(ElevatedButton), findsWidgets);
-    
+
     // Verify that file transcription section is present
     expect(find.text('File Transcription'), findsOneWidget);
-    
+
     // Verify that real-time transcription section is present
     expect(find.text('Real-time Transcription'), findsOneWidget);
   });
