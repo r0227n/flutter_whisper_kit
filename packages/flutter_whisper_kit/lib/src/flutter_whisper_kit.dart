@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 
 import 'models.dart';
 import 'whisper_kit_error.dart';
 import 'platform_specifics/flutter_whisper_kit_platform_interface.dart';
+import 'platform_specifics/flutter_whisper_kit_ffi.dart';
 
 /// The main entry point for the Flutter WhisperKit plugin.
 ///
@@ -17,6 +19,16 @@ import 'platform_specifics/flutter_whisper_kit_platform_interface.dart';
 /// [FlutterWhisperKitPlatform] instance, ensuring consistent behavior
 /// across different platforms while abstracting away the platform-specific code.
 class FlutterWhisperKit {
+  /// Constructs a new instance of [FlutterWhisperKit].
+  ///
+  /// This constructor initializes the plugin and registers the appropriate
+  /// platform implementation based on the current platform.
+  FlutterWhisperKit() {
+    if (Platform.isIOS || Platform.isMacOS) {
+      // Register the FFI implementation for iOS and macOS
+      FlutterWhisperKitPlatform.instance = FFIFlutterWhisperKit();
+    }
+  }
   /// Loads a WhisperKit model.
   ///
   /// Downloads and initializes a WhisperKit model for speech recognition.

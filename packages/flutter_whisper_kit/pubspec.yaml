@@ -15,11 +15,25 @@ dependencies:
     sdk: flutter
   pigeon: ^25.3.1
   plugin_platform_interface: ^2.0.2
+  ffi: 2.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  ffigen: 18.1.0
+
+ffigen:
+  name: 'WhisperKitBindings'
+  description: 'Bindings for WhisperKit'
+  language: 'objc++'
+  output: 'lib/src/bindings/whisper_kit_bindings.dart'
+  headers:
+    entry-points:
+      - '../flutter_whisper_kit_apple/darwin/flutter_whisper_kit_apple/Sources/flutter_whisper_kit_apple/WhisperKitBindings.h'
+  objc-interfaces:
+    include:
+      - 'WhisperKitBridge.*'
 
 
 flutter:
