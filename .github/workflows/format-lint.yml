@@ -18,14 +18,14 @@ jobs:
         uses: ./.github/actions/setup-fvm
       
       - name: Install Dependencies
-        run: fvm flutter pub get
+        run: flutter pub get
       
       - name: Verify Formatting
-        run: fvm dart format --output=none --set-exit-if-changed .
+        run: dart format --output=none --set-exit-if-changed .
       
       - name: Run Analyzer
-        run: fvm flutter analyze --no-fatal-infos
+        run: flutter analyze --no-fatal-infos
       
       - name: Run Tests (if available)
-        run: fvm flutter test
+        run: flutter test
         continue-on-error: true
