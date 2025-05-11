@@ -93,6 +93,7 @@ protocol WhisperKitMessage {
   func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func fetchAvailableModels(modelRepo: String, matching: [String], token: String?, completion: @escaping (Result<[String?], Error>) -> Void)
+  func deviceName(completion: @escaping (Result<String, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -191,6 +192,21 @@ class WhisperKitMessageSetup {
       }
     } else {
       fetchAvailableModelsChannel.setMessageHandler(nil)
+    }
+    let deviceNameChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisper_kit.WhisperKitMessage.deviceName\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      deviceNameChannel.setMessageHandler { _, reply in
+        api.deviceName { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      deviceNameChannel.setMessageHandler(nil)
     }
   }
 }

@@ -445,6 +445,21 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
+  /// Gets the current device name
+  ///
+  /// - Parameter completion: Callback with the device name
+  func deviceName(completion: @escaping (Result<String, Error>) -> Void) {
+    Task {
+      do {
+        let deviceName = WhisperKit.deviceName()
+        completion(.success(deviceName))
+      } catch {
+        print("Error getting device name: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
   /// Starts recording audio for transcription
   ///
   /// - Parameters:
