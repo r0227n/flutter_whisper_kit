@@ -242,4 +242,30 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
   @override
   Stream<Progress> get modelProgressStream =>
       _modelProgressStreamController.stream;
+      
+  /// Fetches available WhisperKit models from a repository.
+  ///
+  /// - [modelRepo]: The repository to fetch models from (default: "argmaxinc/whisperkit-coreml").
+  /// - [matching]: Optional list of glob patterns to filter models by.
+  /// - [token]: Optional access token for private repositories.
+  ///
+  /// Returns a list of available model names.
+  @override
+  Future<List<String>> fetchAvailableModels({
+    String modelRepo = 'argmaxinc/whisperkit-coreml',
+    List<String> matching = const ['*'],
+    String? token,
+  }) async {
+    try {
+      final result = await _whisperKitMessage.fetchAvailableModels(
+        modelRepo,
+        matching.map((e) => e).toList(),
+        token,
+      );
+      return result.whereType<String>().toList();
+    } catch (e) {
+      print('Error fetching available models: $e');
+      rethrow;
+    }
+  }
 }

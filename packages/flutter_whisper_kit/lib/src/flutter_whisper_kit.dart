@@ -235,4 +235,35 @@ class FlutterWhisperKit {
   /// feedback to the user about the download status.
   Stream<Progress> get modelProgressStream =>
       FlutterWhisperKitPlatform.instance.modelProgressStream;
+      
+  /// Fetches available WhisperKit models from a repository.
+  ///
+  /// - [modelRepo]: The repository to fetch models from (default: "argmaxinc/whisperkit-coreml").
+  /// - [matching]: Optional list of glob patterns to filter models by.
+  /// - [token]: Optional access token for private repositories.
+  ///
+  /// Returns a list of available model names.
+  ///
+  /// Example:
+  /// ```dart
+  /// final models = await flutterWhisperKit.fetchAvailableModels();
+  /// print('Available models: $models');
+  /// ```
+  Future<List<String>> fetchAvailableModels({
+    String modelRepo = 'argmaxinc/whisperkit-coreml',
+    List<String> matching = const ['*'],
+    String? token,
+  }) async {
+    try {
+      return await FlutterWhisperKitPlatform.instance.fetchAvailableModels(
+        modelRepo: modelRepo,
+        matching: matching,
+        token: token,
+      );
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

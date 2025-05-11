@@ -420,6 +420,32 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     return WhisperKit.formatModelFiles(localModels)
   }
   
+  ///
+  /// - Parameters:
+  ///   - modelRepo: The repository to fetch models from
+  ///   - completion: Callback with result of the operation
+  func fetchAvailableModels(
+    modelRepo: String, matching: [String?], token: String?,
+    completion: @escaping (Result<[String?], Error>) -> Void
+  ) {
+    Task {
+      do {
+        let matchingPatterns = matching.compactMap { $0 }
+        
+        let models = try await WhisperKit.fetchAvailableModels(
+          from: modelRepo,
+          matching: matchingPatterns,
+          token: token
+        )
+        
+        completion(.success(models))
+      } catch {
+        print("Error fetching available models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
   /// Starts recording audio for transcription
   ///
   /// - Parameters:
