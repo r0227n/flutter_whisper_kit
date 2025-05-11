@@ -445,6 +445,42 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
+  ///
+  /// - Parameters:
+  ///   - completion: Callback with the detected language result
+  func detectLanguage(
+    audioPath: String,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        // Ensure WhisperKit is initialized
+        guard let whisperKit = whisperKit else {
+          throw NSError(
+            domain: "WhisperKitError", code: 1002,
+            userInfo: [
+              NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."
+            ])
+        }
+        
+        let result = try await whisperKit.detectLanguage(audioPath: audioPath)
+        
+        let resultDict: [String: Any] = [
+          "language": result.language,
+          "probabilities": result.langProbs
+        ]
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        
+        completion(.success(jsonString))
+      } catch {
+        print("Error detecting language: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
   /// Gets the recommended models for the current device
   ///
   /// - Parameter completion: Callback with the recommended models
