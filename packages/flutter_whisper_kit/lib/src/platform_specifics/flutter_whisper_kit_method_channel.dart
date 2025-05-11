@@ -268,17 +268,13 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       rethrow;
     }
   }
-  
+
   /// Gets the current device name.
   ///
   /// Returns the name of the current device as recognized by WhisperKit.
   /// This is useful for determining which models are compatible with the device.
   @override
   Future<String> deviceName() async {
-    final result = await _whisperKitMessage.deviceName();
-    if (result == null) {
-      throw Exception('Failed to get device name');
-    }
-    return result;
+    return _whisperKitMessage.deviceName();
   }
 }

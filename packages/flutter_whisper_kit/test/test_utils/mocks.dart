@@ -8,6 +8,9 @@ class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperKitPlatform {
   @override
+  Future<String> deviceName() => Future.value('Mock Device');
+
+  @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
