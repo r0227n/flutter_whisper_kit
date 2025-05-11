@@ -267,22 +267,6 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            final modelFiles =
-                await _flutterWhisperkitPlugin.recommendedModels();
-            if (modelFiles != null) {
-              try {
-                final formattedModelFiles = await _flutterWhisperkitPlugin
-                    .formatModelFiles(modelFiles.supported);
-                print('Formatted model files: $formattedModelFiles');
-              } catch (e) {
-                print('Error formatting model files: $e');
-              }
-            }
-          },
-          child: const Icon(Icons.language),
-        ),
       ),
     );
   }
