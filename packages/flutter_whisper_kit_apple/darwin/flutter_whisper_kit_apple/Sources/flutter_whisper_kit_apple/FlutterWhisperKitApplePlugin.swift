@@ -560,15 +560,11 @@ private class WhisperKitApiImpl: WhisperKitMessage {
         )
         
         let configDict: [String: Any] = [
-          "name": config.repoName,
-          "version": config.repoVersion,
-          "device_support": config.deviceSupports.map { support in
-            [
-              "supportedModels": support.supportedModels,
-              "defaultModel": support.defaultModel,
-              "disabledModels": support.disabledModels
-            ]
-          }
+          "repoName": config.repoName,
+          "repoVersion": config.repoVersion,
+          "deviceSupports": config.deviceSupports.map { $0.toJson() },
+          "knownModels": config.knownModels,
+          "defaultSupport": config.defaultSupport.toJson()
         ]
         
         let jsonData = try JSONSerialization.data(withJSONObject: configDict, options: [])
@@ -931,3 +927,27 @@ private func resolveAssetPath(assetPath: String) -> String? {
   return nil
 }
 #endif
+
+/// Extension for DeviceSupport to handle JSON conversion
+extension DeviceSupport {
+    /// Converts DeviceSupport to a dictionary for JSON serialization
+    func toJson() -> [String: Any] {
+        return [
+            "chips": chips as Any,
+            "identifiers": identifiers,
+            "models": models.toJson()
+        ]
+    }
+}
+
+/// Extension for ModelSupport to handle JSON conversion
+extension ModelSupport {
+    /// Converts ModelSupport to a dictionary for JSON serialization
+    func toJson() -> [String: Any] {
+        return [
+            "default": `default`,
+            "supported": supported,
+            "disabled": disabled
+        ]
+    }
+}

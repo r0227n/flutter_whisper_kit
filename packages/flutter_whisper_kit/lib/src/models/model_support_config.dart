@@ -1,4 +1,5 @@
-import 'package:flutter_whisper_kit/src/models/model_support.dart';
+import 'model_support.dart';
+import 'device_support.dart';
 
 /// Represents the model support configuration for WhisperKit.
 class ModelSupportConfig {
@@ -18,7 +19,7 @@ class ModelSupportConfig {
   final String repoVersion;
 
   /// List of device-specific model support configurations.
-  final List<ModelSupport> deviceSupports;
+  final List<DeviceSupport> deviceSupports;
 
   /// List of all known model variants across all device supports.
   final List<String> knownModels;
@@ -29,28 +30,27 @@ class ModelSupportConfig {
   /// Creates a [ModelSupportConfig] from a JSON map.
   factory ModelSupportConfig.fromJson(Map<String, dynamic> json) {
     // Parse device supports
-    final List<ModelSupport> deviceSupports = (json['device_support'] as List?)
-            ?.map((e) => ModelSupport.fromJson(e as Map<String, dynamic>))
+    final List<DeviceSupport> deviceSupports =
+        (json['deviceSupports'] as List?)
+            ?.map((e) => DeviceSupport.fromJson(e as Map<String, dynamic>))
             .toList() ??
         [];
 
-    // Compute known models by flattening all supported models
-    final Set<String> knownModelsSet = {};
-    for (final support in deviceSupports) {
-      knownModelsSet.addAll(support.supportedModels);
-    }
-    final List<String> knownModels = knownModelsSet.toList()..sort();
+    // Parse known models
+    final List<String> knownModels =
+        (json['knownModels'] as List?)?.map((e) => e as String).toList() ?? [];
 
-    // Create default support for unknown devices that supports all known models
-    final ModelSupport defaultSupport = ModelSupport(
-      supportedModels: knownModels,
-      defaultModel: 'tiny',
-      disabledModels: [],
-    );
+    // Parse default support
+    final ModelSupport defaultSupport =
+        json['defaultSupport'] != null
+            ? ModelSupport.fromJson(
+              json['defaultSupport'] as Map<String, dynamic>,
+            )
+            : ModelSupport(supported: [], defaultModel: 'tiny', disabled: []);
 
     return ModelSupportConfig(
       repoName: json['name'] as String? ?? '',
-      repoVersion: json['version'] as String? ?? '',
+      repoVersion: json['repoVersion'] as String? ?? '',
       deviceSupports: deviceSupports,
       knownModels: knownModels,
       defaultSupport: defaultSupport,
@@ -60,9 +60,10 @@ class ModelSupportConfig {
   /// Converts this [ModelSupportConfig] to a JSON map.
   Map<String, dynamic> toJson() {
     return {
-      'name': repoName,
-      'version': repoVersion,
-      'device_support': deviceSupports.map((e) => e.toJson()).toList(),
+      'repoVersion': repoVersion,
+      'deviceSupports': deviceSupports.map((e) => e.toJson()).toList(),
+      'knownModels': knownModels,
+      'defaultSupport': defaultSupport.toJson(),
     };
   }
 
@@ -79,7 +80,8 @@ class ModelSupportConfig {
     return ModelSupportConfig(
       repoName: repoName.isEmpty ? fallback.repoName : repoName,
       repoVersion: repoVersion.isEmpty ? fallback.repoVersion : repoVersion,
-      deviceSupports: deviceSupports.isEmpty ? fallback.deviceSupports : deviceSupports,
+      deviceSupports:
+          deviceSupports.isEmpty ? fallback.deviceSupports : deviceSupports,
       knownModels: knownModels.isEmpty ? fallback.knownModels : knownModels,
       defaultSupport: defaultSupport,
     );
