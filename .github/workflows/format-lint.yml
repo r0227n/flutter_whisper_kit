@@ -7,7 +7,7 @@ on:
 
 jobs:
   setup:
-    uses: ./.github/actions/setup-fvm.yml
+    uses: ./.github/actions/setup-fvm
 
   format-and-lint:
     name: Format and Lint
