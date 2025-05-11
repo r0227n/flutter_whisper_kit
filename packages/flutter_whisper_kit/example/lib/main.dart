@@ -271,7 +271,6 @@ class _MyAppState extends State<MyApp> {
           onPressed: () async {
             final result =
                 await _flutterWhisperkitPlugin.fetchAvailableModels();
-            print(result);
           },
           child: const Icon(Icons.mic),
         ),
