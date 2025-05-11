@@ -24,4 +24,6 @@ abstract class WhisperKitMessage {
     List<String> matching,
     String? token,
   );
+  @async
+  String deviceName();
 }
