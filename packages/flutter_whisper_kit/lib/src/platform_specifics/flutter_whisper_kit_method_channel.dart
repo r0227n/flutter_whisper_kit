@@ -288,6 +288,26 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
     return ModelSupport.fromJson(json);
   }
 
+  /// Gets the current device name.
+  ///
+  /// Returns the name of the current device as recognized by WhisperKit.
+  /// This is useful for determining which models are compatible with the device.
+  @override
+  Future<String> deviceName() async {
+    return _whisperKitMessage.deviceName();
+  }
+
+  @override
+  Future<List<String>> formatModelFiles(List<String> modelFiles) async {
+    try {
+      final result = await _whisperKitMessage.formatModelFiles(modelFiles);
+      return result.whereType<String>().toList();
+    } catch (e) {
+      debugPrint('Error formatting model files: $e');
+      rethrow;
+    }
+  }
+
   @override
   Future<LanguageDetectionResult> detectLanguage(String audioPath) async {
     try {
@@ -305,14 +325,5 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       debugPrint('Error detecting language: $e');
       rethrow;
     }
-  }
-
-  /// Gets the current device name.
-  ///
-  /// Returns the name of the current device as recognized by WhisperKit.
-  /// This is useful for determining which models are compatible with the device.
-  @override
-  Future<String> deviceName() async {
-    return _whisperKitMessage.deviceName();
   }
 }

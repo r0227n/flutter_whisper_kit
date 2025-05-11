@@ -24,8 +24,6 @@ abstract class WhisperKitMessage {
     List<String> matching,
     String? token,
   );
-  @async
-  String? detectLanguage(String audioPath);
 
   /// Retrieves the name of the device asynchronously.
   ///
@@ -35,4 +33,8 @@ abstract class WhisperKitMessage {
   String deviceName();
   @async
   String? recommendedModels();
+  @async
+  List<String?> formatModelFiles(List<String> modelFiles);
+  @async
+  String? detectLanguage(String audioPath);
 }
