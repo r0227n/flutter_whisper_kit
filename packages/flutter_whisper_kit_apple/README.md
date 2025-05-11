@@ -9,8 +9,8 @@ This package is part of the flutter_whisper_kit plugin system and provides the A
 ## Platform Support
 
 This package specifically supports:
-- iOS 14.0+
-- macOS 11.0+
+- iOS 16.0+
+- macOS 13.0+
 
 ## Implementation Details
 
@@ -22,6 +22,10 @@ Flutter WhisperKit Apple provides the native implementation that connects Flutte
 4. Real-time streaming of transcription results
 5. Platform-specific optimizations
 
+## WhisperKit Version
+
+This plugin uses WhisperKit v0.12.0, which provides high-quality on-device speech recognition capabilities. The integration is done via Swift Package Manager, with the dependency specified in the Package.swift file.
+
 ## Architecture
 
 The implementation uses:
@@ -29,6 +33,16 @@ The implementation uses:
 - Pigeon for type-safe communication between Flutter and native code
 - CoreML for optimized model inference
 - AVFoundation for audio capture and processing
+- Swift Package Manager for WhisperKit integration
+
+## Key Features
+
+- **Model Management**: Downloads and manages WhisperKit models from Hugging Face repositories
+- **Audio Transcription**: Processes audio files and generates accurate transcriptions
+- **Real-time Transcription**: Captures and transcribes audio from the device microphone
+- **Progress Tracking**: Provides detailed progress updates during model downloads
+- **Language Detection**: Identifies the language being spoken in audio files
+- **Platform Optimizations**: Leverages Apple's CoreML for efficient model inference
 
 ## For Plugin Developers
 
@@ -39,15 +53,31 @@ If you're working on extending or maintaining this plugin:
 1. **FlutterWhisperKitApplePlugin**: Main plugin class that registers with the Flutter engine
 2. **WhisperKitApiImpl**: Implementation of the Pigeon-generated interface
 3. **TranscriptionStreamHandler**: Manages streaming transcription results back to Flutter
+4. **ModelProgressStreamHandler**: Handles progress updates during model downloads
+5. **AudioProcessor**: Manages audio recording and processing for real-time transcription
 
 ### Native Implementation
 
 The native implementation:
-1. Configures WhisperKit with compute options
+1. Configures WhisperKit with compute options (CPU, GPU, Neural Engine)
 2. Manages model downloading and storage
 3. Handles audio file transcription
 4. Processes real-time audio from the microphone
 5. Streams transcription results back to Flutter
+6. Provides detailed error information for troubleshooting
+
+### WhisperKit Configuration
+
+The plugin configures WhisperKit with the following key parameters:
+
+```swift
+// Initialize WhisperKit with compute options
+let whisperKit = try WhisperKit(
+    modelPath: modelURL,
+    computeUnits: .all,
+    prewarmMode: true
+)
+```
 
 ### Error Codes
 
@@ -76,9 +106,18 @@ The plugin uses the following error code system to report errors:
 | **5000-5999** | **Configuration and Parameters** | **Errors related to configuration and input parameters** |
 | 5001 | Parameters | File path is required |
 
+## Performance Considerations
+
+- **Model Size**: Larger models provide better accuracy but require more memory and processing power
+- **Compute Units**: The plugin uses all available compute units (CPU, GPU, Neural Engine) by default
+- **Prewarming**: Models are prewarmed by default to improve initial inference speed
+- **Audio Chunking**: Real-time transcription uses Voice Activity Detection (VAD) for optimal chunking
+
 ## References
 
 - [WhisperKit GitHub Repository](https://github.com/argmaxinc/WhisperKit)
 - [Flutter Plugin Development](https://docs.flutter.dev/packages-and-plugins/developing-packages)
 - [Pigeon Documentation](https://pub.dev/packages/pigeon)
+- [CoreML Documentation](https://developer.apple.com/documentation/coreml)
+- [AVFoundation Documentation](https://developer.apple.com/documentation/avfoundation)
 
