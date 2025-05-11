@@ -355,4 +355,45 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       rethrow;
     }
   }
+
+  /// Fetches recommended models for the current device from a remote repository.
+  ///
+  /// This method retrieves model support information specifically tailored for
+  /// the current device from a remote repository.
+  ///
+  /// Parameters:
+  /// - [repo]: The repository name (default: "argmaxinc/whisperkit-coreml").
+  /// - [downloadBase]: The base URL for downloads (optional).
+  /// - [token]: An access token for the repository (optional).
+  ///
+  /// Returns a [Future] that completes with a [ModelSupport] object containing
+  /// information about supported models for the current device.
+  @override
+  Future<ModelSupport> recommendedRemoteModels({
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? downloadBase,
+    String? token,
+  }) async {
+    try {
+      final result = await _whisperKitMessage.recommendedRemoteModels(
+        repo,
+        downloadBase,
+        token,
+      );
+
+      if (result == null) {
+        throw Exception('Failed to fetch recommended remote models');
+      }
+
+      // Parse the JSON string into a ModelSupport object
+      final Map<String, dynamic> json = Map<String, dynamic>.from(
+        jsonDecode(result) as Map,
+      );
+
+      return ModelSupport.fromJson(json);
+    } catch (e) {
+      debugPrint('Error fetching recommended remote models: $e');
+      rethrow;
+    }
+  }
 }

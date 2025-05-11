@@ -362,4 +362,21 @@ class FlutterWhisperKit {
   Future<ModelSupportConfig> fetchModelSupportConfig() async {
     return await FlutterWhisperKitPlatform.instance.fetchModelSupportConfig();
   }
+
+  /// Fetches recommended models for the current device from a remote repository.
+  ///
+  /// This method retrieves model support information specifically tailored for
+  /// the current device from a remote repository.
+  ///
+  /// Returns a [Future] that completes with a [ModelSupport] object containing
+  /// information about supported models for the current device.
+  ///
+  /// Example:
+  /// ```dart
+  /// final modelSupport = await flutterWhisperKit.recommendedRemoteModels();
+  /// print('Recommended models: $modelSupport');
+  /// ```
+  Future<ModelSupport> recommendedRemoteModels() async {
+    return await FlutterWhisperKitPlatform.instance.recommendedRemoteModels();
+  }
 }

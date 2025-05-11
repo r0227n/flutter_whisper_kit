@@ -220,6 +220,19 @@ class MockFlutterWhisperkitPlatform
       ),
     ),
   );
+
+  @override
+  Future<ModelSupport> recommendedRemoteModels({
+    String? downloadBase,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+  }) => Future.value(
+    ModelSupport(
+      defaultModel: 'tiny',
+      supported: ['tiny', 'base', 'small', 'medium', 'large'],
+      disabled: [],
+    ),
+  );
 }
 
 /// Sets up a mock platform for testing.
