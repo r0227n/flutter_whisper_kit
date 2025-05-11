@@ -1,0 +1,32 @@
+name: Format and Lint
+
+on:
+  pull_request:
+    branches: [ '**' ]
+  workflow_dispatch:
+
+jobs:
+  setup:
+    uses: ./.github/actions/setup-fvm.yml
+
+  format-and-lint:
+    name: Format and Lint
+    needs: setup
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      
+      - name: Install Dependencies
+        run: fvm flutter pub get
+      
+      - name: Verify Formatting
+        run: fvm dart format --output=none --set-exit-if-changed .
+      
+      - name: Run Analyzer
+        run: fvm flutter analyze --no-fatal-infos
+      
+      - name: Run Tests (if available)
+        run: fvm flutter test
+        continue-on-error: true
