@@ -11,6 +11,15 @@ class MockFlutterWhisperkitPlatform
   Future<String> deviceName() => Future.value('Mock Device');
 
   @override
+  Future<ModelSupport> recommendedModels() => Future.value(
+    ModelSupport(
+      defaultModel: 'tiny',
+      supported: ['tiny', 'base', 'small', 'medium', 'large'],
+      disabled: [],
+    ),
+  );
+
+  @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,

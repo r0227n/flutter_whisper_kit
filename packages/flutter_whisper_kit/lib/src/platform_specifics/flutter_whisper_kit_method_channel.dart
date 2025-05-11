@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -267,6 +268,24 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       // Error is propagated to the caller
       rethrow;
     }
+  }
+
+  /// Gets the recommended models for the current device.
+  ///
+  /// Returns information about which models are supported on the current device,
+  /// including the default recommended model and any disabled models.
+  @override
+  Future<ModelSupport> recommendedModels() async {
+    final result = await _whisperKitMessage.recommendedModels();
+    if (result == null) {
+      throw Exception('Failed to get recommended models');
+    }
+
+    // Parse the JSON string into a ModelSupport object
+    final Map<String, dynamic> json = Map<String, dynamic>.from(
+      jsonDecode(result) as Map,
+    );
+    return ModelSupport.fromJson(json);
   }
 
   /// Gets the current device name.

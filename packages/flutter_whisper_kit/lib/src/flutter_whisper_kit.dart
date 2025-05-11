@@ -283,4 +283,23 @@ class FlutterWhisperKit {
   Future<String> deviceName() async {
     return await FlutterWhisperKitPlatform.instance.deviceName();
   }
+
+  /// Returns a list of recommended models for the current device.
+  ///
+  /// This method returns a list of model variants that are recommended for
+  /// the current device based on its hardware capabilities and WhisperKit's
+  /// model compatibility matrix.
+  ///
+  /// Returns a [ModelSupport] object containing the default model, supported models, and disabled models.
+  ///
+  /// Example:
+  /// ```dart
+  /// final modelSupport = await flutterWhisperKit.recommendedModels();
+  /// print('Default model: ${modelSupport.defaultModel}');
+  /// print('Supported models: ${modelSupport.supported}');
+  /// print('Disabled models: ${modelSupport.disabled}');
+  /// ```
+  Future<ModelSupport> recommendedModels() async {
+    return await FlutterWhisperKitPlatform.instance.recommendedModels();
+  }
 }
