@@ -559,15 +559,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           token: token
         )
         
-        let configDict: [String: Any] = [
-          "repoName": config.repoName,
-          "repoVersion": config.repoVersion,
-          "deviceSupports": config.deviceSupports.map { $0.toJson() },
-          "knownModels": config.knownModels,
-          "defaultSupport": config.defaultSupport.toJson()
-        ]
-        
-        let jsonData = try JSONSerialization.data(withJSONObject: configDict, options: [])
+        let jsonData = try JSONSerialization.data(withJSONObject: config.toJson(), options: [])
         let jsonString = String(data: jsonData, encoding: .utf8)
         
         completion(.success(jsonString))
@@ -927,27 +919,3 @@ private func resolveAssetPath(assetPath: String) -> String? {
   return nil
 }
 #endif
-
-/// Extension for DeviceSupport to handle JSON conversion
-extension DeviceSupport {
-    /// Converts DeviceSupport to a dictionary for JSON serialization
-    func toJson() -> [String: Any] {
-        return [
-            "chips": chips as Any,
-            "identifiers": identifiers,
-            "models": models.toJson()
-        ]
-    }
-}
-
-/// Extension for ModelSupport to handle JSON conversion
-extension ModelSupport {
-    /// Converts ModelSupport to a dictionary for JSON serialization
-    func toJson() -> [String: Any] {
-        return [
-            "default": `default`,
-            "supported": supported,
-            "disabled": disabled
-        ]
-    }
-}
