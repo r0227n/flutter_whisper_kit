@@ -264,7 +264,7 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       );
       return result.whereType<String>().toList();
     } catch (e) {
-      print('Error fetching available models: $e');
+      // Error is propagated to the caller
       rethrow;
     }
   }
