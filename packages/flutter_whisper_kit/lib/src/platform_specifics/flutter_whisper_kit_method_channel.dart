@@ -326,4 +326,33 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       rethrow;
     }
   }
+
+  @override
+  Future<ModelSupportConfig> fetchModelSupportConfig({
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? downloadBase,
+    String? token,
+  }) async {
+    try {
+      final result = await _whisperKitMessage.fetchModelSupportConfig(
+        repo,
+        downloadBase,
+        token,
+      );
+
+      if (result == null) {
+        throw Exception('Failed to fetch model support configuration');
+      }
+
+      // Parse the JSON string into a ModelSupportConfig object
+      final Map<String, dynamic> json = Map<String, dynamic>.from(
+        jsonDecode(result) as Map,
+      );
+
+      return ModelSupportConfig.fromJson(json);
+    } catch (e) {
+      debugPrint('Error fetching model support configuration: $e');
+      rethrow;
+    }
+  }
 }

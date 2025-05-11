@@ -541,6 +541,47 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
+  ///
+  /// - Parameters:
+  ///   - repo: The repository name to fetch from
+  ///   - completion: Callback with the model support configuration
+  func fetchModelSupportConfig(
+    repo: String, downloadBase: String?, token: String?,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        let downloadBaseURL = downloadBase != nil ? URL(string: downloadBase!) : nil
+        
+        let config = try await WhisperKit.fetchModelSupportConfig(
+          from: repo,
+          downloadBase: downloadBaseURL,
+          token: token
+        )
+        
+        let configDict: [String: Any] = [
+          "name": config.repoName,
+          "version": config.repoVersion,
+          "device_support": config.deviceSupports.map { support in
+            [
+              "supportedModels": support.supportedModels,
+              "defaultModel": support.defaultModel,
+              "disabledModels": support.disabledModels
+            ]
+          }
+        ]
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: configDict, options: [])
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        
+        completion(.success(jsonString))
+      } catch {
+        print("Error fetching model support config: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
   /// Starts recording audio for transcription
   ///
   /// - Parameters:
