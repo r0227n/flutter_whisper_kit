@@ -36,10 +36,11 @@ class ModelDiscoverySection extends StatelessWidget {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        
+
         // Fetch Available Models
         ElevatedButton(
-          onPressed: isLoadingAvailableModels ? null : onFetchAvailableModelsPressed,
+          onPressed:
+              isLoadingAvailableModels ? null : onFetchAvailableModelsPressed,
           child: Text(
             isLoadingAvailableModels ? 'Loading...' : 'Fetch Available Models',
           ),
@@ -62,21 +63,23 @@ class ModelDiscoverySection extends StatelessWidget {
               availableModels.isEmpty
                   ? const Text('Press the button to fetch available models')
                   : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: availableModels
-                          .map((model) => Text(model))
-                          .toList(),
-                    ),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:
+                        availableModels.map((model) => Text(model)).toList(),
+                  ),
             ],
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Get Recommended Models
         ElevatedButton(
-          onPressed: isLoadingRecommendedModels ? null : onGetRecommendedModelsPressed,
+          onPressed:
+              isLoadingRecommendedModels ? null : onGetRecommendedModelsPressed,
           child: Text(
-            isLoadingRecommendedModels ? 'Loading...' : 'Get Recommended Models',
+            isLoadingRecommendedModels
+                ? 'Loading...'
+                : 'Get Recommended Models',
           ),
         ),
         const SizedBox(height: 8),
@@ -97,39 +100,48 @@ class ModelDiscoverySection extends StatelessWidget {
               recommendedModels == null
                   ? const Text('Press the button to get recommended models')
                   : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Default Model: ${recommendedModels?.defaultModel ?? "Unknown"}'),
-                        const SizedBox(height: 4),
-                        const Text('Supported Models:'),
-                        if (recommendedModels?.supported != null) ...[
-                          ...recommendedModels!.supported
-                              .map((model) => Text('- $model')),
-                        ],
-                        const SizedBox(height: 4),
-                        const Text('Disabled Models:'),
-                        if (recommendedModels?.disabled != null) ...[
-                          recommendedModels!.disabled.isEmpty
-                              ? const Text('- None')
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: recommendedModels!.disabled
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Default Model: ${recommendedModels?.defaultModel ?? "Unknown"}',
+                      ),
+                      const SizedBox(height: 4),
+                      const Text('Supported Models:'),
+                      if (recommendedModels?.supported != null) ...[
+                        ...recommendedModels!.supported.map(
+                          (model) => Text('- $model'),
+                        ),
+                      ],
+                      const SizedBox(height: 4),
+                      const Text('Disabled Models:'),
+                      if (recommendedModels?.disabled != null) ...[
+                        recommendedModels!.disabled.isEmpty
+                            ? const Text('- None')
+                            : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children:
+                                  recommendedModels!.disabled
                                       .map((model) => Text('- $model'))
                                       .toList(),
-                                ),
-                        ],
+                            ),
                       ],
-                    ),
+                    ],
+                  ),
             ],
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Get Recommended Remote Models
         ElevatedButton(
-          onPressed: isLoadingRecommendedRemoteModels ? null : onGetRecommendedRemoteModelsPressed,
+          onPressed:
+              isLoadingRecommendedRemoteModels
+                  ? null
+                  : onGetRecommendedRemoteModelsPressed,
           child: Text(
-            isLoadingRecommendedRemoteModels ? 'Loading...' : 'Get Recommended Remote Models',
+            isLoadingRecommendedRemoteModels
+                ? 'Loading...'
+                : 'Get Recommended Remote Models',
           ),
         ),
         const SizedBox(height: 8),
@@ -148,31 +160,37 @@ class ModelDiscoverySection extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               recommendedRemoteModels == null
-                  ? const Text('Press the button to get recommended remote models')
+                  ? const Text(
+                    'Press the button to get recommended remote models',
+                  )
                   : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Default Model: ${recommendedRemoteModels?.defaultModel ?? "Unknown"}'),
-                        const SizedBox(height: 4),
-                        const Text('Supported Models:'),
-                        if (recommendedRemoteModels?.supported != null) ...[
-                          ...recommendedRemoteModels!.supported
-                              .map((model) => Text('- $model')),
-                        ],
-                        const SizedBox(height: 4),
-                        const Text('Disabled Models:'),
-                        if (recommendedRemoteModels?.disabled != null) ...[
-                          recommendedRemoteModels!.disabled.isEmpty
-                              ? const Text('- None')
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: recommendedRemoteModels!.disabled
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Default Model: ${recommendedRemoteModels?.defaultModel ?? "Unknown"}',
+                      ),
+                      const SizedBox(height: 4),
+                      const Text('Supported Models:'),
+                      if (recommendedRemoteModels?.supported != null) ...[
+                        ...recommendedRemoteModels!.supported.map(
+                          (model) => Text('- $model'),
+                        ),
+                      ],
+                      const SizedBox(height: 4),
+                      const Text('Disabled Models:'),
+                      if (recommendedRemoteModels?.disabled != null) ...[
+                        recommendedRemoteModels!.disabled.isEmpty
+                            ? const Text('- None')
+                            : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children:
+                                  recommendedRemoteModels!.disabled
                                       .map((model) => Text('- $model'))
                                       .toList(),
-                                ),
-                        ],
+                            ),
                       ],
-                    ),
+                    ],
+                  ),
             ],
           ),
         ),

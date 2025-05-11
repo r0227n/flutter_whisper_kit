@@ -490,7 +490,8 @@ class _MyAppState extends State<MyApp> {
               recommendedModels: _recommendedModels,
               isLoadingRecommendedModels: _isLoadingRecommendedModels,
               recommendedRemoteModels: _recommendedRemoteModels,
-              isLoadingRecommendedRemoteModels: _isLoadingRecommendedRemoteModels,
+              isLoadingRecommendedRemoteModels:
+                  _isLoadingRecommendedRemoteModels,
               onFetchAvailableModelsPressed: _fetchAvailableModels,
               onGetRecommendedModelsPressed: _getRecommendedModels,
               onGetRecommendedRemoteModelsPressed: _getRecommendedRemoteModels,
@@ -519,11 +520,12 @@ class _MyAppState extends State<MyApp> {
               onFetchModelSupportConfigPressed: _fetchModelSupportConfig,
               onModelFilesChanged: (value) {
                 setState(() {
-                  _modelFilesToFormat = value
-                      .split(',')
-                      .map((e) => e.trim())
-                      .where((e) => e.isNotEmpty)
-                      .toList();
+                  _modelFilesToFormat =
+                      value
+                          .split(',')
+                          .map((e) => e.trim())
+                          .where((e) => e.isNotEmpty)
+                          .toList();
                 });
               },
             ),

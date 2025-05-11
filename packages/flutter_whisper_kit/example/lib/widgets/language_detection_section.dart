@@ -23,16 +23,22 @@ class LanguageDetectionSection extends StatelessWidget {
       if (languageDetectionResult?.probabilities == null) {
         return [];
       }
-      
+
       final entries = languageDetectionResult!.probabilities.entries.toList();
-      entries.sort((a, b) => b.value.compareTo(a.value)); // Sort by probability (descending)
-      
+      entries.sort(
+        (a, b) => b.value.compareTo(a.value),
+      ); // Sort by probability (descending)
+
       return entries
-          .where((entry) => entry.value > 0.01) // Filter out very low probabilities
+          .where(
+            (entry) => entry.value > 0.01,
+          ) // Filter out very low probabilities
           .take(5) // Take top 5
-          .map((entry) => Text(
-                '- ${entry.key}: ${(entry.value * 100).toStringAsFixed(2)}%',
-              ))
+          .map(
+            (entry) => Text(
+              '- ${entry.key}: ${(entry.value * 100).toStringAsFixed(2)}%',
+            ),
+          )
           .toList();
     }
 
@@ -45,9 +51,10 @@ class LanguageDetectionSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         ElevatedButton(
-          onPressed: isModelLoaded && !isDetectingLanguage
-              ? onDetectLanguagePressed
-              : null,
+          onPressed:
+              isModelLoaded && !isDetectingLanguage
+                  ? onDetectLanguagePressed
+                  : null,
           child: Text(
             isDetectingLanguage ? 'Detecting...' : 'Detect Language from File',
           ),
@@ -68,16 +75,20 @@ class LanguageDetectionSection extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               languageDetectionResult == null
-                  ? const Text('Press the button to detect language from a file')
+                  ? const Text(
+                    'Press the button to detect language from a file',
+                  )
                   : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Detected Language: ${languageDetectionResult?.language ?? "Unknown"}'),
-                        const SizedBox(height: 8),
-                        const Text('Language Probabilities:'),
-                        ...getProbabilityWidgets(),
-                      ],
-                    ),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Detected Language: ${languageDetectionResult?.language ?? "Unknown"}',
+                      ),
+                      const SizedBox(height: 8),
+                      const Text('Language Probabilities:'),
+                      ...getProbabilityWidgets(),
+                    ],
+                  ),
             ],
           ),
         ),

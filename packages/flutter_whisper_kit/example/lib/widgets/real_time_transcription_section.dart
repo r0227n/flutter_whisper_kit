@@ -35,16 +35,17 @@ class RealTimeTranscriptionSection extends StatelessWidget {
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(8.0),
           ),
-          child: segments.isNotEmpty
-              ? ListView.builder(
-                  itemCount: segments.length,
-                  itemBuilder: (context, index) {
-                    return Text(
-                      '[${segments[index].start.toStringAsFixed(2)}s - ${segments[index].end.toStringAsFixed(2)}s]: ${segments[index].text}',
-                    );
-                  },
-                )
-              : const Text('No segments'),
+          child:
+              segments.isNotEmpty
+                  ? ListView.builder(
+                    itemCount: segments.length,
+                    itemBuilder: (context, index) {
+                      return Text(
+                        '[${segments[index].start.toStringAsFixed(2)}s - ${segments[index].end.toStringAsFixed(2)}s]: ${segments[index].text}',
+                      );
+                    },
+                  )
+                  : const Text('No segments'),
         ),
         const SizedBox(height: 8),
         Container(

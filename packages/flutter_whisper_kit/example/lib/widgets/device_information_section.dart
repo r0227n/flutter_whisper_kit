@@ -25,9 +25,7 @@ class DeviceInformationSection extends StatelessWidget {
         const SizedBox(height: 8),
         ElevatedButton(
           onPressed: isLoadingDeviceName ? null : onGetDeviceNamePressed,
-          child: Text(
-            isLoadingDeviceName ? 'Loading...' : 'Get Device Name',
-          ),
+          child: Text(isLoadingDeviceName ? 'Loading...' : 'Get Device Name'),
         ),
         const SizedBox(height: 8),
         Container(
