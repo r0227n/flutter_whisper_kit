@@ -102,6 +102,7 @@ protocol WhisperKitMessage {
   func formatModelFiles(modelFiles: [String], completion: @escaping (Result<[String?], Error>) -> Void)
   func detectLanguage(audioPath: String, completion: @escaping (Result<String?, Error>) -> Void)
   func fetchModelSupportConfig(repo: String, downloadBase: String?, token: String?, completion: @escaping (Result<String?, Error>) -> Void)
+  func recommendedRemoteModels(repo: String, downloadBase: String?, token: String?, completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -287,6 +288,25 @@ class WhisperKitMessageSetup {
       }
     } else {
       fetchModelSupportConfigChannel.setMessageHandler(nil)
+    }
+    let recommendedRemoteModelsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisper_kit.WhisperKitMessage.recommendedRemoteModels\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      recommendedRemoteModelsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let repoArg = args[0] as! String
+        let downloadBaseArg: String? = nilOrValue(args[1])
+        let tokenArg: String? = nilOrValue(args[2])
+        api.recommendedRemoteModels(repo: repoArg, downloadBase: downloadBaseArg, token: tokenArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      recommendedRemoteModelsChannel.setMessageHandler(nil)
     }
   }
 }
