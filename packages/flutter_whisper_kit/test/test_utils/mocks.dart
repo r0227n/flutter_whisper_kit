@@ -29,6 +29,10 @@ class MockFlutterWhisperkitPlatform
       );
 
   @override
+  Future<List<String>> formatModelFiles(List<String> modelPaths) =>
+      Future.value(modelPaths);
+
+  @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,

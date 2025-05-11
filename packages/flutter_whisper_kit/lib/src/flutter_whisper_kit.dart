@@ -320,4 +320,24 @@ class FlutterWhisperKit {
   Future<LanguageDetectionResult> detectLanguage(String audioPath) async {
     return await FlutterWhisperKitPlatform.instance.detectLanguage(audioPath);
   }
+
+  /// Formats model files.
+  ///
+  /// This method formats model files for consistent handling across the plugin.
+  ///
+  /// Parameters:
+  /// - [modelFiles]: A list of model file names to format.
+  ///
+  /// Returns a list of formatted model file names.
+  ///
+  /// Example:
+  /// ```dart
+  /// final formattedModelFiles = await flutterWhisperKit.formatModelFiles(modelFiles);
+  /// print('Formatted model files: $formattedModelFiles');
+  /// ```
+  Future<List<String>> formatModelFiles(List<String> modelFiles) async {
+    return await FlutterWhisperKitPlatform.instance.formatModelFiles(
+      modelFiles,
+    );
+  }
 }

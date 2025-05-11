@@ -93,13 +93,14 @@ protocol WhisperKitMessage {
   func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func fetchAvailableModels(modelRepo: String, matching: [String], token: String?, completion: @escaping (Result<[String?], Error>) -> Void)
-  func detectLanguage(audioPath: String, completion: @escaping (Result<String?, Error>) -> Void)
   /// Retrieves the name of the device asynchronously.
   ///
   /// This method is asynchronous and returns a [Future] containing the device name as a [String].
   /// Ensure to use `await` or handle the returned [Future] appropriately.
   func deviceName(completion: @escaping (Result<String, Error>) -> Void)
   func recommendedModels(completion: @escaping (Result<String?, Error>) -> Void)
+  func formatModelFiles(modelFiles: [String], completion: @escaping (Result<[String?], Error>) -> Void)
+  func detectLanguage(audioPath: String, completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -199,23 +200,6 @@ class WhisperKitMessageSetup {
     } else {
       fetchAvailableModelsChannel.setMessageHandler(nil)
     }
-    let detectLanguageChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisper_kit.WhisperKitMessage.detectLanguage\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      detectLanguageChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let audioPathArg = args[0] as! String
-        api.detectLanguage(audioPath: audioPathArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      detectLanguageChannel.setMessageHandler(nil)
-    }
     /// Retrieves the name of the device asynchronously.
     ///
     /// This method is asynchronous and returns a [Future] containing the device name as a [String].
@@ -249,6 +233,40 @@ class WhisperKitMessageSetup {
       }
     } else {
       recommendedModelsChannel.setMessageHandler(nil)
+    }
+    let formatModelFilesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisper_kit.WhisperKitMessage.formatModelFiles\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      formatModelFilesChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let modelFilesArg = args[0] as! [String]
+        api.formatModelFiles(modelFiles: modelFilesArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      formatModelFilesChannel.setMessageHandler(nil)
+    }
+    let detectLanguageChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisper_kit.WhisperKitMessage.detectLanguage\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      detectLanguageChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let audioPathArg = args[0] as! String
+        api.detectLanguage(audioPath: audioPathArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      detectLanguageChannel.setMessageHandler(nil)
     }
   }
 }
