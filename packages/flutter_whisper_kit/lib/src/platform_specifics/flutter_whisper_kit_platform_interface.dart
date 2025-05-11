@@ -225,4 +225,16 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   Future<String> deviceName() {
     throw UnimplementedError('deviceName() has not been implemented.');
   }
+
+  /// Gets the recommended models for the current device.
+  ///
+  /// Returns information about which models are supported on the current device,
+  /// including the default recommended model and any disabled models.
+  ///
+  /// Returns a [Future] that completes with a [ModelSupport] object.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<ModelSupport> recommendedModels() {
+    throw UnimplementedError('recommendedModels() has not been implemented.');
+  }
 }

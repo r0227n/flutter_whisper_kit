@@ -445,6 +445,35 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
+  /// Gets the recommended models for the current device
+  ///
+  /// - Parameter completion: Callback with the recommended models
+  func recommendedModels(completion: @escaping (Result<String?, Error>) -> Void) {
+    Task {
+      do {
+        let modelSupport = WhisperKit.recommendedModels()
+        
+        let supportedModels = modelSupport.supportedModels
+        let defaultModel = modelSupport.defaultModel
+        let disabledModels = modelSupport.disabledModels
+        
+        let modelSupportDict: [String: Any] = [
+          "supportedModels": supportedModels,
+          "defaultModel": defaultModel,
+          "disabledModels": disabledModels
+        ]
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: modelSupportDict, options: [])
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        
+        completion(.success(jsonString))
+      } catch {
+        print("Error getting recommended models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
   /// Gets the current device name
   ///
   /// - Parameter completion: Callback with the device name
