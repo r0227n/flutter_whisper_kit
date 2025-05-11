@@ -453,14 +453,14 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       do {
         let modelSupport = WhisperKit.recommendedModels()
         
-        let supportedModels = modelSupport.supportedModels
-        let defaultModel = modelSupport.defaultModel
-        let disabledModels = modelSupport.disabledModels
+        let defaultModel = modelSupport.default
+        let supportedModels = modelSupport.supported
+        let disabledModels = modelSupport.disabled
         
         let modelSupportDict: [String: Any] = [
-          "supportedModels": supportedModels,
-          "defaultModel": defaultModel,
-          "disabledModels": disabledModels
+          "default": defaultModel,
+          "supported": supportedModels,
+          "disabled": disabledModels
         ]
         
         let jsonData = try JSONSerialization.data(withJSONObject: modelSupportDict, options: [])

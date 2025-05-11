@@ -93,7 +93,12 @@ protocol WhisperKitMessage {
   func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func fetchAvailableModels(modelRepo: String, matching: [String], token: String?, completion: @escaping (Result<[String?], Error>) -> Void)
+  /// Retrieves the name of the device asynchronously.
+  ///
+  /// This method is asynchronous and returns a [Future] containing the device name as a [String].
+  /// Ensure to use `await` or handle the returned [Future] appropriately.
   func deviceName(completion: @escaping (Result<String, Error>) -> Void)
+  func recommendedModels(completion: @escaping (Result<String?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -193,6 +198,10 @@ class WhisperKitMessageSetup {
     } else {
       fetchAvailableModelsChannel.setMessageHandler(nil)
     }
+    /// Retrieves the name of the device asynchronously.
+    ///
+    /// This method is asynchronous and returns a [Future] containing the device name as a [String].
+    /// Ensure to use `await` or handle the returned [Future] appropriately.
     let deviceNameChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisper_kit.WhisperKitMessage.deviceName\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       deviceNameChannel.setMessageHandler { _, reply in
@@ -207,6 +216,21 @@ class WhisperKitMessageSetup {
       }
     } else {
       deviceNameChannel.setMessageHandler(nil)
+    }
+    let recommendedModelsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisper_kit.WhisperKitMessage.recommendedModels\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      recommendedModelsChannel.setMessageHandler { _, reply in
+        api.recommendedModels { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      recommendedModelsChannel.setMessageHandler(nil)
     }
   }
 }
