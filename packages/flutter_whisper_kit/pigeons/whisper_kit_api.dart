@@ -37,4 +37,10 @@ abstract class WhisperKitMessage {
   List<String?> formatModelFiles(List<String> modelFiles);
   @async
   String? detectLanguage(String audioPath);
+  @async
+  String? fetchModelSupportConfig(
+    String repo,
+    String? downloadBase,
+    String? token,
+  );
 }

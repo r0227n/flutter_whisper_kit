@@ -270,4 +270,28 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   Future<List<String>> formatModelFiles(List<String> modelFiles) {
     throw UnimplementedError('formatModelFiles() has not been implemented.');
   }
+
+  /// Fetches model support configuration from a remote repository.
+  ///
+  /// This method retrieves a configuration file from the specified repository
+  /// that contains information about which models are supported on different devices.
+  ///
+  /// Parameters:
+  /// - [repo]: The repository name (default: "argmaxinc/whisperkit-coreml").
+  /// - [downloadBase]: The base URL for downloads (optional).
+  /// - [token]: An access token for the repository (optional).
+  ///
+  /// Returns a [Future] that completes with a [ModelSupportConfig] object containing
+  /// information about supported models for different devices.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<ModelSupportConfig> fetchModelSupportConfig({
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? downloadBase,
+    String? token,
+  }) {
+    throw UnimplementedError(
+      'fetchModelSupportConfig() has not been implemented.',
+    );
+  }
 }

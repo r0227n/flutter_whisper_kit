@@ -226,11 +226,35 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.2"
+  http_parser:
+    dependency: transitive
+    description:
+      name: http_parser
+      sha256: "178d74305e7866013777bab2c3d8726205dc5a4dd935297175b19a23a2e66571"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.2"
+  huggingface_client:
+    dependency: transitive
+    description:
+      name: huggingface_client
+      sha256: a276805db74a0a8ef83306e6492e5b0cf6c7a15d209d7492c4e875035f56ba37
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.2"
   integration_test:
     dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.20.2"
   leak_tracker:
     dependency: transitive
     description:

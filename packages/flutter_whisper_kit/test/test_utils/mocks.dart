@@ -191,6 +191,35 @@ class MockFlutterWhisperkitPlatform
     'large-v2',
     'large-v3',
   ]);
+
+  @override
+  Future<ModelSupportConfig> fetchModelSupportConfig({
+    String? downloadBase,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+  }) => Future.value(
+    ModelSupportConfig(
+      repoName: repo,
+      repoVersion: '1.0.0',
+      deviceSupports: [
+        DeviceSupport(
+          chips: 'A12, A13',
+          identifiers: ['iPhone12,1', 'iPhone12,3'],
+          models: ModelSupport(
+            defaultModel: 'tiny',
+            supported: ['tiny', 'base', 'small', 'medium', 'large'],
+            disabled: [],
+          ),
+        ),
+      ],
+      knownModels: ['tiny', 'base', 'small', 'medium', 'large'],
+      defaultSupport: ModelSupport(
+        defaultModel: 'tiny',
+        supported: ['tiny', 'base', 'small', 'medium', 'large'],
+        disabled: [],
+      ),
+    ),
+  );
 }
 
 /// Sets up a mock platform for testing.

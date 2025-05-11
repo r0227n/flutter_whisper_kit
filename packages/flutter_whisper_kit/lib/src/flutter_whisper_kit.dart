@@ -340,4 +340,26 @@ class FlutterWhisperKit {
       modelFiles,
     );
   }
+
+  /// Fetches model support configuration from a remote repository.
+  ///
+  /// This method retrieves a configuration file from the specified repository
+  /// that contains information about which models are supported on different devices.
+  ///
+  /// Parameters:
+  /// - [repo]: The repository name (default: "argmaxinc/whisperkit-coreml").
+  /// - [downloadBase]: The base URL for downloads (optional).
+  /// - [token]: An access token for the repository (optional).
+  ///
+  /// Returns a [Future] that completes with a [ModelSupportConfig] object containing
+  /// information about supported models for different devices.
+  ///
+  /// Example:
+  /// ```dart
+  /// final modelSupportConfig = await flutterWhisperKit.fetchModelSupportConfig();
+  /// print('Model support config: $modelSupportConfig');
+  /// ```
+  Future<ModelSupportConfig> fetchModelSupportConfig() async {
+    return await FlutterWhisperKitPlatform.instance.fetchModelSupportConfig();
+  }
 }
