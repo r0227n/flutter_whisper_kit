@@ -570,6 +570,41 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
+  ///
+  /// - Parameters:
+  ///   - repo: The repository name to fetch from
+  ///   - completion: Callback with the recommended models for the current device
+  func recommendedRemoteModels(
+    repo: String, downloadBase: String?, token: String?,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        let downloadBaseURL = downloadBase != nil ? URL(string: downloadBase!) : nil
+        
+        let modelSupport = try await WhisperKit.recommendedRemoteModels(
+          from: repo,
+          downloadBase: downloadBaseURL,
+          token: token
+        )
+        
+        let supportDict: [String: Any] = [
+          "supportedModels": modelSupport.supportedModels,
+          "defaultModel": modelSupport.defaultModel,
+          "disabledModels": modelSupport.disabledModels
+        ]
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: supportDict, options: [])
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        
+        completion(.success(jsonString))
+      } catch {
+        print("Error fetching recommended remote models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
   /// Starts recording audio for transcription
   ///
   /// - Parameters:

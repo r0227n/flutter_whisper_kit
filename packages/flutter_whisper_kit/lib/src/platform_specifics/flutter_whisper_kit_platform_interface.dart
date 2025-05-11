@@ -294,4 +294,28 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
       'fetchModelSupportConfig() has not been implemented.',
     );
   }
+
+  /// Fetches recommended models for the current device from a remote repository.
+  ///
+  /// This method retrieves model support information specifically tailored for
+  /// the current device from a remote repository.
+  ///
+  /// Parameters:
+  /// - [repo]: The repository name (default: "argmaxinc/whisperkit-coreml").
+  /// - [downloadBase]: The base URL for downloads (optional).
+  /// - [token]: An access token for the repository (optional).
+  ///
+  /// Returns a [Future] that completes with a [ModelSupport] object containing
+  /// information about supported models for the current device.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<ModelSupport> recommendedRemoteModels({
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? downloadBase,
+    String? token,
+  }) {
+    throw UnimplementedError(
+      'recommendedRemoteModels() has not been implemented.',
+    );
+  }
 }

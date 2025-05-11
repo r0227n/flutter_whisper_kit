@@ -43,4 +43,10 @@ abstract class WhisperKitMessage {
     String? downloadBase,
     String? token,
   );
+  @async
+  String? recommendedRemoteModels(
+    String repo,
+    String? downloadBase,
+    String? token,
+  );
 }
