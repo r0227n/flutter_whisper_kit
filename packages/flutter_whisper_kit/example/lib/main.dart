@@ -8,8 +8,6 @@ import 'widgets/device_information_section.dart';
 import 'widgets/model_discovery_section.dart';
 import 'widgets/language_detection_section.dart';
 import 'widgets/model_configuration_section.dart';
-import 'widgets/file_transcription_section.dart';
-import 'widgets/real_time_transcription_section.dart';
 
 void main() {
   runApp(const MyApp());

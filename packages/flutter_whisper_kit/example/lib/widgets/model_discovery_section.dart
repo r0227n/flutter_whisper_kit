@@ -99,22 +99,25 @@ class ModelDiscoverySection extends StatelessWidget {
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Default Model: ${recommendedModels.defaultModel}'),
+                        Text('Default Model: ${recommendedModels?.defaultModel ?? "Unknown"}'),
                         const SizedBox(height: 4),
                         const Text('Supported Models:'),
-                        ...recommendedModels.supported
-                            .map((model) => Text('- $model'))
-                            .toList(),
+                        if (recommendedModels?.supported != null) ...[
+                          ...recommendedModels!.supported
+                              .map((model) => Text('- $model')),
+                        ],
                         const SizedBox(height: 4),
                         const Text('Disabled Models:'),
-                        recommendedModels.disabled.isEmpty
-                            ? const Text('- None')
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: recommendedModels.disabled
-                                    .map((model) => Text('- $model'))
-                                    .toList(),
-                              ),
+                        if (recommendedModels?.disabled != null) ...[
+                          recommendedModels!.disabled.isEmpty
+                              ? const Text('- None')
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: recommendedModels!.disabled
+                                      .map((model) => Text('- $model'))
+                                      .toList(),
+                                ),
+                        ],
                       ],
                     ),
             ],
@@ -149,22 +152,25 @@ class ModelDiscoverySection extends StatelessWidget {
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Default Model: ${recommendedRemoteModels.defaultModel}'),
+                        Text('Default Model: ${recommendedRemoteModels?.defaultModel ?? "Unknown"}'),
                         const SizedBox(height: 4),
                         const Text('Supported Models:'),
-                        ...recommendedRemoteModels.supported
-                            .map((model) => Text('- $model'))
-                            .toList(),
+                        if (recommendedRemoteModels?.supported != null) ...[
+                          ...recommendedRemoteModels!.supported
+                              .map((model) => Text('- $model')),
+                        ],
                         const SizedBox(height: 4),
                         const Text('Disabled Models:'),
-                        recommendedRemoteModels.disabled.isEmpty
-                            ? const Text('- None')
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: recommendedRemoteModels.disabled
-                                    .map((model) => Text('- $model'))
-                                    .toList(),
-                              ),
+                        if (recommendedRemoteModels?.disabled != null) ...[
+                          recommendedRemoteModels!.disabled.isEmpty
+                              ? const Text('- None')
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: recommendedRemoteModels!.disabled
+                                      .map((model) => Text('- $model'))
+                                      .toList(),
+                                ),
+                        ],
                       ],
                     ),
             ],

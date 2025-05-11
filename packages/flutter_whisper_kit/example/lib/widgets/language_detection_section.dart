@@ -54,18 +54,21 @@ class LanguageDetectionSection extends StatelessWidget {
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Detected Language: ${languageDetectionResult.language}'),
+                        Text('Detected Language: ${languageDetectionResult?.language ?? "Unknown"}'),
                         const SizedBox(height: 8),
                         const Text('Language Probabilities:'),
-                        ...languageDetectionResult.probabilities.entries
-                            .toList()
-                            .where((entry) => entry.value > 0.01) // Filter out very low probabilities
-                            .sorted((a, b) => b.value.compareTo(a.value)) // Sort by probability (descending)
-                            .take(5) // Take top 5
-                            .map((entry) => Text(
-                                  '- ${entry.key}: ${(entry.value * 100).toStringAsFixed(2)}%',
-                                ))
-                            .toList(),
+                        if (languageDetectionResult?.probabilities != null) ...[
+                          ...languageDetectionResult!.probabilities.entries
+                              .toList()
+                              .where((entry) => entry.value > 0.01) // Filter out very low probabilities
+                              .map((e) => e) // Map to same type to avoid sorted method
+                              .toList()
+                              ..sort((a, b) => b.value.compareTo(a.value)) // Sort by probability (descending)
+                              .take(5) // Take top 5
+                              .map((entry) => Text(
+                                    '- ${entry.key}: ${(entry.value * 100).toStringAsFixed(2)}%',
+                                  )),
+                        ],
                       ],
                     ),
             ],

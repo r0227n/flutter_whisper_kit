@@ -41,7 +41,7 @@ class ModelConfigurationSection extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        TextField(
+        TextFormField(
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             hintText: 'Enter model file names separated by commas',
@@ -112,28 +112,30 @@ class ModelConfigurationSection extends StatelessWidget {
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Repository: ${modelSupportConfig.repoName}'),
-                        Text('Version: ${modelSupportConfig.repoVersion}'),
+                        Text('Repository: ${modelSupportConfig?.repoName ?? "Unknown"}'),
+                        Text('Version: ${modelSupportConfig?.repoVersion ?? "Unknown"}'),
                         const SizedBox(height: 4),
                         const Text('Known Models:'),
-                        ...modelSupportConfig.knownModels
-                            .map((model) => Text('- $model'))
-                            .toList(),
+                        if (modelSupportConfig?.knownModels != null) ...[
+                          ...modelSupportConfig!.knownModels
+                              .map((model) => Text('- $model')),
+                        ],
                         const SizedBox(height: 4),
                         const Text('Device Supports:'),
-                        ...modelSupportConfig.deviceSupports
-                            .map((deviceSupport) => Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Chip: ${deviceSupport.chips ?? "Unknown"}'),
-                                    Text('Identifiers: ${deviceSupport.identifiers.join(", ")}'),
-                                    Text('Default Model: ${deviceSupport.models.defaultModel}'),
-                                    Text('Supported Models: ${deviceSupport.models.supported.join(", ")}'),
-                                    Text('Disabled Models: ${deviceSupport.models.disabled.isEmpty ? "None" : deviceSupport.models.disabled.join(", ")}'),
-                                    const SizedBox(height: 8),
-                                  ],
-                                ))
-                            .toList(),
+                        if (modelSupportConfig?.deviceSupports != null) ...[
+                          ...modelSupportConfig!.deviceSupports
+                              .map((deviceSupport) => Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Chip: ${deviceSupport.chips ?? "Unknown"}'),
+                                      Text('Identifiers: ${deviceSupport.identifiers.join(", ")}'),
+                                      Text('Default Model: ${deviceSupport.models.defaultModel}'),
+                                      Text('Supported Models: ${deviceSupport.models.supported.join(", ")}'),
+                                      Text('Disabled Models: ${deviceSupport.models.disabled.isEmpty ? "None" : deviceSupport.models.disabled.join(", ")}'),
+                                      const SizedBox(height: 8),
+                                    ],
+                                  )),
+                        ],
                       ],
                     ),
             ],
