@@ -19,5 +19,9 @@ abstract class WhisperKitMessage {
   @async
   String? stopRecording(bool loop);
   @async
-  List<String?> fetchAvailableModels(String modelRepo, List<String?> matching, String? token);
+  List<String?> fetchAvailableModels(
+    String modelRepo,
+    List<String> matching,
+    String? token,
+  );
 }

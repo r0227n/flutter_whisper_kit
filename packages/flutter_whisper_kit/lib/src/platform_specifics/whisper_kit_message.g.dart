@@ -172,7 +172,7 @@ class WhisperKitMessage {
 
   Future<List<String?>> fetchAvailableModels(
     String modelRepo,
-    List<String?> matching,
+    List<String> matching,
     String? token,
   ) async {
     final String pigeonVar_channelName =
@@ -196,8 +196,13 @@ class WhisperKitMessage {
         message: pigeonVar_replyList[1] as String?,
         details: pigeonVar_replyList[2],
       );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
     } else {
-      return (pigeonVar_replyList[0] as List<Object?>).cast<String?>();
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<String?>();
     }
   }
 }

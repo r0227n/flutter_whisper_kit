@@ -242,7 +242,7 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
   @override
   Stream<Progress> get modelProgressStream =>
       _modelProgressStreamController.stream;
-      
+
   /// Fetches available WhisperKit models from a repository.
   ///
   /// - [modelRepo]: The repository to fetch models from (default: "argmaxinc/whisperkit-coreml").
