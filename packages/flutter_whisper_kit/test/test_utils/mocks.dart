@@ -202,10 +202,14 @@ class MockFlutterWhisperkitPlatform
       repoName: repo,
       repoVersion: '1.0.0',
       deviceSupports: [
-        ModelSupport(
-          defaultModel: 'tiny',
-          supported: ['tiny', 'base', 'small', 'medium', 'large'],
-          disabled: [],
+        DeviceSupport(
+          chips: 'A12, A13',
+          identifiers: ['iPhone12,1', 'iPhone12,3'],
+          models: ModelSupport(
+            defaultModel: 'tiny',
+            supported: ['tiny', 'base', 'small', 'medium', 'large'],
+            disabled: [],
+          ),
         ),
       ],
       knownModels: ['tiny', 'base', 'small', 'medium', 'large'],
