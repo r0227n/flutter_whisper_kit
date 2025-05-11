@@ -17,6 +17,17 @@ import 'platform_specifics/flutter_whisper_kit_platform_interface.dart';
 /// [FlutterWhisperKitPlatform] instance, ensuring consistent behavior
 /// across different platforms while abstracting away the platform-specific code.
 class FlutterWhisperKit {
+  /// Helper function to handle platform calls with error handling
+  Future<T> _handlePlatformCall<T>(Future<T> Function() platformCall) async {
+    try {
+      return await platformCall();
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// Loads a WhisperKit model.
   ///
   /// Downloads and initializes a WhisperKit model for speech recognition.
@@ -56,17 +67,13 @@ class FlutterWhisperKit {
       }
 
       // Delegate to the platform implementation
-      return await FlutterWhisperKitPlatform.instance.loadModel(
-        variant,
-        modelRepo: modelRepo,
-        redownload: redownload,
+      return await _handlePlatformCall(
+        () => FlutterWhisperKitPlatform.instance.loadModel(
+          variant,
+          modelRepo: modelRepo,
+          redownload: redownload,
+        ),
       );
-    } on PlatformException catch (e) {
-      // Convert platform exceptions to WhisperKitError for better error handling
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      // Rethrow other exceptions
-      rethrow;
     } finally {
       // Ensure the progress subscription is cancelled to prevent memory leaks
       progressSubscription?.cancel();
@@ -109,19 +116,12 @@ class FlutterWhisperKit {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
   }) async {
-    try {
-      // Delegate to the platform implementation
-      return await FlutterWhisperKitPlatform.instance.transcribeFromFile(
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.transcribeFromFile(
         filePath,
         options: options,
-      );
-    } on PlatformException catch (e) {
-      // Convert platform exceptions to WhisperKitError for better error handling
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      // Rethrow other exceptions
-      rethrow;
-    }
+      ),
+    );
   }
 
   /// Starts recording audio from the microphone for real-time transcription.
@@ -158,19 +158,12 @@ class FlutterWhisperKit {
     ),
     bool loop = true,
   }) async {
-    try {
-      // Delegate to the platform implementation
-      return await FlutterWhisperKitPlatform.instance.startRecording(
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.startRecording(
         options: options,
         loop: loop,
-      );
-    } on PlatformException catch (e) {
-      // Convert platform exceptions to WhisperKitError for better error handling
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      // Rethrow other exceptions
-      rethrow;
-    }
+      ),
+    );
   }
 
   /// Stops recording audio and optionally triggers transcription.
@@ -186,16 +179,9 @@ class FlutterWhisperKit {
   /// is stopped. If [loop] is false, also triggers transcription of the recorded audio.
   /// Throws a [WhisperKitError] if stopping recording fails.
   Future<String?> stopRecording({bool loop = true}) async {
-    try {
-      // Delegate to the platform implementation
-      return await FlutterWhisperKitPlatform.instance.stopRecording(loop: loop);
-    } on PlatformException catch (e) {
-      // Convert platform exceptions to WhisperKitError for better error handling
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      // Rethrow other exceptions
-      rethrow;
-    }
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.stopRecording(loop: loop),
+    );
   }
 
   /// Stream of real-time transcription results.
@@ -254,17 +240,13 @@ class FlutterWhisperKit {
     List<String> matching = const ['*'],
     String? token,
   }) async {
-    try {
-      return await FlutterWhisperKitPlatform.instance.fetchAvailableModels(
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.fetchAvailableModels(
         modelRepo: modelRepo,
         matching: matching,
         token: token,
-      );
-    } on PlatformException catch (e) {
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      rethrow;
-    }
+      ),
+    );
   }
 
   /// Returns the name of the device.
@@ -281,13 +263,9 @@ class FlutterWhisperKit {
   /// print('Device name: $deviceName');
   /// ```
   Future<String> deviceName() async {
-    try {
-      return await FlutterWhisperKitPlatform.instance.deviceName();
-    } on PlatformException catch (e) {
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      rethrow;
-    }
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.deviceName(),
+    );
   }
 
   /// Returns a list of recommended models for the current device.
@@ -306,13 +284,9 @@ class FlutterWhisperKit {
   /// print('Disabled models: ${modelSupport.disabled}');
   /// ```
   Future<ModelSupport> recommendedModels() async {
-    try {
-      return await FlutterWhisperKitPlatform.instance.recommendedModels();
-    } on PlatformException catch (e) {
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      rethrow;
-    }
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.recommendedModels(),
+    );
   }
 
   /// Detects the language of an audio file.
@@ -330,13 +304,9 @@ class FlutterWhisperKit {
   /// print('Language probabilities: ${result.probabilities}');
   /// ```
   Future<LanguageDetectionResult> detectLanguage(String audioPath) async {
-    try {
-      return await FlutterWhisperKitPlatform.instance.detectLanguage(audioPath);
-    } on PlatformException catch (e) {
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      rethrow;
-    }
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.detectLanguage(audioPath),
+    );
   }
 
   /// Formats model files.
@@ -354,15 +324,9 @@ class FlutterWhisperKit {
   /// print('Formatted model files: $formattedModelFiles');
   /// ```
   Future<List<String>> formatModelFiles(List<String> modelFiles) async {
-    try {
-      return await FlutterWhisperKitPlatform.instance.formatModelFiles(
-        modelFiles,
-      );
-    } on PlatformException catch (e) {
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      rethrow;
-    }
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.formatModelFiles(modelFiles),
+    );
   }
 
   /// Fetches model support configuration from a remote repository.
@@ -384,13 +348,9 @@ class FlutterWhisperKit {
   /// print('Model support config: $modelSupportConfig');
   /// ```
   Future<ModelSupportConfig> fetchModelSupportConfig() async {
-    try {
-      return await FlutterWhisperKitPlatform.instance.fetchModelSupportConfig();
-    } on PlatformException catch (e) {
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      rethrow;
-    }
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.fetchModelSupportConfig(),
+    );
   }
 
   /// Fetches recommended models for the current device from a remote repository.
@@ -407,12 +367,8 @@ class FlutterWhisperKit {
   /// print('Recommended models: $modelSupport');
   /// ```
   Future<ModelSupport> recommendedRemoteModels() async {
-    try {
-      return await FlutterWhisperKitPlatform.instance.recommendedRemoteModels();
-    } on PlatformException catch (e) {
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      rethrow;
-    }
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.recommendedRemoteModels(),
+    );
   }
 }
