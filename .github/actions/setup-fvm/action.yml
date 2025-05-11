@@ -12,7 +12,6 @@ runs:
     - name: Read FVM config
       id: fvm_config
       uses: kuhnroyal/flutter-fvm-config-action@v1
-      shell: bash
     
     - name: Cache FVM
       uses: actions/cache@v3
@@ -21,10 +20,8 @@ runs:
         key: ${{ runner.os }}-fvm-${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
         restore-keys: |
           ${{ runner.os }}-fvm-
-      shell: bash
     
     - name: Setup Flutter with FVM
       uses: leoafarias/fvm-action@v1
       with:
         version: ${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
-      shell: bash
