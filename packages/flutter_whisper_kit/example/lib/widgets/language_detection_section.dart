@@ -18,6 +18,24 @@ class LanguageDetectionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Process language probabilities for display
+    List<Widget> getProbabilityWidgets() {
+      if (languageDetectionResult?.probabilities == null) {
+        return [];
+      }
+      
+      final entries = languageDetectionResult!.probabilities.entries.toList();
+      entries.sort((a, b) => b.value.compareTo(a.value)); // Sort by probability (descending)
+      
+      return entries
+          .where((entry) => entry.value > 0.01) // Filter out very low probabilities
+          .take(5) // Take top 5
+          .map((entry) => Text(
+                '- ${entry.key}: ${(entry.value * 100).toStringAsFixed(2)}%',
+              ))
+          .toList();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -57,18 +75,7 @@ class LanguageDetectionSection extends StatelessWidget {
                         Text('Detected Language: ${languageDetectionResult?.language ?? "Unknown"}'),
                         const SizedBox(height: 8),
                         const Text('Language Probabilities:'),
-                        if (languageDetectionResult?.probabilities != null) ...[
-                          ...languageDetectionResult!.probabilities.entries
-                              .toList()
-                              .where((entry) => entry.value > 0.01) // Filter out very low probabilities
-                              .map((e) => e) // Map to same type to avoid sorted method
-                              .toList()
-                              ..sort((a, b) => b.value.compareTo(a.value)) // Sort by probability (descending)
-                              .take(5) // Take top 5
-                              .map((entry) => Text(
-                                    '- ${entry.key}: ${(entry.value * 100).toStringAsFixed(2)}%',
-                                  )),
-                        ],
+                        ...getProbabilityWidgets(),
                       ],
                     ),
             ],
