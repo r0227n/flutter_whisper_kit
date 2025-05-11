@@ -267,6 +267,13 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            final result =
+                await _flutterWhisperkitPlugin.fetchAvailableModels();
+          },
+          child: const Icon(Icons.mic),
+        ),
       ),
     );
   }

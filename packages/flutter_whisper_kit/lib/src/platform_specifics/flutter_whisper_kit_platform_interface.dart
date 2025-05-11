@@ -194,4 +194,23 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   Stream<Progress> get modelProgressStream {
     throw UnimplementedError('modelProgressStream has not been implemented.');
   }
+
+  /// Fetches available WhisperKit models from a repository.
+  ///
+  /// - [modelRepo]: The repository to fetch models from (default: "argmaxinc/whisperkit-coreml").
+  /// - [matching]: Optional list of glob patterns to filter models by.
+  /// - [token]: Optional access token for private repositories.
+  ///
+  /// Returns a list of available model names.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<List<String>> fetchAvailableModels({
+    String modelRepo = 'argmaxinc/whisperkit-coreml',
+    List<String> matching = const ['*'],
+    String? token,
+  }) {
+    throw UnimplementedError(
+      'fetchAvailableModels() has not been implemented.',
+    );
+  }
 }

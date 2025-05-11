@@ -92,6 +92,7 @@ protocol WhisperKitMessage {
   func transcribeFromFile(filePath: String, options: [String: Any?], completion: @escaping (Result<String?, Error>) -> Void)
   func startRecording(options: [String: Any?], loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
   func stopRecording(loop: Bool, completion: @escaping (Result<String?, Error>) -> Void)
+  func fetchAvailableModels(modelRepo: String, matching: [String], token: String?, completion: @escaping (Result<[String?], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -171,6 +172,25 @@ class WhisperKitMessageSetup {
       }
     } else {
       stopRecordingChannel.setMessageHandler(nil)
+    }
+    let fetchAvailableModelsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_whisper_kit.WhisperKitMessage.fetchAvailableModels\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      fetchAvailableModelsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let modelRepoArg = args[0] as! String
+        let matchingArg = args[1] as! [String]
+        let tokenArg: String? = nilOrValue(args[2])
+        api.fetchAvailableModels(modelRepo: modelRepoArg, matching: matchingArg, token: tokenArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      fetchAvailableModelsChannel.setMessageHandler(nil)
     }
   }
 }

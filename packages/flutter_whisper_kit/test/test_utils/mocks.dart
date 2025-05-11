@@ -148,6 +148,24 @@ class MockFlutterWhisperkitPlatform
       isIndeterminate: false,
     ),
   ]);
+
+  @override
+  Future<List<String>> fetchAvailableModels({
+    String modelRepo = 'argmaxinc/whisperkit-coreml',
+    List<String> matching = const ['*'],
+    String? token,
+  }) => Future.value([
+    'tiny',
+    'tiny.en',
+    'base',
+    'base.en',
+    'small',
+    'small.en',
+    'medium',
+    'medium.en',
+    'large-v2',
+    'large-v3',
+  ]);
 }
 
 /// Sets up a mock platform for testing.
