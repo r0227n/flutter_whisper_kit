@@ -1,27 +1,18 @@
 name: 'Setup FVM'
 description: 'Sets up Flutter Version Management (FVM) with the correct Flutter version'
 
-outputs:
-  flutter_version:
-    description: "Flutter version from FVM config"
-    value: ${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
-
 runs:
   using: "composite"
   steps:
-    - name: Read FVM config
-      id: fvm_config
-      uses: kuhnroyal/flutter-fvm-config-action@v1
-    
-    - name: Cache FVM
-      uses: actions/cache@v3
+    # https://github.com/kuhnroyal/flutter-fvm-config-action
+    - name: Fetch flutter config
+      uses: kuhnroyal/flutter-fvm-config-action@34c3905bc939a4ff9d9cb07d5a977493fa73b2aa # v2.0
+      id: fvm-config-action
+
+    # https://github.com/subosito/flutter-action
+    - name: Setup flutter
+      uses: subosito/flutter-action@1c5eb12d812966ca84680edc38353a0851c8fd56 # v2.14.0
       with:
-        path: ~/.fvm
-        key: ${{ runner.os }}-fvm-${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
-        restore-keys: |
-          ${{ runner.os }}-fvm-
-    
-    - name: Setup Flutter with FVM
-      uses: leoafarias/fvm-action@v1
-      with:
-        version: ${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
+        flutter-version: ${{ steps.fvm-config-action.outputs.FLUTTER_VERSION }}
+        channel: ${{ steps.fvm-config-action.outputs.FLUTTER_CHANNEL }}
+        cache: true
