@@ -302,4 +302,22 @@ class FlutterWhisperKit {
   Future<ModelSupport> recommendedModels() async {
     return await FlutterWhisperKitPlatform.instance.recommendedModels();
   }
+
+  /// Detects the language of an audio file.
+  ///
+  /// This method analyzes the audio content and determines the most likely
+  /// language being spoken, along with confidence scores for various languages.
+  ///
+  /// Returns a [Future] that completes with a [LanguageDetectionResult] containing
+  /// the detected language code and a map of language probabilities.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await flutterWhisperKit.detectLanguage(filePath);
+  /// print('Detected language: ${result.language}');
+  /// print('Language probabilities: ${result.probabilities}');
+  /// ```
+  Future<LanguageDetectionResult> detectLanguage(String audioPath) async {
+    return await FlutterWhisperKitPlatform.instance.detectLanguage(audioPath);
+  }
 }

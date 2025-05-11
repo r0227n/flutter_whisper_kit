@@ -20,6 +20,15 @@ class MockFlutterWhisperkitPlatform
   );
 
   @override
+  Future<LanguageDetectionResult> detectLanguage(String audioPath) =>
+      Future.value(
+        LanguageDetectionResult(
+          language: 'en',
+          probabilities: {'en': 0.95, 'ja': 0.05},
+        ),
+      );
+
+  @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,

@@ -14,13 +14,14 @@ class LanguageDetectionResult {
 
   /// Creates a [LanguageDetectionResult] from a JSON map.
   factory LanguageDetectionResult.fromJson(Map<String, dynamic> json) {
-    final Map<String, dynamic> rawProbs = json['probabilities'] as Map<String, dynamic>;
+    final Map<String, dynamic> rawProbs =
+        json['probabilities'] as Map<String, dynamic>;
     final Map<String, double> probabilities = {};
-    
+
     for (final entry in rawProbs.entries) {
       probabilities[entry.key] = (entry.value as num).toDouble();
     }
-    
+
     return LanguageDetectionResult(
       language: json['language'] as String,
       probabilities: probabilities,
@@ -29,9 +30,6 @@ class LanguageDetectionResult {
 
   /// Converts this [LanguageDetectionResult] to a JSON map.
   Map<String, dynamic> toJson() {
-    return {
-      'language': language,
-      'probabilities': probabilities,
-    };
+    return {'language': language, 'probabilities': probabilities};
   }
 }
