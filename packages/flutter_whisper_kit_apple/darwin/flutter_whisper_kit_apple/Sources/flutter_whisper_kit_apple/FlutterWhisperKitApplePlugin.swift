@@ -588,13 +588,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           token: token
         )
         
-        let supportDict: [String: Any] = [
-          "supportedModels": modelSupport.supportedModels,
-          "defaultModel": modelSupport.defaultModel,
-          "disabledModels": modelSupport.disabledModels
-        ]
-        
-        let jsonData = try JSONSerialization.data(withJSONObject: supportDict, options: [])
+        let jsonData = try JSONSerialization.data(withJSONObject: modelSupport.toJson(), options: [])
         let jsonString = String(data: jsonData, encoding: .utf8)
         
         completion(.success(jsonString))
