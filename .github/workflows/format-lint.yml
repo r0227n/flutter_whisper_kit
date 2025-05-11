@@ -6,17 +6,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup:
-    uses: ./.github/actions/setup-fvm@v1
-
   format-and-lint:
     name: Format and Lint
-    needs: setup
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Setup FVM
+        uses: ./.github/actions/setup-fvm
       
       - name: Install Dependencies
         run: fvm flutter pub get
