@@ -221,35 +221,38 @@ void main() {
       expect(json['fractionCompleted'], 0.25);
     });
   });
-  
+
   group('fetchAvailableModels', () {
     setUp(() {
       setUpMockPlatform();
     });
-    
+
     test('returns list of available models', () async {
       // Arrange
       final flutterWhisperKit = FlutterWhisperKit();
-      
+
       // Act
       final models = await flutterWhisperKit.fetchAvailableModels();
-      
+
       // Assert
       expect(models, isA<List<String>>());
       expect(models, isNotEmpty);
-      expect(models, contains(matches(RegExp(r'(tiny|base|small|medium|large)'))));
+      expect(
+        models,
+        contains(matches(RegExp(r'(tiny|base|small|medium|large)'))),
+      );
     });
-    
+
     test('accepts custom repository and matching patterns', () async {
       // Arrange
       final flutterWhisperKit = FlutterWhisperKit();
-      
+
       // Act
       final models = await flutterWhisperKit.fetchAvailableModels(
         modelRepo: 'custom/repo',
         matching: ['tiny*', 'base*'],
       );
-      
+
       // Assert
       expect(models, isA<List<String>>());
     });

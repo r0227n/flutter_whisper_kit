@@ -209,6 +209,8 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
     List<String> matching = const ['*'],
     String? token,
   }) {
-    throw UnimplementedError('fetchAvailableModels() has not been implemented.');
+    throw UnimplementedError(
+      'fetchAvailableModels() has not been implemented.',
+    );
   }
 }

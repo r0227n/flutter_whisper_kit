@@ -235,7 +235,7 @@ class FlutterWhisperKit {
   /// feedback to the user about the download status.
   Stream<Progress> get modelProgressStream =>
       FlutterWhisperKitPlatform.instance.modelProgressStream;
-      
+
   /// Fetches available WhisperKit models from a repository.
   ///
   /// - [modelRepo]: The repository to fetch models from (default: "argmaxinc/whisperkit-coreml").
