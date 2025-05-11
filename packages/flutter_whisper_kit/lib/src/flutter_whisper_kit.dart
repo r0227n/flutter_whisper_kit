@@ -266,4 +266,21 @@ class FlutterWhisperKit {
       rethrow;
     }
   }
+
+  /// Returns the name of the device.
+  ///
+  /// This method returns the name of the device running the application.
+  /// It uses the `deviceName` method from the platform interface to get
+  /// the device name.
+  ///
+  /// Returns the name of the device.
+  ///
+  /// Example:
+  /// ```dart
+  /// final deviceName = await flutterWhisperKit.deviceName();
+  /// print('Device name: $deviceName');
+  /// ```
+  Future<String> deviceName() async {
+    return await FlutterWhisperKitPlatform.instance.deviceName();
+  }
 }

@@ -213,7 +213,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
       'fetchAvailableModels() has not been implemented.',
     );
   }
-  
+
   /// Gets the current device name.
   ///
   /// Returns the name of the current device as recognized by WhisperKit.
