@@ -254,4 +254,20 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   Future<ModelSupport> recommendedModels() {
     throw UnimplementedError('recommendedModels() has not been implemented.');
   }
+
+  /// Formats model file names.
+  ///
+  /// This method takes a list of model file names and returns a list of
+  /// formatted model file names. It is used to standardize model file names
+  /// for consistent handling across the plugin.
+  ///
+  /// Parameters:
+  /// - [modelFiles]: A list of model file names to format.
+  ///
+  /// Returns a [Future] that completes with a list of formatted model file names.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<List<String>> formatModelFiles(List<String> modelFiles) {
+    throw UnimplementedError('formatModelFiles() has not been implemented.');
+  }
 }
