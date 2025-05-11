@@ -281,7 +281,13 @@ class FlutterWhisperKit {
   /// print('Device name: $deviceName');
   /// ```
   Future<String> deviceName() async {
-    return await FlutterWhisperKitPlatform.instance.deviceName();
+    try {
+      return await FlutterWhisperKitPlatform.instance.deviceName();
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Returns a list of recommended models for the current device.
@@ -300,7 +306,13 @@ class FlutterWhisperKit {
   /// print('Disabled models: ${modelSupport.disabled}');
   /// ```
   Future<ModelSupport> recommendedModels() async {
-    return await FlutterWhisperKitPlatform.instance.recommendedModels();
+    try {
+      return await FlutterWhisperKitPlatform.instance.recommendedModels();
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Detects the language of an audio file.
@@ -318,7 +330,13 @@ class FlutterWhisperKit {
   /// print('Language probabilities: ${result.probabilities}');
   /// ```
   Future<LanguageDetectionResult> detectLanguage(String audioPath) async {
-    return await FlutterWhisperKitPlatform.instance.detectLanguage(audioPath);
+    try {
+      return await FlutterWhisperKitPlatform.instance.detectLanguage(audioPath);
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Formats model files.
@@ -336,9 +354,15 @@ class FlutterWhisperKit {
   /// print('Formatted model files: $formattedModelFiles');
   /// ```
   Future<List<String>> formatModelFiles(List<String> modelFiles) async {
-    return await FlutterWhisperKitPlatform.instance.formatModelFiles(
-      modelFiles,
-    );
+    try {
+      return await FlutterWhisperKitPlatform.instance.formatModelFiles(
+        modelFiles,
+      );
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Fetches model support configuration from a remote repository.
@@ -360,7 +384,13 @@ class FlutterWhisperKit {
   /// print('Model support config: $modelSupportConfig');
   /// ```
   Future<ModelSupportConfig> fetchModelSupportConfig() async {
-    return await FlutterWhisperKitPlatform.instance.fetchModelSupportConfig();
+    try {
+      return await FlutterWhisperKitPlatform.instance.fetchModelSupportConfig();
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Fetches recommended models for the current device from a remote repository.
@@ -377,6 +407,12 @@ class FlutterWhisperKit {
   /// print('Recommended models: $modelSupport');
   /// ```
   Future<ModelSupport> recommendedRemoteModels() async {
-    return await FlutterWhisperKitPlatform.instance.recommendedRemoteModels();
+    try {
+      return await FlutterWhisperKitPlatform.instance.recommendedRemoteModels();
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
   }
 }
