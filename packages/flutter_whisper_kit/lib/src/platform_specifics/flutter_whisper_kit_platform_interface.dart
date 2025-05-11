@@ -214,6 +214,23 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
     );
   }
 
+  /// Detects the language of an audio file.
+  ///
+  /// This method analyzes the audio content and determines the most likely
+  /// language being spoken, along with confidence scores for various languages.
+  ///
+  /// Parameters:
+  /// - [audioPath]: The path to the audio file to analyze.
+  ///   This should be a valid path to an audio file in a supported format.
+  ///
+  /// Returns a [Future] that completes with a [LanguageDetectionResult] containing
+  /// the detected language code and a map of language probabilities.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<LanguageDetectionResult> detectLanguage(String audioPath) {
+    throw UnimplementedError('detectLanguage() has not been implemented.');
+  }
+
   /// Gets the current device name.
   ///
   /// Returns the name of the current device as recognized by WhisperKit.

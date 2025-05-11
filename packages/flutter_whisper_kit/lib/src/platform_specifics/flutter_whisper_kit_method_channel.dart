@@ -288,6 +288,25 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
     return ModelSupport.fromJson(json);
   }
 
+  @override
+  Future<LanguageDetectionResult> detectLanguage(String audioPath) async {
+    try {
+      final result = await _whisperKitMessage.detectLanguage(audioPath);
+      if (result == null) {
+        throw Exception('Failed to detect language');
+      }
+
+      // Parse the JSON string into a LanguageDetectionResult object
+      final Map<String, dynamic> json = Map<String, dynamic>.from(
+        jsonDecode(result) as Map,
+      );
+      return LanguageDetectionResult.fromJson(json);
+    } catch (e) {
+      debugPrint('Error detecting language: $e');
+      rethrow;
+    }
+  }
+
   /// Gets the current device name.
   ///
   /// Returns the name of the current device as recognized by WhisperKit.

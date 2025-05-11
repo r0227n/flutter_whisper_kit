@@ -24,6 +24,8 @@ abstract class WhisperKitMessage {
     List<String> matching,
     String? token,
   );
+  @async
+  String? detectLanguage(String audioPath);
 
   /// Retrieves the name of the device asynchronously.
   ///
