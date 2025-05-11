@@ -1,36 +1,30 @@
-name: Setup FVM
+name: 'Setup FVM'
+description: 'Sets up Flutter Version Management (FVM) with the correct Flutter version'
 
-on:
-  workflow_call:
-    outputs:
-      flutter_version:
-        description: "Flutter version from FVM config"
-        value: ${{ jobs.setup-fvm.outputs.flutter_version }}
+outputs:
+  flutter_version:
+    description: "Flutter version from FVM config"
+    value: ${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
 
-jobs:
-  setup-fvm:
-    name: Setup FVM
-    runs-on: ubuntu-latest
-    outputs:
-      flutter_version: ${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
+runs:
+  using: "composite"
+  steps:
+    - name: Read FVM config
+      id: fvm_config
+      uses: kuhnroyal/flutter-fvm-config-action@v1
+      shell: bash
     
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-        
-      - name: Read FVM config
-        id: fvm_config
-        uses: kuhnroyal/flutter-fvm-config-action@v1
-      
-      - name: Cache FVM
-        uses: actions/cache@v3
-        with:
-          path: ~/.fvm
-          key: ${{ runner.os }}-fvm-${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-fvm-
-      
-      - name: Setup Flutter with FVM
-        uses: leoafarias/fvm-action@v1
-        with:
-          version: ${{ steps.fvm_config.outputs.FLUTTER_VERSION }} 
+    - name: Cache FVM
+      uses: actions/cache@v3
+      with:
+        path: ~/.fvm
+        key: ${{ runner.os }}-fvm-${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
+        restore-keys: |
+          ${{ runner.os }}-fvm-
+      shell: bash
+    
+    - name: Setup Flutter with FVM
+      uses: leoafarias/fvm-action@v1
+      with:
+        version: ${{ steps.fvm_config.outputs.FLUTTER_VERSION }}
+      shell: bash
