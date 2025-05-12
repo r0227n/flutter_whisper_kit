@@ -14,7 +14,7 @@ jobs:
     name: Get Changed Files
     runs-on: ubuntu-latest
     outputs:
-      pkg_apple: ${{ steps.changed-files.outputs.pkg_apple }}
+      pkg_apple: ${{ steps.changed-files.outputs.pkg_apple_all_changed_files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,12 +35,12 @@ jobs:
     steps:
       - name: Output Changed Files Info
         run: |
-          echo "Changed files in flutter_whisper_kit_apple: ${{ needs.get-changed-files.outputs.pkg_apple.test_any_changed == 'true' }}"
+          echo "Changed files in flutter_whisper_kit_apple: ${{ needs.get-changed-files.outputs.pkg_apple == 'true' }}"
 
   validate-apple-package-versions:
     name: Validate Apple Package Versions
     needs: get-changed-files
-    if: ${{ needs.get-changed-files.outputs.pkg_apple.test_any_changed == 'true' }}
+    if: ${{ needs.get-changed-files.outputs.pkg_apple == 'true' }}
     uses: ./.github/workflows/wc-version-validation.yml
     with:
       pubspec_path: packages/flutter_whisper_kit_apple/pubspec.yaml
