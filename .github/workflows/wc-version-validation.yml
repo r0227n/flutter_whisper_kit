@@ -48,7 +48,7 @@ jobs:
       - name: Create version check result
         if: always()
         run: |
-          echo "## Version Check Results" > version_check_results.md
+          echo "## Apple Package Version Check Results" > version_check_results.md
           echo "" >> version_check_results.md
           echo "| File | Version |" >> version_check_results.md
           echo "|------|---------|" >> version_check_results.md
