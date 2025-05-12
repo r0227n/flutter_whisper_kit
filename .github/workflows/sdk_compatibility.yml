@@ -10,8 +10,6 @@ on:
 env:
   FLUTTER_WHISPER_KIT_DIR: packages/flutter_whisper_kit
   FLUTTER_WHISPER_KIT_APPLE_DIR: packages/flutter_whisper_kit_apple
-  FLUTTER_WHISPER_KIT_TEST_DIR: packages/flutter_whisper_kit/test
-  FLUTTER_WHISPER_KIT_APPLE_TEST_DIR: packages/flutter_whisper_kit_apple/test
 
 jobs:
   test-lower-bound:
@@ -36,7 +34,7 @@ jobs:
 
       - name: Run tests
         run: flutter test
-        working-directory: ${{ env.FLUTTER_WHISPER_KIT_TEST_DIR }}
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
 
   test-upper-bound:
     name: Test Upper SDK Bound
@@ -60,7 +58,7 @@ jobs:
 
       - name: Run tests
         run: flutter test
-        working-directory: ${{ env.FLUTTER_WHISPER_KIT_TEST_DIR }}
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
 
   test-apple-lower-bound:
     name: Test Apple Lower SDK Bound
@@ -84,7 +82,7 @@ jobs:
 
       - name: Run tests
         run: flutter test
-        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_TEST_DIR }}
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
 
   test-apple-upper-bound:
     name: Test Apple Upper SDK Bound
@@ -108,7 +106,7 @@ jobs:
 
       - name: Run tests
         run: flutter test
-        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_TEST_DIR }}
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
 
   post-results:
     name: Post Test Results
