@@ -3,7 +3,6 @@ name: SDK Compatibility Tests
 on:
   pull_request:
     branches:
-      - develop
       - 'release/**'
   workflow_dispatch:
 
@@ -112,6 +111,7 @@ jobs:
   post-results:
     name: Post Test Results
     needs: [test-lower-bound, test-upper-bound, test-apple-lower-bound, test-apple-upper-bound]
+    if: always()
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
