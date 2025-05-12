@@ -30,15 +30,15 @@ jobs:
         uses: ./.github/actions/setup-fvm
 
       - name: Install dependencies
-        run: fvm flutter pub get
+        run: flutter pub get
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
 
       - name: Run analyzer
-        run: fvm flutter analyze
+        run: flutter analyze
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
 
       - name: Run tests
-        run: fvm flutter test
+        run: flutter test
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_TEST_DIR }}
 
   test-upper-bound:
@@ -57,15 +57,15 @@ jobs:
         uses: ./.github/actions/setup-fvm
 
       - name: Install dependencies
-        run: fvm flutter pub get
+        run: flutter pub get
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
 
       - name: Run analyzer
-        run: fvm flutter analyze
+        run: flutter analyze
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
 
       - name: Run tests
-        run: fvm flutter test
+        run: flutter test
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_TEST_DIR }}
 
   test-apple-lower-bound:
@@ -84,15 +84,15 @@ jobs:
         uses: ./.github/actions/setup-fvm
 
       - name: Install dependencies
-        run: fvm flutter pub get
+        run: flutter pub get
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
 
       - name: Run analyzer
-        run: fvm flutter analyze
+        run: flutter analyze
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
 
       - name: Run tests
-        run: fvm flutter test
+        run: flutter test
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_TEST_DIR }}
 
   test-apple-upper-bound:
@@ -111,15 +111,15 @@ jobs:
         uses: ./.github/actions/setup-fvm
 
       - name: Install dependencies
-        run: fvm flutter pub get
+        run: flutter pub get
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
 
       - name: Run analyzer
-        run: fvm flutter analyze
+        run: flutter analyze
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
 
       - name: Run tests
-        run: fvm flutter test
+        run: flutter test
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_TEST_DIR }}
 
   post-results:
