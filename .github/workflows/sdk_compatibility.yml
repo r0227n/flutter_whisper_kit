@@ -21,10 +21,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout Repository with specific Flutter version
+        run: |
+          echo '{"flutter": "3.10.0"}' > .fvmrc
+          cat .fvmrc
+      
       - name: Setup FVM
         uses: ./.github/actions/setup-fvm
-        with:
-          flutter-version: '3.10.0'
 
       - name: Install dependencies
         run: fvm flutter pub get
@@ -45,10 +48,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout Repository with stable Flutter version
+        run: |
+          echo '{"flutter": "stable"}' > .fvmrc
+          cat .fvmrc
+      
       - name: Setup FVM
         uses: ./.github/actions/setup-fvm
-        with:
-          flutter-version: 'stable'
 
       - name: Install dependencies
         run: fvm flutter pub get
@@ -69,10 +75,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout Repository with specific Flutter version
+        run: |
+          echo '{"flutter": "3.10.0"}' > .fvmrc
+          cat .fvmrc
+      
       - name: Setup FVM
         uses: ./.github/actions/setup-fvm
-        with:
-          flutter-version: '3.10.0'
 
       - name: Install dependencies
         run: fvm flutter pub get
@@ -93,10 +102,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Checkout Repository with stable Flutter version
+        run: |
+          echo '{"flutter": "stable"}' > .fvmrc
+          cat .fvmrc
+      
       - name: Setup FVM
         uses: ./.github/actions/setup-fvm
-        with:
-          flutter-version: 'stable'
 
       - name: Install dependencies
         run: fvm flutter pub get
