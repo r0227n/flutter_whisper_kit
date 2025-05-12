@@ -14,7 +14,7 @@ jobs:
     name: Get Changed Files
     runs-on: ubuntu-latest
     outputs:
-      pkg_apple: ${{ steps.changed-files.outputs.pkg_apple_all_changed_files }}
+      pkg_apple: ${{ steps.changed-files.outputs.pkg_apple_any_changed }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
