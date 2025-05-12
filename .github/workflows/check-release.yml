@@ -14,7 +14,7 @@ jobs:
     name: Get Changed Files
     runs-on: ubuntu-latest
     outputs:
-      any_flutter_whisper_kit_apple_changed: ${{ contains(steps.changed-files.outputs.all_changed_files, 'packages/flutter_whisper_kit_apple') }}
+      any_flutter_whisper_kit_apple_changed: ${{ contains(steps.changed-files.outputs.all_changed_files, 'packages/flutter_whisper_kit_apple/') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,6 +22,9 @@ jobs:
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v10.1
+        with:
+          files: |
+            packages/flutter_whisper_kit_apple/**
 
   output-changed-files:
     name: Output Changed Files
