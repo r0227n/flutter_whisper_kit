@@ -1,0 +1,145 @@
+name: SDK Compatibility Tests
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - 'release/**'
+  workflow_dispatch:
+
+env:
+  FLUTTER_WHISPER_KIT_DIR: packages/flutter_whisper_kit
+  FLUTTER_WHISPER_KIT_APPLE_DIR: packages/flutter_whisper_kit_apple
+  FLUTTER_WHISPER_KIT_TEST_DIR: packages/flutter_whisper_kit/test
+  FLUTTER_WHISPER_KIT_APPLE_TEST_DIR: packages/flutter_whisper_kit_apple/test
+
+jobs:
+  test-lower-bound:
+    name: Test Lower SDK Bound
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup FVM
+        uses: ./.github/actions/setup-fvm
+        with:
+          flutter-version: '3.10.0'
+
+      - name: Install dependencies
+        run: fvm flutter pub get
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+      - name: Run analyzer
+        run: fvm flutter analyze
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+      - name: Run tests
+        run: fvm flutter test
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_TEST_DIR }}
+
+  test-upper-bound:
+    name: Test Upper SDK Bound
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup FVM
+        uses: ./.github/actions/setup-fvm
+        with:
+          flutter-version: 'stable'
+
+      - name: Install dependencies
+        run: fvm flutter pub get
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+      - name: Run analyzer
+        run: fvm flutter analyze
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+      - name: Run tests
+        run: fvm flutter test
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_TEST_DIR }}
+
+  test-apple-lower-bound:
+    name: Test Apple Lower SDK Bound
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup FVM
+        uses: ./.github/actions/setup-fvm
+        with:
+          flutter-version: '3.10.0'
+
+      - name: Install dependencies
+        run: fvm flutter pub get
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+      - name: Run analyzer
+        run: fvm flutter analyze
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+      - name: Run tests
+        run: fvm flutter test
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_TEST_DIR }}
+
+  test-apple-upper-bound:
+    name: Test Apple Upper SDK Bound
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup FVM
+        uses: ./.github/actions/setup-fvm
+        with:
+          flutter-version: 'stable'
+
+      - name: Install dependencies
+        run: fvm flutter pub get
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+      - name: Run analyzer
+        run: fvm flutter analyze
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+      - name: Run tests
+        run: fvm flutter test
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_TEST_DIR }}
+
+  post-results:
+    name: Post Test Results
+    needs: [test-lower-bound, test-upper-bound, test-apple-lower-bound, test-apple-upper-bound]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create results summary
+        id: create_summary
+        run: |
+          echo "SUMMARY<<EOF" >> $GITHUB_OUTPUT
+          echo "## SDK Compatibility Test Results" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "| Test | Status |" >> $GITHUB_OUTPUT
+          echo "|------|--------|" >> $GITHUB_OUTPUT
+          echo "| Lower SDK Bound (Flutter 3.3.0) | ${{ needs.test-lower-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Upper SDK Bound (Flutter Stable) | ${{ needs.test-upper-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Apple Lower SDK Bound (Flutter 3.3.0) | ${{ needs.test-apple-lower-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Apple Upper SDK Bound (Flutter Stable) | ${{ needs.test-apple-upper-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create results file
+        run: |
+          echo "${{ steps.create_summary.outputs.SUMMARY }}" > sdk_compatibility_results.md
+
+      - name: Post comment to PR
+        if: github.event_name == 'pull_request'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body-file sdk_compatibility_results.md
+        env:
+          GH_TOKEN: ${{ github.token }}
