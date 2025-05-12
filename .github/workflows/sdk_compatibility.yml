@@ -23,7 +23,7 @@ jobs:
 
       - name: Checkout Repository with specific Flutter version
         run: |
-          echo '{"flutter": "3.10.0"}' > .fvmrc
+          echo '{"flutter": "3.16.0"}' > .fvmrc
           cat .fvmrc
       
       - name: Setup FVM
@@ -77,7 +77,7 @@ jobs:
 
       - name: Checkout Repository with specific Flutter version
         run: |
-          echo '{"flutter": "3.10.0"}' > .fvmrc
+          echo '{"flutter": "3.16.0"}' > .fvmrc
           cat .fvmrc
       
       - name: Setup FVM
@@ -139,9 +139,9 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
           echo "| Test | Status |" >> $GITHUB_OUTPUT
           echo "|------|--------|" >> $GITHUB_OUTPUT
-          echo "| Lower SDK Bound (Flutter 3.3.0) | ${{ needs.test-lower-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Lower SDK Bound (Flutter 3.16.0) | ${{ needs.test-lower-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
           echo "| Upper SDK Bound (Flutter Stable) | ${{ needs.test-upper-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
-          echo "| Apple Lower SDK Bound (Flutter 3.3.0) | ${{ needs.test-apple-lower-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Apple Lower SDK Bound (Flutter 3.16.0) | ${{ needs.test-apple-lower-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
           echo "| Apple Upper SDK Bound (Flutter Stable) | ${{ needs.test-apple-upper-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
