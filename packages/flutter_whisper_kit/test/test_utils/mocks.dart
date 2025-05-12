@@ -12,12 +12,12 @@ class MockFlutterWhisperkitPlatform
 
   @override
   Future<ModelSupport> recommendedModels() => Future.value(
-    ModelSupport(
-      defaultModel: 'tiny',
-      supported: ['tiny', 'base', 'small', 'medium', 'large'],
-      disabled: [],
-    ),
-  );
+        ModelSupport(
+          defaultModel: 'tiny',
+          supported: ['tiny', 'base', 'small', 'medium', 'large'],
+          disabled: [],
+        ),
+      );
 
   @override
   Future<LanguageDetectionResult> detectLanguage(String audioPath) =>
@@ -37,7 +37,8 @@ class MockFlutterWhisperkitPlatform
     String? variant, {
     String? modelRepo,
     bool redownload = false,
-  }) => Future.value('Model loaded');
+  }) =>
+      Future.value('Model loaded');
 
   @override
   Future<TranscriptionResult?> transcribeFromFile(
@@ -130,7 +131,8 @@ class MockFlutterWhisperkitPlatform
       chunkingStrategy: ChunkingStrategy.vad,
     ),
     bool loop = true,
-  }) => Future.value('Recording started');
+  }) =>
+      Future.value('Recording started');
 
   @override
   Future<String?> stopRecording({bool loop = true}) =>
@@ -166,73 +168,76 @@ class MockFlutterWhisperkitPlatform
 
   @override
   Stream<Progress> get modelProgressStream => Stream<Progress>.fromIterable([
-    const Progress(
-      totalUnitCount: 100,
-      completedUnitCount: 50,
-      fractionCompleted: 0.5,
-      isIndeterminate: false,
-    ),
-  ]);
+        const Progress(
+          totalUnitCount: 100,
+          completedUnitCount: 50,
+          fractionCompleted: 0.5,
+          isIndeterminate: false,
+        ),
+      ]);
 
   @override
   Future<List<String>> fetchAvailableModels({
     String modelRepo = 'argmaxinc/whisperkit-coreml',
     List<String> matching = const ['*'],
     String? token,
-  }) => Future.value([
-    'tiny',
-    'tiny.en',
-    'base',
-    'base.en',
-    'small',
-    'small.en',
-    'medium',
-    'medium.en',
-    'large-v2',
-    'large-v3',
-  ]);
+  }) =>
+      Future.value([
+        'tiny',
+        'tiny.en',
+        'base',
+        'base.en',
+        'small',
+        'small.en',
+        'medium',
+        'medium.en',
+        'large-v2',
+        'large-v3',
+      ]);
 
   @override
   Future<ModelSupportConfig> fetchModelSupportConfig({
     String? downloadBase,
     String repo = 'argmaxinc/whisperkit-coreml',
     String? token,
-  }) => Future.value(
-    ModelSupportConfig(
-      repoName: repo,
-      repoVersion: '1.0.0',
-      deviceSupports: [
-        DeviceSupport(
-          chips: 'A12, A13',
-          identifiers: ['iPhone12,1', 'iPhone12,3'],
-          models: ModelSupport(
+  }) =>
+      Future.value(
+        ModelSupportConfig(
+          repoName: repo,
+          repoVersion: '1.0.0',
+          deviceSupports: [
+            DeviceSupport(
+              chips: 'A12, A13',
+              identifiers: ['iPhone12,1', 'iPhone12,3'],
+              models: ModelSupport(
+                defaultModel: 'tiny',
+                supported: ['tiny', 'base', 'small', 'medium', 'large'],
+                disabled: [],
+              ),
+            ),
+          ],
+          knownModels: ['tiny', 'base', 'small', 'medium', 'large'],
+          defaultSupport: ModelSupport(
             defaultModel: 'tiny',
             supported: ['tiny', 'base', 'small', 'medium', 'large'],
             disabled: [],
           ),
         ),
-      ],
-      knownModels: ['tiny', 'base', 'small', 'medium', 'large'],
-      defaultSupport: ModelSupport(
-        defaultModel: 'tiny',
-        supported: ['tiny', 'base', 'small', 'medium', 'large'],
-        disabled: [],
-      ),
-    ),
-  );
+      );
 
   @override
   Future<ModelSupport> recommendedRemoteModels({
     String? downloadBase,
     String repo = 'argmaxinc/whisperkit-coreml',
     String? token,
-  }) => Future.value(
-    ModelSupport(
-      defaultModel: 'tiny',
-      supported: ['tiny', 'base', 'small', 'medium', 'large'],
-      disabled: [],
-    ),
-  );
+  }) =>
+      Future.value(
+        ModelSupport(
+          defaultModel: 'tiny',
+          supported: ['tiny', 'base', 'small', 'medium', 'large'],
+          disabled: [],
+        ),
+      );
 }
 
 /// Sets up a mock platform for testing.

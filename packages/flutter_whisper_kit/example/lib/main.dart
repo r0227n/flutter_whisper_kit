@@ -118,8 +118,8 @@ class _MyAppState extends State<MyApp> {
 
     try {
       final filePath = await FilePicker.platform.pickFiles().then(
-        (file) => file?.files.firstOrNull?.path,
-      );
+            (file) => file?.files.firstOrNull?.path,
+          );
 
       if (filePath == null) {
         setState(() {
@@ -132,10 +132,9 @@ class _MyAppState extends State<MyApp> {
       final options = DecodingOptions(
         verbose: true,
         task: DecodingTask.transcribe,
-        language:
-            _selectedLanguage == 'auto'
-                ? null
-                : _selectedLanguage, // Use selected language or null for auto-detection
+        language: _selectedLanguage == 'auto'
+            ? null
+            : _selectedLanguage, // Use selected language or null for auto-detection
         temperature: 0.0,
         temperatureFallbackCount: 5,
         wordTimestamps: true,
@@ -178,10 +177,9 @@ class _MyAppState extends State<MyApp> {
         final options = DecodingOptions(
           verbose: true,
           task: DecodingTask.transcribe,
-          language:
-              _selectedLanguage == 'auto'
-                  ? null
-                  : _selectedLanguage, // Use selected language or null for auto-detection
+          language: _selectedLanguage == 'auto'
+              ? null
+              : _selectedLanguage, // Use selected language or null for auto-detection
           temperature: 0.0,
           temperatureFallbackCount: 5,
           wordTimestamps: true,
@@ -189,23 +187,21 @@ class _MyAppState extends State<MyApp> {
         );
 
         await _flutterWhisperkitPlugin.startRecording(options: options);
-        _transcriptionSubscription = _flutterWhisperkitPlugin
-            .transcriptionStream
-            .listen((result) {
-              setState(() {
-                _transcriptionText = result.text;
-                // Only add segments that don't already exist in the result
-                for (final segment in result.segments) {
-                  if (!_transcriptionResult.any(
-                    (existing) =>
-                        existing.id == segment.id &&
-                        existing.text == segment.text,
-                  )) {
-                    _transcriptionResult.add(segment);
-                  }
-                }
-              });
-            });
+        _transcriptionSubscription =
+            _flutterWhisperkitPlugin.transcriptionStream.listen((result) {
+          setState(() {
+            _transcriptionText = result.text;
+            // Only add segments that don't already exist in the result
+            for (final segment in result.segments) {
+              if (!_transcriptionResult.any(
+                (existing) =>
+                    existing.id == segment.id && existing.text == segment.text,
+              )) {
+                _transcriptionResult.add(segment);
+              }
+            }
+          });
+        });
       }
 
       setState(() {
@@ -337,8 +333,8 @@ class _MyAppState extends State<MyApp> {
 
     try {
       final filePath = await FilePicker.platform.pickFiles().then(
-        (file) => file?.files.firstOrNull?.path,
-      );
+            (file) => file?.files.firstOrNull?.path,
+          );
 
       if (filePath == null) {
         setState(() {
@@ -520,12 +516,11 @@ class _MyAppState extends State<MyApp> {
               onFetchModelSupportConfigPressed: _fetchModelSupportConfig,
               onModelFilesChanged: (value) {
                 setState(() {
-                  _modelFilesToFormat =
-                      value
-                          .split(',')
-                          .map((e) => e.trim())
-                          .where((e) => e.isNotEmpty)
-                          .toList();
+                  _modelFilesToFormat = value
+                      .split(',')
+                      .map((e) => e.trim())
+                      .where((e) => e.isNotEmpty)
+                      .toList();
                 });
               },
             ),
@@ -588,13 +583,12 @@ class ModelSelectionDropdown extends StatelessWidget {
                 onModelChanged(newValue);
               }
             },
-            items:
-                modelVariants.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+            items: modelVariants.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -609,23 +603,23 @@ class LanguageSelectionDropdown extends StatelessWidget {
     required this.selectedLanguage,
     required this.onLanguageChanged,
   }) : _languages = const [
-         'auto', // Auto-detect
-         'en', // English
-         'ja', // Japanese
-         'zh', // Chinese
-         'de', // German
-         'es', // Spanish
-         'ru', // Russian
-         'ko', // Korean
-         'fr', // French
-         'it', // Italian
-         'pt', // Portuguese
-         'tr', // Turkish
-         'pl', // Polish
-         'nl', // Dutch
-         'ar', // Arabic
-         'hi', // Hindi
-       ];
+          'auto', // Auto-detect
+          'en', // English
+          'ja', // Japanese
+          'zh', // Chinese
+          'de', // German
+          'es', // Spanish
+          'ru', // Russian
+          'ko', // Korean
+          'fr', // French
+          'it', // Italian
+          'pt', // Portuguese
+          'tr', // Turkish
+          'pl', // Polish
+          'nl', // Dutch
+          'ar', // Arabic
+          'hi', // Hindi
+        ];
 
   final String selectedLanguage;
   final List<String> _languages;
@@ -648,34 +642,33 @@ class LanguageSelectionDropdown extends StatelessWidget {
                 onLanguageChanged(newValue);
               }
             },
-            items:
-                _languages.map<DropdownMenuItem<String>>((String value) {
-                  // Show language code and name for better readability
-                  String displayText = switch (value) {
-                    'auto' => 'auto (Auto-detect)',
-                    'en' => 'en (English)',
-                    'ja' => 'ja (Japanese)',
-                    'zh' => 'zh (Chinese)',
-                    'de' => 'de (German)',
-                    'es' => 'es (Spanish)',
-                    'ru' => 'ru (Russian)',
-                    'ko' => 'ko (Korean)',
-                    'fr' => 'fr (French)',
-                    'it' => 'it (Italian)',
-                    'pt' => 'pt (Portuguese)',
-                    'tr' => 'tr (Turkish)',
-                    'pl' => 'pl (Polish)',
-                    'nl' => 'nl (Dutch)',
-                    'ar' => 'ar (Arabic)',
-                    'hi' => 'hi (Hindi)',
-                    _ => throw UnimplementedError(),
-                  };
+            items: _languages.map<DropdownMenuItem<String>>((String value) {
+              // Show language code and name for better readability
+              String displayText = switch (value) {
+                'auto' => 'auto (Auto-detect)',
+                'en' => 'en (English)',
+                'ja' => 'ja (Japanese)',
+                'zh' => 'zh (Chinese)',
+                'de' => 'de (German)',
+                'es' => 'es (Spanish)',
+                'ru' => 'ru (Russian)',
+                'ko' => 'ko (Korean)',
+                'fr' => 'fr (French)',
+                'it' => 'it (Italian)',
+                'pt' => 'pt (Portuguese)',
+                'tr' => 'tr (Turkish)',
+                'pl' => 'pl (Polish)',
+                'nl' => 'nl (Dutch)',
+                'ar' => 'ar (Arabic)',
+                'hi' => 'hi (Hindi)',
+                _ => throw UnimplementedError(),
+              };
 
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(displayText),
-                  );
-                }).toList(),
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(displayText),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -763,14 +756,12 @@ class FileTranscriptionSection extends StatelessWidget {
           'File Transcription',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-
         ElevatedButton(
           onPressed: isModelLoaded ? onTranscribePressed : null,
           child: Text(
             isTranscribingFile ? 'Transcribing...' : 'Transcribe from File',
           ),
         ),
-
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
@@ -792,7 +783,6 @@ class FileTranscriptionSection extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(fileTranscriptionResult?.language ?? 'Unknown'),
-
                 const Text(
                   'Segments:',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -805,7 +795,6 @@ class FileTranscriptionSection extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const Text(
                   'Performance:',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -852,7 +841,6 @@ class RealTimeTranscriptionSection extends StatelessWidget {
           'Real-time Transcription',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-
         Container(
           height: 200,
           padding: const EdgeInsets.all(16.0),
@@ -860,19 +848,17 @@ class RealTimeTranscriptionSection extends StatelessWidget {
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(8.0),
           ),
-          child:
-              segments.isNotEmpty
-                  ? ListView.builder(
-                    itemCount: segments.length,
-                    itemBuilder: (context, index) {
-                      return Text(
-                        '[${segments[index].start.toStringAsFixed(2)}s - ${segments[index].end.toStringAsFixed(2)}s]: ${segments[index].text}',
-                      );
-                    },
-                  )
-                  : const Text('No segments'),
+          child: segments.isNotEmpty
+              ? ListView.builder(
+                  itemCount: segments.length,
+                  itemBuilder: (context, index) {
+                    return Text(
+                      '[${segments[index].start.toStringAsFixed(2)}s - ${segments[index].end.toStringAsFixed(2)}s]: ${segments[index].text}',
+                    );
+                  },
+                )
+              : const Text('No segments'),
         ),
-
         Container(
           height: 200,
           padding: const EdgeInsets.all(16.0),
@@ -889,7 +875,6 @@ class RealTimeTranscriptionSection extends StatelessWidget {
             ),
           ),
         ),
-
         ElevatedButton(
           onPressed: isModelLoaded ? onRecordPressed : null,
           child: Text(isRecording ? 'Stop Recording' : 'Start Recording'),

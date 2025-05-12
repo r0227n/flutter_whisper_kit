@@ -6,7 +6,7 @@ repository: https://github.com/r0227n/flutter_whisper_kit/tree/develop/packages/
 issue_tracker: https://github.com/r0227n/flutter_whisper_kit/issues
 
 environment:
-  sdk: ^3.7.2
+  sdk: '>=3.6.0 <4.0.0'
   flutter: '>=3.3.0'
 
 resolution: workspace
@@ -14,7 +14,6 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  huggingface_client: ^1.6.2
   pigeon: ^25.3.1
   plugin_platform_interface: ^2.0.2
 
