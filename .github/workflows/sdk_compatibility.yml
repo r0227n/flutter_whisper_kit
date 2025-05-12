@@ -10,11 +10,13 @@ on:
 env:
   FLUTTER_WHISPER_KIT_DIR: packages/flutter_whisper_kit
   FLUTTER_WHISPER_KIT_APPLE_DIR: packages/flutter_whisper_kit_apple
+  MIN_FLUTTER_SDK_VERSION: '3.27.0' # DartSDK is 3.6.0
 
 jobs:
   test-lower-bound:
     name: Test Lower SDK Bound
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,7 +24,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.0'
+          flutter-version: ${{ env.MIN_FLUTTER_SDK_VERSION }}
 
       - name: Install dependencies
         run: flutter pub get
@@ -39,6 +41,7 @@ jobs:
   test-upper-bound:
     name: Test Upper SDK Bound
     runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -62,7 +65,8 @@ jobs:
 
   test-apple-lower-bound:
     name: Test Apple Lower SDK Bound
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit_apple/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -70,7 +74,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.0'
+          flutter-version: ${{ env.MIN_FLUTTER_SDK_VERSION }}
 
       - name: Install dependencies
         run: flutter pub get
@@ -86,7 +90,8 @@ jobs:
 
   test-apple-upper-bound:
     name: Test Apple Upper SDK Bound
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit_apple/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
