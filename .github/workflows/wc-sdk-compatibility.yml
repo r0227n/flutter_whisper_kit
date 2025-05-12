@@ -36,6 +36,8 @@ jobs:
   test-stable-bound:
     name: Test Stable SDK Bound
     runs-on: ubuntu-latest
+    outputs:
+      stable-version: ${{ steps.flutter_version.outputs.STABLE_VERSION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,6 +46,11 @@ jobs:
         uses: ./.github/actions/setup-fvm
         with:
           flutter-version-override: 'stable'
+
+      - name: Get Flutter stable version
+        id: flutter_version
+        run: |
+          echo "STABLE_VERSION=$(flutter --version | grep -o 'Flutter [0-9]\+\.[0-9]\+\.[0-9]\+' | cut -d' ' -f2)" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         run: flutter pub get
@@ -84,6 +91,8 @@ jobs:
   test-apple-stable-bound:
     name: Test Apple Stable SDK Bound
     runs-on: ubuntu-latest
+    outputs:
+      stable-version: ${{ steps.flutter_version.outputs.STABLE_VERSION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -92,6 +101,11 @@ jobs:
         uses: ./.github/actions/setup-fvm
         with:
           flutter-version-override: 'stable'
+
+      - name: Get Flutter stable version
+        id: flutter_version
+        run: |
+          echo "STABLE_VERSION=$(flutter --version | grep -o 'Flutter [0-9]\+\.[0-9]\+\.[0-9]\+' | cut -d' ' -f2)" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         run: flutter pub get
@@ -113,19 +127,6 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup FVM with Flutter
-        uses: ./.github/actions/setup-fvm
-        with:
-          flutter-version-override: 'stable'
-
-      - name: Get Flutter stable version
-        id: flutter_version
-        run: |
-          echo "STABLE_VERSION=$(flutter --version | grep -o 'Flutter [0-9]\+\.[0-9]\+\.[0-9]\+' | cut -d' ' -f2)" >> $GITHUB_OUTPUT
-
       - name: Create results summary
         id: create_summary
         run: |
@@ -135,9 +136,9 @@ jobs:
           echo "| Test | Status |" >> $GITHUB_OUTPUT
           echo "|------|--------|" >> $GITHUB_OUTPUT
           echo "| Minimum SDK Bound (Flutter ${{ env.MIN_FLUTTER_SDK_VERSION }}) | ${{ needs.test-minimum-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
-          echo "| Stable SDK Bound (Flutter ${{ steps.flutter_version.outputs.STABLE_VERSION }}) | ${{ needs.test-stable-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Stable SDK Bound (Flutter ${{ needs.test-stable-bound.outputs.stable-version }}) | ${{ needs.test-stable-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
           echo "| Apple Minimum SDK Bound (Flutter ${{ env.MIN_FLUTTER_SDK_VERSION }}) | ${{ needs.test-apple-minimum-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
-          echo "| Apple Stable SDK Bound (Flutter ${{ steps.flutter_version.outputs.STABLE_VERSION }}) | ${{ needs.test-apple-stable-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Apple Stable SDK Bound (Flutter ${{ needs.test-apple-stable-bound.outputs.stable-version }}) | ${{ needs.test-apple-stable-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create results file
