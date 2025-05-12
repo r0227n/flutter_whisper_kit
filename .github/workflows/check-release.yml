@@ -4,8 +4,6 @@ on:
   pull_request:
     branches:
       - 'release/**'
-    paths:
-      - 'packages/flutter_whisper_kit_apple/**'
 
 env:
   FLUTTER_WHISPER_KIT_APPLE_DIR: packages/flutter_whisper_kit_apple
@@ -15,6 +13,7 @@ env:
 jobs:
   validate-versions:
     name: Validate Package Versions
+    if: contains(github.event.pull_request.changed_files, env.FLUTTER_WHISPER_KIT_APPLE_DIR)
     uses: ./.github/workflows/wc-version-validation.yml
     with:
       pubspec_path: ${{ env.PUBSPEC_PATH }}
