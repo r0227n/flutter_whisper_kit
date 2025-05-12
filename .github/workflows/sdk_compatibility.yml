@@ -113,7 +113,8 @@ jobs:
     name: Post Test Results
     needs: [test-lower-bound, test-upper-bound, test-apple-lower-bound, test-apple-upper-bound]
     runs-on: ubuntu-latest
-    if: always()
+    permissions:
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
