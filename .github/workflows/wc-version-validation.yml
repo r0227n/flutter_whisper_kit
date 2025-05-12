@@ -16,8 +16,6 @@ jobs:
   validate-versions:
     name: Validate Package Versions
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,29 +42,3 @@ jobs:
             echo "Version check failed: pubspec.yaml version (${{ steps.extract_versions.outputs.PUBSPEC_VERSION }}) does not match podspec version (${{ steps.extract_versions.outputs.PODSPEC_VERSION }})"
             exit 1
           fi
-
-      - name: Create version check result
-        if: always()
-        run: |
-          echo "## Apple Package Version Check Results" > version_check_results.md
-          echo "" >> version_check_results.md
-          echo "| File | Version |" >> version_check_results.md
-          echo "|------|---------|" >> version_check_results.md
-          echo "| pubspec.yaml | ${{ steps.extract_versions.outputs.PUBSPEC_VERSION }} |" >> version_check_results.md
-          echo "| podspec | ${{ steps.extract_versions.outputs.PODSPEC_VERSION }} |" >> version_check_results.md
-          echo "" >> version_check_results.md
-          
-          if [ "${{ steps.compare_versions.outputs.VERSIONS_MATCH }}" == "true" ]; then
-            echo "✅ **Versions match!**" >> version_check_results.md
-          else
-            echo "❌ **Version mismatch detected!**" >> version_check_results.md
-            echo "" >> version_check_results.md
-            echo "Please ensure that the version in pubspec.yaml matches the version in the podspec file." >> version_check_results.md
-          fi
-
-      - name: Post comment to PR
-        if: always()
-        run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body-file version_check_results.md
-        env:
-          GH_TOKEN: ${{ github.token }}
