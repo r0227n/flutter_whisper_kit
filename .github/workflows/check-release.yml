@@ -15,59 +15,10 @@ env:
 jobs:
   validate-versions:
     name: Validate Package Versions
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Extract versions
-        id: extract_versions
-        run: |
-          # Extract version from pubspec.yaml
-          PUBSPEC_VERSION=$(grep -m 1 "version:" ${{ env.PUBSPEC_PATH }} | awk '{print $2}' | tr -d "'\"")
-          echo "PUBSPEC_VERSION=$PUBSPEC_VERSION" >> $GITHUB_OUTPUT
-          
-          # Extract version from podspec
-          PODSPEC_VERSION=$(grep -m 1 "s.version" ${{ env.PODSPEC_PATH }} | awk -F"'" '{print $2}' | tr -d "'\"")
-          echo "PODSPEC_VERSION=$PODSPEC_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Compare versions
-        id: compare_versions
-        run: |
-          if [ "${{ steps.extract_versions.outputs.PUBSPEC_VERSION }}" == "${{ steps.extract_versions.outputs.PODSPEC_VERSION }}" ]; then
-            echo "VERSIONS_MATCH=true" >> $GITHUB_OUTPUT
-            echo "Version check passed: pubspec.yaml and podspec versions match (${{ steps.extract_versions.outputs.PUBSPEC_VERSION }})"
-          else
-            echo "VERSIONS_MATCH=false" >> $GITHUB_OUTPUT
-            echo "Version check failed: pubspec.yaml version (${{ steps.extract_versions.outputs.PUBSPEC_VERSION }}) does not match podspec version (${{ steps.extract_versions.outputs.PODSPEC_VERSION }})"
-            exit 1
-          fi
-
-      - name: Create version check result
-        if: always()
-        run: |
-          echo "## Version Check Results" > version_check_results.md
-          echo "" >> version_check_results.md
-          echo "| File | Version |" >> version_check_results.md
-          echo "|------|---------|" >> version_check_results.md
-          echo "| pubspec.yaml | ${{ steps.extract_versions.outputs.PUBSPEC_VERSION }} |" >> version_check_results.md
-          echo "| podspec | ${{ steps.extract_versions.outputs.PODSPEC_VERSION }} |" >> version_check_results.md
-          echo "" >> version_check_results.md
-          
-          if [ "${{ steps.compare_versions.outputs.VERSIONS_MATCH }}" == "true" ]; then
-            echo "✅ **Versions match!**" >> version_check_results.md
-          else
-            echo "❌ **Version mismatch detected!**" >> version_check_results.md
-            echo "" >> version_check_results.md
-            echo "Please ensure that the version in pubspec.yaml matches the version in the podspec file." >> version_check_results.md
-          fi
-
-      - name: Post comment to PR
-        if: always()
-        run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body-file version_check_results.md
-        env:
-          GH_TOKEN: ${{ github.token }}
+    uses: ./.github/workflows/wc-version-validation.yml
+    with:
+      pubspec_path: ${{ env.PUBSPEC_PATH }}
+      podspec_path: ${{ env.PODSPEC_PATH }}
 
   sdk-compatibility:
     name: Run SDK Compatibility Tests
