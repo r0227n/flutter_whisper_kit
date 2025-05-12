@@ -2,12 +2,6 @@ name: SDK Compatibility Tests
 
 on:
   workflow_call:
-    inputs:
-      flutter_version_override:
-        description: 'Optional Flutter version to override the one in .fvmrc'
-        required: false
-        type: string
-        default: ''
 
 env:
   FLUTTER_WHISPER_KIT_DIR: packages/flutter_whisper_kit
@@ -25,7 +19,7 @@ jobs:
       - name: Setup FVM with Flutter
         uses: ./.github/actions/setup-fvm
         with:
-          flutter-version-override: ${{ inputs.flutter_version_override || env.MIN_FLUTTER_SDK_VERSION }}
+          flutter-version-override: ${{ env.MIN_FLUTTER_SDK_VERSION }}
 
       - name: Install dependencies
         run: flutter pub get
@@ -73,7 +67,7 @@ jobs:
       - name: Setup FVM with Flutter
         uses: ./.github/actions/setup-fvm
         with:
-          flutter-version-override: ${{ inputs.flutter_version_override || env.MIN_FLUTTER_SDK_VERSION }}
+          flutter-version-override: ${{ env.MIN_FLUTTER_SDK_VERSION }}
 
       - name: Install dependencies
         run: flutter pub get
