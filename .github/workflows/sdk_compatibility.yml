@@ -3,6 +3,7 @@ name: SDK Compatibility Tests
 on:
   pull_request:
     branches:
+      - 'develop'
       - 'release/**'
   workflow_dispatch:
 
@@ -12,17 +13,20 @@ env:
   MIN_FLUTTER_SDK_VERSION: '3.27.0' # DartSDK is 3.6.0
 
 jobs:
-  test-lower-bound:
-    name: Test Lower SDK Bound
+  test-minimum-bound:
+    name: Test Minimum SDK Bound
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.MIN_FLUTTER_SDK_VERSION }}
+      - name: Checkout Minimum Flutter Version
+        run: |
+          echo '{"flutter": "${{ env.MIN_FLUTTER_SDK_VERSION }}"}' > .fvmrc
+          cat .fvmrc
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
 
       - name: Install dependencies
         run: flutter pub get
@@ -36,17 +40,20 @@ jobs:
         run: flutter test
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
 
-  test-upper-bound:
-    name: Test Upper SDK Bound
+  test-stable-bound:
+    name: Test Stable SDK Bound
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
+      - name: Update FVM to stable channel
+        run: |
+          echo '{"flutter": "stable"}' > .fvmrc
+          cat .fvmrc
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
 
       - name: Install dependencies
         run: flutter pub get
@@ -60,17 +67,20 @@ jobs:
         run: flutter test
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
 
-  test-apple-lower-bound:
-    name: Test Apple Lower SDK Bound
+  test-apple-minimum-bound:
+    name: Test Apple Minimum SDK Bound
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.MIN_FLUTTER_SDK_VERSION }}
+      - name: Checkout Minimum Flutter Version
+        run: |
+          echo '{"flutter": "${{ env.MIN_FLUTTER_SDK_VERSION }}"}' > .fvmrc
+          cat .fvmrc
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
 
       - name: Install dependencies
         run: flutter pub get
@@ -84,17 +94,20 @@ jobs:
         run: flutter test
         working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
 
-  test-apple-upper-bound:
-    name: Test Apple Upper SDK Bound
+  test-apple-stable-bound:
+    name: Test Apple Stable SDK Bound
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
+      - name: Update FVM to stable channel
+        run: |
+          echo '{"flutter": "stable"}' > .fvmrc
+          cat .fvmrc
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
 
       - name: Install dependencies
         run: flutter pub get
@@ -110,7 +123,7 @@ jobs:
 
   post-results:
     name: Post Test Results
-    needs: [test-lower-bound, test-upper-bound, test-apple-lower-bound, test-apple-upper-bound]
+    needs: [test-minimum-bound, test-stable-bound, test-apple-minimum-bound, test-apple-stable-bound]
     if: always()
     runs-on: ubuntu-latest
     permissions:
@@ -118,6 +131,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Update FVM to stable channel
+        run: |
+          echo '{"flutter": "stable"}' > .fvmrc
+          cat .fvmrc
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
+
+      - name: Get Flutter stable version
+        id: flutter_version
+        run: |
+          echo "STABLE_VERSION=$(flutter --version | grep -o 'Flutter [0-9]\+\.[0-9]\+\.[0-9]\+' | cut -d' ' -f2)" >> $GITHUB_OUTPUT
 
       - name: Create results summary
         id: create_summary
@@ -127,10 +153,10 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
           echo "| Test | Status |" >> $GITHUB_OUTPUT
           echo "|------|--------|" >> $GITHUB_OUTPUT
-          echo "| Lower SDK Bound (Flutter 3.28.0) | ${{ needs.test-lower-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
-          echo "| Upper SDK Bound (Flutter Stable) | ${{ needs.test-upper-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
-          echo "| Apple Lower SDK Bound (Flutter 3.28.0) | ${{ needs.test-apple-lower-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
-          echo "| Apple Upper SDK Bound (Flutter Stable) | ${{ needs.test-apple-upper-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Minimum SDK Bound (Flutter ${{ env.MIN_FLUTTER_SDK_VERSION }}) | ${{ needs.test-minimum-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Stable SDK Bound (Flutter ${{ steps.flutter_version.outputs.STABLE_VERSION }}) | ${{ needs.test-stable-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Apple Minimum SDK Bound (Flutter ${{ env.MIN_FLUTTER_SDK_VERSION }}) | ${{ needs.test-apple-minimum-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Apple Stable SDK Bound (Flutter ${{ steps.flutter_version.outputs.STABLE_VERSION }}) | ${{ needs.test-apple-stable-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create results file
