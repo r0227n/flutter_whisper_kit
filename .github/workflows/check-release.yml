@@ -6,6 +6,9 @@ on:
       - 'release/**'
       - 'develop'
 
+permissions:
+  pull-requests: write
+
 jobs:
   validate-versions:
     name: Validate Package Versions
