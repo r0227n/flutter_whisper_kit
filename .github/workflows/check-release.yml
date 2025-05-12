@@ -26,7 +26,11 @@ jobs:
           files_yaml: |
             pkg_apple:
               - 'packages/flutter_whisper_kit_apple/**'
-      
+
+      - name: Output Changed Files Info
+        run: |
+          echo "Changed files in flutter_whisper_kit_apple: ${{ steps.changed-files.outputs.pkg_apple_any_changed }}"
+          echo "Changed files in flutter_whisper_kit_apple: ${{ steps.changed-files.outputs.pkg_apple_all_changed }}"
 
   output-changed-files:
     name: Output Changed Files
