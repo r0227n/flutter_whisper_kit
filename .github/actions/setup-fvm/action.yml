@@ -1,9 +1,22 @@
 name: 'Setup FVM'
 description: 'Sets up Flutter Version Management (FVM) with the correct Flutter version'
 
+inputs:
+  flutter-version-override:
+    description: 'Optional Flutter version to override the one in .fvmrc'
+    required: false
+    default: ''
+
 runs:
   using: "composite"
   steps:
+    # Update .fvmrc if override is provided
+    - name: Override Flutter Version in .fvmrc
+      if: inputs.flutter-version-override != ''
+      shell: bash
+      run: |
+        echo '{"flutter": "${{ inputs.flutter-version-override }}"}' > .fvmrc
+
     # https://github.com/kuhnroyal/flutter-fvm-config-action
     - name: Fetch flutter config
       uses: kuhnroyal/flutter-fvm-config-action@34c3905bc939a4ff9d9cb07d5a977493fa73b2aa # v2.0

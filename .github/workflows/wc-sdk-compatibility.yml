@@ -1,0 +1,158 @@
+name: SDK Compatibility Tests
+
+on:
+  workflow_call:
+    inputs:
+      flutter_version_override:
+        description: 'Optional Flutter version to override the one in .fvmrc'
+        required: false
+        type: string
+        default: ''
+
+env:
+  FLUTTER_WHISPER_KIT_DIR: packages/flutter_whisper_kit
+  FLUTTER_WHISPER_KIT_APPLE_DIR: packages/flutter_whisper_kit_apple
+  MIN_FLUTTER_SDK_VERSION: '3.27.0' # DartSDK is 3.6.0
+
+jobs:
+  test-minimum-bound:
+    name: Test Minimum SDK Bound
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
+        with:
+          flutter-version-override: ${{ inputs.flutter_version_override || env.MIN_FLUTTER_SDK_VERSION }}
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+      - name: Run analyzer
+        run: flutter analyze
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+      - name: Run tests
+        run: flutter test
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+  test-stable-bound:
+    name: Test Stable SDK Bound
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
+        with:
+          flutter-version-override: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+      - name: Run analyzer
+        run: flutter analyze
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+      - name: Run tests
+        run: flutter test
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_DIR }}
+
+  test-apple-minimum-bound:
+    name: Test Apple Minimum SDK Bound
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
+        with:
+          flutter-version-override: ${{ inputs.flutter_version_override || env.MIN_FLUTTER_SDK_VERSION }}
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+      - name: Run analyzer
+        run: flutter analyze
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+      - name: Run tests
+        run: flutter test
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+  test-apple-stable-bound:
+    name: Test Apple Stable SDK Bound
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
+        with:
+          flutter-version-override: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+      - name: Run analyzer
+        run: flutter analyze
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+      - name: Run tests
+        run: flutter test
+        working-directory: ${{ env.FLUTTER_WHISPER_KIT_APPLE_DIR }}
+
+  post-results:
+    name: Post Test Results
+    needs: [test-minimum-bound, test-stable-bound, test-apple-minimum-bound, test-apple-stable-bound]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup FVM with Flutter
+        uses: ./.github/actions/setup-fvm
+        with:
+          flutter-version-override: 'stable'
+
+      - name: Get Flutter stable version
+        id: flutter_version
+        run: |
+          echo "STABLE_VERSION=$(flutter --version | grep -o 'Flutter [0-9]\+\.[0-9]\+\.[0-9]\+' | cut -d' ' -f2)" >> $GITHUB_OUTPUT
+
+      - name: Create results summary
+        id: create_summary
+        run: |
+          echo "SUMMARY<<EOF" >> $GITHUB_OUTPUT
+          echo "## SDK Compatibility Test Results" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "| Test | Status |" >> $GITHUB_OUTPUT
+          echo "|------|--------|" >> $GITHUB_OUTPUT
+          echo "| Minimum SDK Bound (Flutter ${{ env.MIN_FLUTTER_SDK_VERSION }}) | ${{ needs.test-minimum-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Stable SDK Bound (Flutter ${{ steps.flutter_version.outputs.STABLE_VERSION }}) | ${{ needs.test-stable-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Apple Minimum SDK Bound (Flutter ${{ env.MIN_FLUTTER_SDK_VERSION }}) | ${{ needs.test-apple-minimum-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "| Apple Stable SDK Bound (Flutter ${{ steps.flutter_version.outputs.STABLE_VERSION }}) | ${{ needs.test-apple-stable-bound.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create results file
+        run: |
+          echo "${{ steps.create_summary.outputs.SUMMARY }}" > sdk_compatibility_results.md
+
+      - name: Post comment to PR
+        if: github.event_name == 'pull_request'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body-file sdk_compatibility_results.md
+        env:
+          GH_TOKEN: ${{ github.token }}
