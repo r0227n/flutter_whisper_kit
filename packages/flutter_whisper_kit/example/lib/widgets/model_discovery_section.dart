@@ -63,10 +63,10 @@ class ModelDiscoverySection extends StatelessWidget {
               availableModels.isEmpty
                   ? const Text('Press the button to fetch available models')
                   : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                        availableModels.map((model) => Text(model)).toList(),
-                  ),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:
+                          availableModels.map((model) => Text(model)).toList(),
+                    ),
             ],
           ),
         ),
@@ -100,33 +100,32 @@ class ModelDiscoverySection extends StatelessWidget {
               recommendedModels == null
                   ? const Text('Press the button to get recommended models')
                   : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Default Model: ${recommendedModels?.defaultModel ?? "Unknown"}',
-                      ),
-                      const SizedBox(height: 4),
-                      const Text('Supported Models:'),
-                      if (recommendedModels?.supported != null) ...[
-                        ...recommendedModels!.supported.map(
-                          (model) => Text('- $model'),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Default Model: ${recommendedModels?.defaultModel ?? "Unknown"}',
                         ),
-                      ],
-                      const SizedBox(height: 4),
-                      const Text('Disabled Models:'),
-                      if (recommendedModels?.disabled != null) ...[
-                        recommendedModels!.disabled.isEmpty
-                            ? const Text('- None')
-                            : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children:
-                                  recommendedModels!.disabled
+                        const SizedBox(height: 4),
+                        const Text('Supported Models:'),
+                        if (recommendedModels?.supported != null) ...[
+                          ...recommendedModels!.supported.map(
+                            (model) => Text('- $model'),
+                          ),
+                        ],
+                        const SizedBox(height: 4),
+                        const Text('Disabled Models:'),
+                        if (recommendedModels?.disabled != null) ...[
+                          recommendedModels!.disabled.isEmpty
+                              ? const Text('- None')
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: recommendedModels!.disabled
                                       .map((model) => Text('- $model'))
                                       .toList(),
-                            ),
+                                ),
+                        ],
                       ],
-                    ],
-                  ),
+                    ),
             ],
           ),
         ),
@@ -134,10 +133,9 @@ class ModelDiscoverySection extends StatelessWidget {
 
         // Get Recommended Remote Models
         ElevatedButton(
-          onPressed:
-              isLoadingRecommendedRemoteModels
-                  ? null
-                  : onGetRecommendedRemoteModelsPressed,
+          onPressed: isLoadingRecommendedRemoteModels
+              ? null
+              : onGetRecommendedRemoteModelsPressed,
           child: Text(
             isLoadingRecommendedRemoteModels
                 ? 'Loading...'
@@ -161,36 +159,35 @@ class ModelDiscoverySection extends StatelessWidget {
               const SizedBox(height: 8),
               recommendedRemoteModels == null
                   ? const Text(
-                    'Press the button to get recommended remote models',
-                  )
+                      'Press the button to get recommended remote models',
+                    )
                   : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Default Model: ${recommendedRemoteModels?.defaultModel ?? "Unknown"}',
-                      ),
-                      const SizedBox(height: 4),
-                      const Text('Supported Models:'),
-                      if (recommendedRemoteModels?.supported != null) ...[
-                        ...recommendedRemoteModels!.supported.map(
-                          (model) => Text('- $model'),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Default Model: ${recommendedRemoteModels?.defaultModel ?? "Unknown"}',
                         ),
-                      ],
-                      const SizedBox(height: 4),
-                      const Text('Disabled Models:'),
-                      if (recommendedRemoteModels?.disabled != null) ...[
-                        recommendedRemoteModels!.disabled.isEmpty
-                            ? const Text('- None')
-                            : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children:
-                                  recommendedRemoteModels!.disabled
+                        const SizedBox(height: 4),
+                        const Text('Supported Models:'),
+                        if (recommendedRemoteModels?.supported != null) ...[
+                          ...recommendedRemoteModels!.supported.map(
+                            (model) => Text('- $model'),
+                          ),
+                        ],
+                        const SizedBox(height: 4),
+                        const Text('Disabled Models:'),
+                        if (recommendedRemoteModels?.disabled != null) ...[
+                          recommendedRemoteModels!.disabled.isEmpty
+                              ? const Text('- None')
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: recommendedRemoteModels!.disabled
                                       .map((model) => Text('- $model'))
                                       .toList(),
-                            ),
+                                ),
+                        ],
                       ],
-                    ],
-                  ),
+                    ),
             ],
           ),
         ),

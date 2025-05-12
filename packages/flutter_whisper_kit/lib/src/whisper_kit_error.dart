@@ -29,33 +29,33 @@ sealed class WhisperKitError implements Exception {
         return switch (errorCode) {
           // Handle all other model initialization errors (1000-1999)
           >= 1000 && <= 1999 => ModelLoadingFailedError(
-            message: errorMessage,
-            details: details,
-          ),
+              message: errorMessage,
+              details: details,
+            ),
 
           // Transcription and Processing (2000-2999)
           >= 2000 && <= 2999 => TranscriptionFailedError(
-            message: errorMessage,
-            details: details,
-          ),
+              message: errorMessage,
+              details: details,
+            ),
 
           // Recording and Audio Capture (3000-3999)
           >= 3000 && <= 3999 => RecordingFailedError(
-            message: errorMessage,
-            details: details,
-          ),
+              message: errorMessage,
+              details: details,
+            ),
 
           // File System and Permissions (4000-4999)
           >= 4000 && <= 4999 => PermissionDeniedError(
-            message: errorMessage,
-            details: details,
-          ),
+              message: errorMessage,
+              details: details,
+            ),
 
           // Configuration and Parameters (5000-5999)
           >= 5000 && <= 5999 => InvalidArgumentsError(
-            message: errorMessage,
-            details: details,
-          ),
+              message: errorMessage,
+              details: details,
+            ),
 
           // Default case for unhandled numeric error codes
           _ => UnknownError(message: errorMessage, details: details),

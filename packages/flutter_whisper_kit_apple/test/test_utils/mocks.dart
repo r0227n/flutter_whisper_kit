@@ -16,13 +16,13 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
   /// Stream of model loading progress updates
   @override
   Stream<Progress> get modelProgressStream => Stream<Progress>.fromIterable([
-    Progress(
-      completedUnitCount: 10,
-      totalUnitCount: 10,
-      fractionCompleted: 1.0,
-      isIndeterminate: false,
-    ),
-  ]);
+        Progress(
+          completedUnitCount: 10,
+          totalUnitCount: 10,
+          fractionCompleted: 1.0,
+          isIndeterminate: false,
+        ),
+      ]);
 
   @override
   Future<TranscriptionResult?> transcribeFromFile(
@@ -161,7 +161,8 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
     bool loop = true,
-  }) => Future.value('Recording started');
+  }) =>
+      Future.value('Recording started');
 
   @override
   Future<String?> stopRecording({bool loop = true}) =>

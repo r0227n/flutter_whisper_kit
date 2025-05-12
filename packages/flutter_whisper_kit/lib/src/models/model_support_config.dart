@@ -30,8 +30,7 @@ class ModelSupportConfig {
   /// Creates a [ModelSupportConfig] from a JSON map.
   factory ModelSupportConfig.fromJson(Map<String, dynamic> json) {
     // Parse device supports
-    final List<DeviceSupport> deviceSupports =
-        (json['deviceSupports'] as List?)
+    final List<DeviceSupport> deviceSupports = (json['deviceSupports'] as List?)
             ?.map((e) => DeviceSupport.fromJson(e as Map<String, dynamic>))
             .toList() ??
         [];
@@ -41,12 +40,11 @@ class ModelSupportConfig {
         (json['knownModels'] as List?)?.map((e) => e as String).toList() ?? [];
 
     // Parse default support
-    final ModelSupport defaultSupport =
-        json['defaultSupport'] != null
-            ? ModelSupport.fromJson(
-              json['defaultSupport'] as Map<String, dynamic>,
-            )
-            : ModelSupport(supported: [], defaultModel: 'tiny', disabled: []);
+    final ModelSupport defaultSupport = json['defaultSupport'] != null
+        ? ModelSupport.fromJson(
+            json['defaultSupport'] as Map<String, dynamic>,
+          )
+        : ModelSupport(supported: [], defaultModel: 'tiny', disabled: []);
 
     return ModelSupportConfig(
       repoName: json['name'] as String? ?? '',

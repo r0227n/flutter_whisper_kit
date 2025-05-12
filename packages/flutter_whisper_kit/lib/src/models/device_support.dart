@@ -24,7 +24,7 @@ class DeviceSupport {
       chips: json['chips'] as String?,
       identifiers:
           (json['identifiers'] as List?)?.map((e) => e as String).toList() ??
-          [],
+              [],
       models: ModelSupport.fromJson(
         json['models'] as Map<String, dynamic>? ?? {},
       ),

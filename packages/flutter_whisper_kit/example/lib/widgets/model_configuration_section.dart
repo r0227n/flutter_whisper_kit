@@ -75,12 +75,11 @@ class ModelConfigurationSection extends StatelessWidget {
               formattedModelFiles.isEmpty
                   ? const Text('Press the button to format model files')
                   : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                        formattedModelFiles
-                            .map((file) => Text('- $file'))
-                            .toList(),
-                  ),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: formattedModelFiles
+                          .map((file) => Text('- $file'))
+                          .toList(),
+                    ),
             ],
           ),
         ),
@@ -88,10 +87,9 @@ class ModelConfigurationSection extends StatelessWidget {
 
         // Fetch Model Support Config
         ElevatedButton(
-          onPressed:
-              isLoadingModelSupportConfig
-                  ? null
-                  : onFetchModelSupportConfigPressed,
+          onPressed: isLoadingModelSupportConfig
+              ? null
+              : onFetchModelSupportConfigPressed,
           child: Text(
             isLoadingModelSupportConfig
                 ? 'Loading...'
@@ -116,48 +114,49 @@ class ModelConfigurationSection extends StatelessWidget {
               modelSupportConfig == null
                   ? const Text('Press the button to fetch model support config')
                   : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Repository: ${modelSupportConfig?.repoName ?? "Unknown"}',
-                      ),
-                      Text(
-                        'Version: ${modelSupportConfig?.repoVersion ?? "Unknown"}',
-                      ),
-                      const SizedBox(height: 4),
-                      const Text('Known Models:'),
-                      if (modelSupportConfig?.knownModels != null) ...[
-                        ...modelSupportConfig!.knownModels.map(
-                          (model) => Text('- $model'),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Repository: ${modelSupportConfig?.repoName ?? "Unknown"}',
                         ),
-                      ],
-                      const SizedBox(height: 4),
-                      const Text('Device Supports:'),
-                      if (modelSupportConfig?.deviceSupports != null) ...[
-                        ...modelSupportConfig!.deviceSupports.map(
-                          (deviceSupport) => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Chip: ${deviceSupport.chips ?? "Unknown"}'),
-                              Text(
-                                'Identifiers: ${deviceSupport.identifiers.join(", ")}',
-                              ),
-                              Text(
-                                'Default Model: ${deviceSupport.models.defaultModel}',
-                              ),
-                              Text(
-                                'Supported Models: ${deviceSupport.models.supported.join(", ")}',
-                              ),
-                              Text(
-                                'Disabled Models: ${deviceSupport.models.disabled.isEmpty ? "None" : deviceSupport.models.disabled.join(", ")}',
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                        Text(
+                          'Version: ${modelSupportConfig?.repoVersion ?? "Unknown"}',
+                        ),
+                        const SizedBox(height: 4),
+                        const Text('Known Models:'),
+                        if (modelSupportConfig?.knownModels != null) ...[
+                          ...modelSupportConfig!.knownModels.map(
+                            (model) => Text('- $model'),
                           ),
-                        ),
+                        ],
+                        const SizedBox(height: 4),
+                        const Text('Device Supports:'),
+                        if (modelSupportConfig?.deviceSupports != null) ...[
+                          ...modelSupportConfig!.deviceSupports.map(
+                            (deviceSupport) => Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    'Chip: ${deviceSupport.chips ?? "Unknown"}'),
+                                Text(
+                                  'Identifiers: ${deviceSupport.identifiers.join(", ")}',
+                                ),
+                                Text(
+                                  'Default Model: ${deviceSupport.models.defaultModel}',
+                                ),
+                                Text(
+                                  'Supported Models: ${deviceSupport.models.supported.join(", ")}',
+                                ),
+                                Text(
+                                  'Disabled Models: ${deviceSupport.models.disabled.isEmpty ? "None" : deviceSupport.models.disabled.join(", ")}',
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
+                    ),
             ],
           ),
         ),

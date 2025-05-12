@@ -117,15 +117,13 @@ class DecodingOptions {
   factory DecodingOptions.fromJson(Map<String, dynamic> json) {
     return DecodingOptions(
       verbose: json['verbose'] as bool? ?? false,
-      task:
-          json['task'] == 'translate'
-              ? DecodingTask.translate
-              : DecodingTask.transcribe,
+      task: json['task'] == 'translate'
+          ? DecodingTask.translate
+          : DecodingTask.transcribe,
       language: json['language'] as String?,
-      temperature:
-          json['temperature'] != null
-              ? (json['temperature'] as num).toDouble()
-              : 0.0,
+      temperature: json['temperature'] != null
+          ? (json['temperature'] as num).toDouble()
+          : 0.0,
       temperatureIncrementOnFallback:
           json['temperatureIncrementOnFallback'] != null
               ? (json['temperatureIncrementOnFallback'] as num).toDouble()
@@ -139,10 +137,9 @@ class DecodingOptions {
       skipSpecialTokens: json['skipSpecialTokens'] as bool? ?? false,
       withoutTimestamps: json['withoutTimestamps'] as bool? ?? false,
       wordTimestamps: json['wordTimestamps'] as bool? ?? false,
-      maxInitialTimestamp:
-          json['maxInitialTimestamp'] != null
-              ? (json['maxInitialTimestamp'] as num).toDouble()
-              : 1.0,
+      maxInitialTimestamp: json['maxInitialTimestamp'] != null
+          ? (json['maxInitialTimestamp'] as num).toDouble()
+          : 1.0,
       clipTimestamps:
           (json['clipTimestamps'] as List<dynamic>?)?.cast<double>() ?? [],
       promptTokens: (json['promptTokens'] as List<dynamic>?)?.cast<int>() ?? [],
@@ -150,27 +147,22 @@ class DecodingOptions {
       suppressBlank: json['suppressBlank'] as bool? ?? false,
       supressTokens:
           (json['supressTokens'] as List<dynamic>?)?.cast<int>() ?? [],
-      compressionRatioThreshold:
-          json['compressionRatioThreshold'] != null
-              ? (json['compressionRatioThreshold'] as num).toDouble()
-              : null,
-      logProbThreshold:
-          json['logProbThreshold'] != null
-              ? (json['logProbThreshold'] as num).toDouble()
-              : null,
-      firstTokenLogProbThreshold:
-          json['firstTokenLogProbThreshold'] != null
-              ? (json['firstTokenLogProbThreshold'] as num).toDouble()
-              : null,
-      noSpeechThreshold:
-          json['noSpeechThreshold'] != null
-              ? (json['noSpeechThreshold'] as num).toDouble()
-              : null,
+      compressionRatioThreshold: json['compressionRatioThreshold'] != null
+          ? (json['compressionRatioThreshold'] as num).toDouble()
+          : null,
+      logProbThreshold: json['logProbThreshold'] != null
+          ? (json['logProbThreshold'] as num).toDouble()
+          : null,
+      firstTokenLogProbThreshold: json['firstTokenLogProbThreshold'] != null
+          ? (json['firstTokenLogProbThreshold'] as num).toDouble()
+          : null,
+      noSpeechThreshold: json['noSpeechThreshold'] != null
+          ? (json['noSpeechThreshold'] as num).toDouble()
+          : null,
       concurrentWorkerCount: json['concurrentWorkerCount'] as int? ?? 4,
-      chunkingStrategy:
-          json['chunkingStrategy'] == 'vad'
-              ? ChunkingStrategy.vad
-              : ChunkingStrategy.none,
+      chunkingStrategy: json['chunkingStrategy'] == 'vad'
+          ? ChunkingStrategy.vad
+          : ChunkingStrategy.none,
     );
   }
 

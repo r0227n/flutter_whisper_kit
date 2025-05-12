@@ -22,7 +22,6 @@ class ModelSupport {
       defaultModel: json['default'] as String? ?? 'tiny',
       supported:
           (json['supported'] as List?)?.map((e) => e as String).toList() ?? [],
-
       disabled:
           (json['disabled'] as List?)?.map((e) => e as String).toList() ?? [],
     );
@@ -33,7 +32,6 @@ class ModelSupport {
     return {
       'default': defaultModel,
       'supported': supported,
-
       'disabled': disabled,
     };
   }

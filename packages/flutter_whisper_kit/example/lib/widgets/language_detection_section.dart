@@ -51,10 +51,9 @@ class LanguageDetectionSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         ElevatedButton(
-          onPressed:
-              isModelLoaded && !isDetectingLanguage
-                  ? onDetectLanguagePressed
-                  : null,
+          onPressed: isModelLoaded && !isDetectingLanguage
+              ? onDetectLanguagePressed
+              : null,
           child: Text(
             isDetectingLanguage ? 'Detecting...' : 'Detect Language from File',
           ),
@@ -76,19 +75,19 @@ class LanguageDetectionSection extends StatelessWidget {
               const SizedBox(height: 8),
               languageDetectionResult == null
                   ? const Text(
-                    'Press the button to detect language from a file',
-                  )
+                      'Press the button to detect language from a file',
+                    )
                   : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Detected Language: ${languageDetectionResult?.language ?? "Unknown"}',
-                      ),
-                      const SizedBox(height: 8),
-                      const Text('Language Probabilities:'),
-                      ...getProbabilityWidgets(),
-                    ],
-                  ),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Detected Language: ${languageDetectionResult?.language ?? "Unknown"}',
+                        ),
+                        const SizedBox(height: 8),
+                        const Text('Language Probabilities:'),
+                        ...getProbabilityWidgets(),
+                      ],
+                    ),
             ],
           ),
         ),

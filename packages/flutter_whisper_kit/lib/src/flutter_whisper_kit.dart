@@ -58,12 +58,11 @@ class FlutterWhisperKit {
     try {
       if (onProgress != null) {
         progressSubscription = FlutterWhisperKitPlatform
-            .instance
-            .modelProgressStream
+            .instance.modelProgressStream
             .listen((progress) {
-              // Convert the Progress object to a simple double for the callback
-              onProgress(progress);
-            });
+          // Convert the Progress object to a simple double for the callback
+          onProgress(progress);
+        });
       }
 
       // Delegate to the platform implementation
