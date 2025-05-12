@@ -127,6 +127,9 @@ jobs:
     permissions:
       pull-requests: write
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Create results summary
         id: create_summary
         run: |
