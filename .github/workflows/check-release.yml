@@ -12,7 +12,8 @@ permissions:
 jobs:
   validate-versions:
     name: Validate Package Versions
-    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit_apple')
+    if: >-
+      contains(toJSON(github.event.pull_request.files.*.filename), 'packages/flutter_whisper_kit_apple/')
     uses: ./.github/workflows/wc-version-validation.yml
     with:
       pubspec_path: packages/flutter_whisper_kit_apple/pubspec.yaml
