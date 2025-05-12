@@ -16,7 +16,6 @@ jobs:
   test-lower-bound:
     name: Test Lower SDK Bound
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -41,7 +40,6 @@ jobs:
   test-upper-bound:
     name: Test Upper SDK Bound
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -66,7 +64,6 @@ jobs:
   test-apple-lower-bound:
     name: Test Apple Lower SDK Bound
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit_apple/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -91,7 +88,6 @@ jobs:
   test-apple-upper-bound:
     name: Test Apple Upper SDK Bound
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit_apple/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
