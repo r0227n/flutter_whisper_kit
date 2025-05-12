@@ -6,19 +6,14 @@ on:
       - 'release/**'
       - 'develop'
 
-env:
-  FLUTTER_WHISPER_KIT_APPLE_DIR: packages/flutter_whisper_kit_apple
-  PUBSPEC_PATH: packages/flutter_whisper_kit_apple/pubspec.yaml
-  PODSPEC_PATH: packages/flutter_whisper_kit_apple/darwin/flutter_whisper_kit_apple.podspec
-
 jobs:
   validate-versions:
     name: Validate Package Versions
-    if: contains(github.event.pull_request.changed_files, env.FLUTTER_WHISPER_KIT_APPLE_DIR)
+    if: contains(github.event.pull_request.changed_files, 'packages/flutter_whisper_kit_apple')
     uses: ./.github/workflows/wc-version-validation.yml
     with:
-      pubspec_path: ${{ env.PUBSPEC_PATH }}
-      podspec_path: ${{ env.PODSPEC_PATH }}
+      pubspec_path: packages/flutter_whisper_kit_apple/pubspec.yaml
+      podspec_path: packages/flutter_whisper_kit_apple/darwin/flutter_whisper_kit_apple.podspec
 
   sdk-compatibility:
     name: Run SDK Compatibility Tests
