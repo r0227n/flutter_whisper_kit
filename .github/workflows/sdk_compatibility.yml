@@ -21,13 +21,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout Repository with specific Flutter version
-        run: |
-          echo '{"flutter": "3.28.0"}' > .fvmrc
-          cat .fvmrc
-      
-      - name: Setup FVM
-        uses: ./.github/actions/setup-fvm
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.28.0'
 
       - name: Install dependencies
         run: flutter pub get
@@ -48,13 +45,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout Repository with stable Flutter version
-        run: |
-          echo '{"flutter": "stable"}' > .fvmrc
-          cat .fvmrc
-      
-      - name: Setup FVM
-        uses: ./.github/actions/setup-fvm
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
 
       - name: Install dependencies
         run: flutter pub get
@@ -75,13 +69,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout Repository with specific Flutter version
-        run: |
-          echo '{"flutter": "3.28.0"}' > .fvmrc
-          cat .fvmrc
-      
-      - name: Setup FVM
-        uses: ./.github/actions/setup-fvm
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.28.0'
 
       - name: Install dependencies
         run: flutter pub get
@@ -102,13 +93,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout Repository with stable Flutter version
-        run: |
-          echo '{"flutter": "stable"}' > .fvmrc
-          cat .fvmrc
-      
-      - name: Setup FVM
-        uses: ./.github/actions/setup-fvm
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
 
       - name: Install dependencies
         run: flutter pub get
