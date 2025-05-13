@@ -2,7 +2,7 @@ name: Pana Package Evaluation
 
 on:
   pull_request:
-    branches: [ 'release/**' , 'develop']
+    branches: [ 'release/**' ]
   workflow_dispatch:
 
 jobs:
