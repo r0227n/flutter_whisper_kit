@@ -37,4 +37,10 @@ jobs:
     uses: ./.github/workflows/wc-sdk-compatibility.yml
     permissions:
       pull-requests: write
+      
+  pana-evaluation:
+    name: Run Pana Package Evaluation
+    uses: ./.github/workflows/wc-pana-evaluation.yml
+    permissions:
+      pull-requests: write
 

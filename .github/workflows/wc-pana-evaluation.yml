@@ -1,6 +1,13 @@
 name: Pana Package Evaluation
 
 on:
+  workflow_call:
+    inputs:
+      package_dir:
+        description: 'Directory of the package to evaluate'
+        required: false
+        type: string
+        default: 'packages/flutter_whisper_kit'
   pull_request:
     branches: [ 'release/**' ]
   workflow_dispatch:
@@ -15,7 +22,7 @@ jobs:
       BASE_DIR: /tmp/pana-evaluation
       PANA_OUTPUT_FILE: /tmp/pana-evaluation/pana_output.json
       COMMENT_FILE: /tmp/pana-evaluation/comment.md
-      PACKAGE_DIR: packages/flutter_whisper_kit
+      PACKAGE_DIR: ${{ inputs.package_dir || 'packages/flutter_whisper_kit' }}
     
     steps:
       - name: Checkout Repository
