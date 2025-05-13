@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pkg_apple: ${{ steps.changed-files.outputs.pkg_apple_any_changed == 'true' }}
+      pkg_flutter: ${{ steps.changed-files.outputs.pkg_flutter_any_changed == 'true' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,6 +23,8 @@ jobs:
           files_yaml: |
             pkg_apple:
               - 'packages/flutter_whisper_kit_apple/**'
+            pkg_flutter:
+              - 'packages/flutter_whisper_kit/**'
 
   validate-apple-package-versions:
     name: Validate Apple Package Versions
@@ -38,9 +41,23 @@ jobs:
     permissions:
       pull-requests: write
       
-  pana-evaluation:
-    name: Run Pana Package Evaluation
+  pana-evaluation-flutter:
+    name: Run Pana Evaluation for Flutter Whisper Kit
+    needs: diff-files
+    if: ${{ needs.diff-files.outputs.pkg_flutter }}
     uses: ./.github/workflows/wc-pana-evaluation.yml
+    with:
+      package_dir: packages/flutter_whisper_kit
+    permissions:
+      pull-requests: write
+      
+  pana-evaluation-apple:
+    name: Run Pana Evaluation for Flutter Whisper Kit Apple
+    needs: diff-files
+    if: ${{ needs.diff-files.outputs.pkg_apple }}
+    uses: ./.github/workflows/wc-pana-evaluation.yml
+    with:
+      package_dir: packages/flutter_whisper_kit_apple
     permissions:
       pull-requests: write
 
