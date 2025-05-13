@@ -5,7 +5,6 @@ on:
     branches:
       - 'release/**'
       - 'develop'
-
 jobs:
   diff-files:
     name: Get Changed Files
@@ -49,6 +48,8 @@ jobs:
     uses: ./.github/workflows/wc-pana-evaluation.yml
     with:
       package_dir: packages/flutter_whisper_kit
+    permissions:
+      pull-requests: write
       
   pana-evaluation-apple:
     name: Run Pana Evaluation for Flutter Whisper Kit Apple
@@ -57,4 +58,6 @@ jobs:
     uses: ./.github/workflows/wc-pana-evaluation.yml
     with:
       package_dir: packages/flutter_whisper_kit_apple
+    permissions:
+      pull-requests: write
 
