@@ -38,17 +38,17 @@ jobs:
         run: |
           # Run pana on the package directory
           cd ${{ env.PACKAGE_DIR }}
-          PANA_OUTPUT=$(dart pub global run pana --json --no-warning)
+          dart pub global run pana --json --no-warning > ${{ env.PANA_OUTPUT_FILE }}
           
           # Extract key metrics from the output
-          SCORE=$(echo "$PANA_OUTPUT" | jq -r '.scores.grantedPoints')
-          MAX_SCORE=$(echo "$PANA_OUTPUT" | jq -r '.scores.maxPoints')
-          PERCENTAGE=$(echo "$PANA_OUTPUT" | jq -r '.scores.grantedPoints / .scores.maxPoints * 100 | floor')
+          SCORE=$(cat ${{ env.PANA_OUTPUT_FILE }} | jq -r '.scores.grantedPoints')
+          MAX_SCORE=$(cat ${{ env.PANA_OUTPUT_FILE }} | jq -r '.scores.maxPoints')
+          PERCENTAGE=$(cat ${{ env.PANA_OUTPUT_FILE }} | jq -r '.scores.grantedPoints / .scores.maxPoints * 100 | floor')
           
           # Count issues by type
-          ERRORS=$(echo "$PANA_OUTPUT" | jq -r '.report.sections[].status | select(. == "failed") | length')
-          WARNINGS=$(echo "$PANA_OUTPUT" | jq -r '.report.sections[].status | select(. == "partial") | length')
-          SUGGESTIONS=$(echo "$PANA_OUTPUT" | jq -r '.report.sections[].hints | length')
+          ERRORS=$(cat ${{ env.PANA_OUTPUT_FILE }} | jq -r '.report.sections[].status | select(. == "failed") | length')
+          WARNINGS=$(cat ${{ env.PANA_OUTPUT_FILE }} | jq -r '.report.sections[].status | select(. == "partial") | length')
+          SUGGESTIONS=$(cat ${{ env.PANA_OUTPUT_FILE }} | jq -r '.report.sections[].hints | length')
           
           # Save metrics to GITHUB_OUTPUT for the next step
           echo "score=$SCORE" >> $GITHUB_OUTPUT
@@ -57,9 +57,6 @@ jobs:
           echo "errors=$ERRORS" >> $GITHUB_OUTPUT
           echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
           echo "suggestions=$SUGGESTIONS" >> $GITHUB_OUTPUT
-          
-          # Save pana output to a file
-          echo "$PANA_OUTPUT" > ${{ env.PANA_OUTPUT_FILE }}
       
       - name: Generate Comment Content
         id: comment
