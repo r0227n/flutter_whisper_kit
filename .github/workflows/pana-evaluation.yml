@@ -2,13 +2,15 @@ name: Pana Package Evaluation
 
 on:
   pull_request:
-    branches: [ 'release/**' ]
+    branches: [ 'release/**' , 'develop']
   workflow_dispatch:
 
 jobs:
   pana-evaluation:
     name: Evaluate Package with Pana
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     env:
       BASE_DIR: /tmp/pana-evaluation
       PANA_OUTPUT_FILE: /tmp/pana-evaluation/pana_output.json
@@ -19,11 +21,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x'
-          channel: 'stable'
+      - name: Setup FVM
+        uses: ./.github/actions/setup-fvm
       
       - name: Install Dependencies
         run: flutter pub get
