@@ -10,8 +10,8 @@ jobs:
     name: Get Changed Files
     runs-on: ubuntu-latest
     outputs:
-      pkg_apple: ${{ steps.changed-files.outputs.pkg_apple_any_changed == 'true' }}
-      pkg_flutter: ${{ steps.changed-files.outputs.pkg_flutter_any_changed == 'true' }}
+      pkg_apple: ${{ steps.changed-files.outputs.pkg_apple_any_changed }}
+      pkg_flutter: ${{ steps.changed-files.outputs.pkg_flutter_any_changed }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
