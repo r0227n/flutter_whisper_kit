@@ -10,25 +10,21 @@ jobs:
     name: Get Changed Files
     runs-on: ubuntu-latest
     outputs:
-      pkg_apple: ${{ steps.changed-files-apple.outputs.any_changed == 'true' }}
-      pkg_flutter: ${{ steps.changed-files-flutter.outputs.any_changed == 'true' }}
+      pkg_apple: ${{ steps.changed-files.outputs.pkg_apple_any_changed == 'true' }}
+      pkg_flutter: ${{ steps.changed-files.outputs.pkg_flutter_any_changed == 'true' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Get changed files for Flutter Whisper Kit
-        id: changed-files-flutter
+      - name: Get changed files
+        id: changed-files
         uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46
         with:
-          files: |
-            packages/flutter_whisper_kit/**
-
-      - name: Get changed files for Flutter Whisper Kit Apple
-        id: changed-files-apple
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46
-        with:
-          files: |
-            packages/flutter_whisper_kit_apple/**
+          files_yaml: |
+            pkg_flutter:
+              - 'packages/flutter_whisper_kit/**'
+            pkg_apple:
+              - 'packages/flutter_whisper_kit_apple/**'
 
   validate-apple-package-versions:
     name: Validate Apple Package Versions
