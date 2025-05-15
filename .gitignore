@@ -4,5 +4,8 @@
 .flutter-plugins
 .flutter-plugins-dependencies
 
+# node_modules
+node_modules/
+
 # FVM Version Cache
 .fvm/
