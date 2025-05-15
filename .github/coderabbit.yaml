@@ -1,4 +1,5 @@
-language: "en-US"
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "ja-JP"
 early_access: false
 
 reviews:
