@@ -25,6 +25,7 @@ reviews:
 auto_review:
   enabled: true
   drafts: false
+  bot_user_prs: true
 
 chat:
   auto_reply: true
