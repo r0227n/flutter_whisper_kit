@@ -1,0 +1,29 @@
+language: "en-US"
+early_access: false
+
+reviews:
+  profile: "balanced"  # Options: strict, balanced, chill
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  collapse_walkthrough: false
+  
+  files:
+    include:
+      - "packages/flutter_whisper_kit/**/*.dart"
+      - "packages/flutter_whisper_kit_apple/**/*.dart"
+      - "packages/flutter_whisper_kit_apple/**/*.swift"
+    exclude:
+      - "**/.dart_tool/**"
+      - "**/.flutter-plugins"
+      - "**/.flutter-plugins-dependencies"
+      - "**/.fvm/**"
+      - "**/build/**"
+      - "**/*.g.dart"  # Generated files
+
+auto_review:
+  enabled: true
+  drafts: false
+
+chat:
+  auto_reply: true
