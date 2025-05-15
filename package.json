@@ -1,0 +1,21 @@
+{
+  "name": "flutter_whisper_kit",
+  "version": "1.0.0",
+  "description": "[DeepWiki](https://deepwiki.com/r0227n/flutter_whisper_kit)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"No tests specified\"",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7"
+  }
+}
