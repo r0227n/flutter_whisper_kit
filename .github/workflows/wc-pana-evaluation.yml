@@ -1,9 +1,21 @@
 name: Pana Package Evaluation
 
 on:
+  workflow_call:
+    inputs:
+      package_dir:
+        description: 'Directory of the package to evaluate'
+        required: true
+        type: string
   pull_request:
     branches: [ 'release/**' ]
   workflow_dispatch:
+    inputs:
+      package_dir:
+        description: 'Directory of the package to evaluate'
+        required: true
+        type: string
+        default: 'packages/flutter_whisper_kit'
 
 jobs:
   pana-evaluation:
@@ -15,7 +27,8 @@ jobs:
       BASE_DIR: /tmp/pana-evaluation
       PANA_OUTPUT_FILE: /tmp/pana-evaluation/pana_output.json
       COMMENT_FILE: /tmp/pana-evaluation/comment.md
-      PACKAGE_DIR: packages/flutter_whisper_kit
+      PACKAGE_DIR: ${{ inputs.package_dir }}
+      PACKAGE_NAME: ${{ inputs.package_dir == 'packages/flutter_whisper_kit_apple' && 'Flutter Whisper Kit Apple' || 'Flutter Whisper Kit' }}
     
     steps:
       - name: Checkout Repository
@@ -66,7 +79,7 @@ jobs:
           PANA_OUTPUT=$(cat ${{ env.PANA_OUTPUT_FILE }})
           
           # Start building the comment
-          echo "## 📊 Pana Package Evaluation Results" > ${{ env.COMMENT_FILE }}
+          echo "## 📊 Pana Package Evaluation Results: ${{ env.PACKAGE_NAME }}" > ${{ env.COMMENT_FILE }}
           echo "" >> ${{ env.COMMENT_FILE }}
           echo "### Overall Score: ${{ steps.pana.outputs.score }}/${{ steps.pana.outputs.max_score }} (${{ steps.pana.outputs.percentage }}%)" >> ${{ env.COMMENT_FILE }}
           echo "" >> ${{ env.COMMENT_FILE }}
