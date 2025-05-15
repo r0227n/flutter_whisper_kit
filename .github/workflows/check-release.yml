@@ -4,7 +4,7 @@ on:
   pull_request:
     branches:
       - 'release/**'
-      - 'develop'
+      
 jobs:
   diff-files:
     name: Get Changed Files
