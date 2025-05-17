@@ -50,9 +50,11 @@ abstract class WhisperKitMessage {
     String? token,
   );
   @async
-  String? setupModels(String? model, String? downloadBase, String? modelRepo, String? modelToken, String? modelFolder, bool download);
+  String? setupModels(String? model, String? downloadBase, String? modelRepo,
+      String? modelToken, String? modelFolder, bool download);
   @async
-  String? download(String variant, String? downloadBase, bool useBackgroundSession, String repo, String? token);
+  String? download(String variant, String? downloadBase,
+      bool useBackgroundSession, String repo, String? token);
   @async
   String? prewarmModels();
   @async

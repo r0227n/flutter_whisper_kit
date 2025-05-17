@@ -396,7 +396,7 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       rethrow;
     }
   }
-  
+
   @override
   Future<String?> setupModels({
     String? model,

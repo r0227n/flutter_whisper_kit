@@ -318,7 +318,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
       'recommendedRemoteModels() has not been implemented.',
     );
   }
-  
+
   /// Sets up WhisperKit models with the given parameters.
   ///
   /// This method initializes the WhisperKit framework with the specified configuration.
@@ -345,7 +345,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError('setupModels() has not been implemented.');
   }
-  
+
   /// Downloads a WhisperKit model from a repository.
   ///
   /// This method downloads a model variant from the specified repository
@@ -370,7 +370,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError('download() has not been implemented.');
   }
-  
+
   /// Preloads models into memory for faster inference.
   ///
   /// This method prepares the models for use by loading them into memory
@@ -383,7 +383,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   Future<String?> prewarmModels() {
     throw UnimplementedError('prewarmModels() has not been implemented.');
   }
-  
+
   /// Releases model resources when they are no longer needed.
   ///
   /// This method unloads the models from memory to free up resources.
@@ -395,7 +395,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   Future<String?> unloadModels() {
     throw UnimplementedError('unloadModels() has not been implemented.');
   }
-  
+
   /// Resets the transcription state.
   ///
   /// This method stops recording and resets the transcription timings.
@@ -407,7 +407,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   Future<String?> clearState() {
     throw UnimplementedError('clearState() has not been implemented.');
   }
-  
+
   /// Sets the logging callback for WhisperKit.
   ///
   /// This method configures a callback function for tracking progress and debugging.

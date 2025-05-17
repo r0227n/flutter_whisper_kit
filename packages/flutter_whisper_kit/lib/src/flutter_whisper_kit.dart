@@ -370,7 +370,7 @@ class FlutterWhisperKit {
       () => FlutterWhisperKitPlatform.instance.recommendedRemoteModels(),
     );
   }
-  
+
   /// Sets up WhisperKit models with the given parameters.
   ///
   /// This method initializes the WhisperKit framework with the specified configuration.
@@ -405,7 +405,7 @@ class FlutterWhisperKit {
       ),
     );
   }
-  
+
   /// Downloads a WhisperKit model from a repository.
   ///
   /// This method downloads a model variant from the specified repository
@@ -455,7 +455,7 @@ class FlutterWhisperKit {
       progressSubscription?.cancel();
     }
   }
-  
+
   /// Preloads models into memory for faster inference.
   ///
   /// This method prepares the models for use by loading them into memory
@@ -469,7 +469,7 @@ class FlutterWhisperKit {
       () => FlutterWhisperKitPlatform.instance.prewarmModels(),
     );
   }
-  
+
   /// Releases model resources when they are no longer needed.
   ///
   /// This method unloads the models from memory to free up resources.
@@ -482,7 +482,7 @@ class FlutterWhisperKit {
       () => FlutterWhisperKitPlatform.instance.unloadModels(),
     );
   }
-  
+
   /// Resets the transcription state.
   ///
   /// This method stops recording and resets the transcription timings.
@@ -495,7 +495,7 @@ class FlutterWhisperKit {
       () => FlutterWhisperKitPlatform.instance.clearState(),
     );
   }
-  
+
   /// Sets the logging callback for WhisperKit.
   ///
   /// This method configures a callback function for tracking progress and debugging.

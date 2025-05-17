@@ -238,7 +238,7 @@ class MockFlutterWhisperkitPlatform
           disabled: [],
         ),
       );
-      
+
   @override
   Future<String?> setupModels({
     String? model,
@@ -261,10 +261,12 @@ class MockFlutterWhisperkitPlatform
       Future.value('/path/to/downloaded/model');
 
   @override
-  Future<String?> prewarmModels() => Future.value('Models prewarmed successfully');
+  Future<String?> prewarmModels() =>
+      Future.value('Models prewarmed successfully');
 
   @override
-  Future<String?> unloadModels() => Future.value('Models unloaded successfully');
+  Future<String?> unloadModels() =>
+      Future.value('Models unloaded successfully');
 
   @override
   Future<String?> clearState() => Future.value('State cleared successfully');
