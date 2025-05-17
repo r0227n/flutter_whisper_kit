@@ -238,6 +238,39 @@ class MockFlutterWhisperkitPlatform
           disabled: [],
         ),
       );
+      
+  @override
+  Future<String?> setupModels({
+    String? model,
+    String? downloadBase,
+    String? modelRepo,
+    String? modelToken,
+    String? modelFolder,
+    bool download = true,
+  }) =>
+      Future.value('Models set up successfully');
+
+  @override
+  Future<String?> download({
+    required String variant,
+    String? downloadBase,
+    bool useBackgroundSession = false,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+  }) =>
+      Future.value('/path/to/downloaded/model');
+
+  @override
+  Future<String?> prewarmModels() => Future.value('Models prewarmed successfully');
+
+  @override
+  Future<String?> unloadModels() => Future.value('Models unloaded successfully');
+
+  @override
+  Future<String?> clearState() => Future.value('State cleared successfully');
+
+  @override
+  Future<void> loggingCallback({String? level}) => Future.value();
 }
 
 /// Sets up a mock platform for testing.

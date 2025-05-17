@@ -318,4 +318,106 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
       'recommendedRemoteModels() has not been implemented.',
     );
   }
+  
+  /// Sets up WhisperKit models with the given parameters.
+  ///
+  /// This method initializes the WhisperKit framework with the specified configuration.
+  /// It either uses a local model folder if provided or downloads the model.
+  ///
+  /// Parameters:
+  /// - [model]: The model variant to use.
+  /// - [downloadBase]: The base URL for downloads.
+  /// - [modelRepo]: The repository to download the model from.
+  /// - [modelToken]: An access token for the repository.
+  /// - [modelFolder]: A local folder containing the model files.
+  /// - [download]: Whether to download the model if not available locally.
+  ///
+  /// Returns a [Future] that completes with a success message if the models are set up successfully.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<String?> setupModels({
+    String? model,
+    String? downloadBase,
+    String? modelRepo,
+    String? modelToken,
+    String? modelFolder,
+    bool download = true,
+  }) {
+    throw UnimplementedError('setupModels() has not been implemented.');
+  }
+  
+  /// Downloads a WhisperKit model from a repository.
+  ///
+  /// This method downloads a model variant from the specified repository
+  /// and tracks the progress through the [modelProgressStream].
+  ///
+  /// Parameters:
+  /// - [variant]: The model variant to download.
+  /// - [downloadBase]: The base URL for downloads.
+  /// - [useBackgroundSession]: Whether to use a background session for the download.
+  /// - [repo]: The repository to download from.
+  /// - [token]: An access token for the repository.
+  ///
+  /// Returns a [Future] that completes with the path to the downloaded model.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<String?> download({
+    required String variant,
+    String? downloadBase,
+    bool useBackgroundSession = false,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+  }) {
+    throw UnimplementedError('download() has not been implemented.');
+  }
+  
+  /// Preloads models into memory for faster inference.
+  ///
+  /// This method prepares the models for use by loading them into memory
+  /// but does not perform any inference. It is useful for reducing the
+  /// latency of the first transcription.
+  ///
+  /// Returns a [Future] that completes with a success message if the models are prewarmed successfully.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<String?> prewarmModels() {
+    throw UnimplementedError('prewarmModels() has not been implemented.');
+  }
+  
+  /// Releases model resources when they are no longer needed.
+  ///
+  /// This method unloads the models from memory to free up resources.
+  /// It should be called when the models are no longer needed.
+  ///
+  /// Returns a [Future] that completes with a success message if the models are unloaded successfully.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<String?> unloadModels() {
+    throw UnimplementedError('unloadModels() has not been implemented.');
+  }
+  
+  /// Resets the transcription state.
+  ///
+  /// This method stops recording and resets the transcription timings.
+  /// It should be called when starting a new transcription session.
+  ///
+  /// Returns a [Future] that completes with a success message if the state is cleared successfully.
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<String?> clearState() {
+    throw UnimplementedError('clearState() has not been implemented.');
+  }
+  
+  /// Sets the logging callback for WhisperKit.
+  ///
+  /// This method configures a callback function for tracking progress and debugging.
+  /// The callback receives log messages with the specified level.
+  ///
+  /// Parameters:
+  /// - [level]: The logging level (e.g., "debug", "info", "warning", "error").
+  ///
+  /// Throws an [UnimplementedError] if the subclass does not override this method.
+  Future<void> loggingCallback({String? level}) {
+    throw UnimplementedError('loggingCallback() has not been implemented.');
+  }
 }
