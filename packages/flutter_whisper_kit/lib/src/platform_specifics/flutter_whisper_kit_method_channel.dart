@@ -396,4 +396,65 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       rethrow;
     }
   }
+
+  @override
+  Future<String?> setupModels({
+    String? model,
+    String? downloadBase,
+    String? modelRepo,
+    String? modelToken,
+    String? modelFolder,
+    bool download = true,
+  }) async {
+    final response = await _whisperKitMessage.setupModels(
+      model,
+      downloadBase,
+      modelRepo,
+      modelToken,
+      modelFolder,
+      download,
+    );
+    return response;
+  }
+
+  @override
+  Future<String?> download({
+    required String variant,
+    String? downloadBase,
+    bool useBackgroundSession = false,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+  }) async {
+    final response = await _whisperKitMessage.download(
+      variant,
+      downloadBase,
+      useBackgroundSession,
+      repo,
+      token,
+    );
+    return response;
+  }
+
+  @override
+  Future<String?> prewarmModels() async {
+    final response = await _whisperKitMessage.prewarmModels();
+    return response;
+  }
+
+  @override
+  Future<String?> unloadModels() async {
+    final response = await _whisperKitMessage.unloadModels();
+    return response;
+  }
+
+  @override
+  Future<String?> clearState() async {
+    final response = await _whisperKitMessage.clearState();
+    return response;
+  }
+
+  @override
+  Future<void> loggingCallback({String? level}) async {
+    await _whisperKitMessage.loggingCallback(level);
+  }
 }

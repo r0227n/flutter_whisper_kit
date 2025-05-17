@@ -370,4 +370,144 @@ class FlutterWhisperKit {
       () => FlutterWhisperKitPlatform.instance.recommendedRemoteModels(),
     );
   }
+
+  /// Sets up WhisperKit models with the given parameters.
+  ///
+  /// This method initializes the WhisperKit framework with the specified configuration.
+  /// It either uses a local model folder if provided or downloads the model.
+  ///
+  /// Parameters:
+  /// - [model]: The model variant to use.
+  /// - [downloadBase]: The base URL for downloads.
+  /// - [modelRepo]: The repository to download the model from.
+  /// - [modelToken]: An access token for the repository.
+  /// - [modelFolder]: A local folder containing the model files.
+  /// - [download]: Whether to download the model if not available locally.
+  ///
+  /// Returns a [Future] that completes with a success message if the models are set up successfully,
+  /// or throws a [WhisperKitError] if setup fails.
+  Future<String?> setupModels({
+    String? model,
+    String? downloadBase,
+    String? modelRepo,
+    String? modelToken,
+    String? modelFolder,
+    bool download = true,
+  }) async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.setupModels(
+        model: model,
+        downloadBase: downloadBase,
+        modelRepo: modelRepo,
+        modelToken: modelToken,
+        modelFolder: modelFolder,
+        download: download,
+      ),
+    );
+  }
+
+  /// Downloads a WhisperKit model from a repository.
+  ///
+  /// This method downloads a model variant from the specified repository
+  /// and tracks the progress through the [modelProgressStream].
+  ///
+  /// Parameters:
+  /// - [variant]: The model variant to download.
+  /// - [downloadBase]: The base URL for downloads.
+  /// - [useBackgroundSession]: Whether to use a background session for the download.
+  /// - [repo]: The repository to download from.
+  /// - [token]: An access token for the repository.
+  /// - [onProgress]: A callback function that receives download progress updates.
+  ///
+  /// Returns a [Future] that completes with the path to the downloaded model,
+  /// or throws a [WhisperKitError] if download fails.
+  Future<String?> download({
+    required String variant,
+    String? downloadBase,
+    bool useBackgroundSession = false,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+    Function(Progress progress)? onProgress,
+  }) async {
+    // Subscribe to the progress stream if a callback is provided
+    StreamSubscription<Progress>? progressSubscription;
+
+    try {
+      if (onProgress != null) {
+        progressSubscription = FlutterWhisperKitPlatform
+            .instance.modelProgressStream
+            .listen((progress) {
+          onProgress(progress);
+        });
+      }
+
+      return await _handlePlatformCall(
+        () => FlutterWhisperKitPlatform.instance.download(
+          variant: variant,
+          downloadBase: downloadBase,
+          useBackgroundSession: useBackgroundSession,
+          repo: repo,
+          token: token,
+        ),
+      );
+    } finally {
+      // Ensure the progress subscription is cancelled to prevent memory leaks
+      progressSubscription?.cancel();
+    }
+  }
+
+  /// Preloads models into memory for faster inference.
+  ///
+  /// This method prepares the models for use by loading them into memory
+  /// but does not perform any inference. It is useful for reducing the
+  /// latency of the first transcription.
+  ///
+  /// Returns a [Future] that completes with a success message if the models are prewarmed successfully,
+  /// or throws a [WhisperKitError] if prewarming fails.
+  Future<String?> prewarmModels() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.prewarmModels(),
+    );
+  }
+
+  /// Releases model resources when they are no longer needed.
+  ///
+  /// This method unloads the models from memory to free up resources.
+  /// It should be called when the models are no longer needed.
+  ///
+  /// Returns a [Future] that completes with a success message if the models are unloaded successfully,
+  /// or throws a [WhisperKitError] if unloading fails.
+  Future<String?> unloadModels() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.unloadModels(),
+    );
+  }
+
+  /// Resets the transcription state.
+  ///
+  /// This method stops recording and resets the transcription timings.
+  /// It should be called when starting a new transcription session.
+  ///
+  /// Returns a [Future] that completes with a success message if the state is cleared successfully,
+  /// or throws a [WhisperKitError] if clearing fails.
+  Future<String?> clearState() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.clearState(),
+    );
+  }
+
+  /// Sets the logging callback for WhisperKit.
+  ///
+  /// This method configures a callback function for tracking progress and debugging.
+  /// The callback receives log messages with the specified level.
+  ///
+  /// Parameters:
+  /// - [level]: The logging level (e.g., "debug", "info", "warning", "error").
+  ///
+  /// Throws a [WhisperKitError] if setting the logging callback fails.
+  Future<void> loggingCallback({String? level}) async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.loggingCallback(level: level),
+    );
+  }
 }
