@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - 'release/**'
+  workflow_dispatch:
       
 jobs:
   diff-files:
