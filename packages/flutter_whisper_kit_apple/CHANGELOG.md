@@ -1,3 +1,15 @@
+## 0.1.0
+
+* Expanded native API and improved platform integration:
+  * Added support for device name retrieval, recommended models, and model support configuration.
+  * Implemented language detection, model formatting, and recommended remote models.
+  * Enhanced model management: setup, prewarm, unload, clear state, and logging callback support.
+  * Improved error handling and reporting for platform method calls.
+* Improved test coverage and reliability for platform features.
+* Package metadata:
+  * Updated repository and homepage URLs.
+  * Bumped version to 0.1.0.
+
 ## 0.0.1
 
 * Initial release of Flutter WhisperKit for Apple platforms.
@@ -11,4 +23,3 @@
 * Known limitations:
   * Limited configuration options
   * Performance optimizations pending
-
