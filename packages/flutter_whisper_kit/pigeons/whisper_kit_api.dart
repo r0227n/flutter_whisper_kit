@@ -19,7 +19,7 @@ abstract class WhisperKitMessage {
   @async
   String? stopRecording(bool loop);
   @async
-  List<String?> fetchAvailableModels(
+  List<String> fetchAvailableModels(
     String modelRepo,
     List<String> matching,
     String? token,
@@ -30,7 +30,7 @@ abstract class WhisperKitMessage {
   @async
   String? recommendedModels();
   @async
-  List<String?> formatModelFiles(List<String> modelFiles);
+  List<String> formatModelFiles(List<String> modelFiles);
   @async
   String? detectLanguage(String audioPath);
   @async

@@ -499,7 +499,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   ///   - completion: Callback with the formatted model file names
   func formatModelFiles(
     modelFiles: [String],
-    completion: @escaping (Result<[String?], Error>) -> Void
+    completion: @escaping (Result<[String], Error>) -> Void
   ) {
     let formattedFiles = WhisperKit.formatModelFiles(modelFiles)
     completion(.success(formattedFiles))
@@ -628,7 +628,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
           downloadBase: downloadBaseURL,
           modelRepo: modelRepo,
           modelToken: modelToken,
-          modelFolder: modelFolderURL,
+          modelFolder: modelFolderURL?.path,
           download: download
         )
         
