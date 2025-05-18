@@ -91,7 +91,7 @@ The plugin uses the following error code system to report errors:
 
 
 <!-- URLs -->
-[flutter_whisper_kit]: (https://pub.dev/packages/flutter_whisper_kit)
+[flutter_whisper_kit]: https://pub.dev/packages/flutter_whisper_kit
 [DeepWiki]: https://deepwiki.com/r0227n/flutter_whisper_kit
 [WhisperKit]: https://github.com/argmaxinc/WhisperKit
 [Flutter Plugin Development]: https://docs.flutter.dev/packages-and-plugins/developing-packages
