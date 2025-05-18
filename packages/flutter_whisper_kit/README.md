@@ -1,8 +1,10 @@
 # flutter_whisper_kit
 
-A Flutter plugin that provides on-device speech recognition capabilities using WhisperKit.
+A Flutter plugin that provides on-device speech recognition capabilities using [WhisperKit].
 
 ## Features
+
+### 🧠 [DeepWiki]
 
 - High-quality on-device speech recognition
 - No data sent to external servers
@@ -12,18 +14,14 @@ A Flutter plugin that provides on-device speech recognition capabilities using W
 - Progress tracking for model downloads
 - Configurable transcription options
 
-## Demo
+## Platform Support
 
-https://github.com/user-attachments/assets/4a405460-2eb9-4485-a467-24b8ebf6bee7
+| Platform | Minimum Version |
+|----------|----------------|
+| iOS      | 16.0+         |
+| macOS    | 13.0+         |
 
-## Installation
-
-Add the following to your `pubspec.yaml`:
-
-```yaml
-dependencies:
-  flutter_whisper_kit: latest
-```
+`Android` support is planned for future releases.
 
 ## Usage
 
@@ -84,16 +82,7 @@ final finalTranscription = await whisperKit.stopRecording();
 print('Final transcription: $finalTranscription');
 ```
 
-## Platform Support
 
-Currently, Flutter WhisperKit supports:
-
-- iOS 16.0+
-- macOS 13.0+
-
-Android support is planned for future releases.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
+<!-- URLs -->
+[WhisperKit]: https://github.com/argmaxinc/WhisperKit
+[DeepWiki]: https://deepwiki.com/r0227n/flutter_whisper_kit
