@@ -25,10 +25,6 @@ abstract class WhisperKitMessage {
     String? token,
   );
 
-  /// Retrieves the name of the device asynchronously.
-  ///
-  /// This method is asynchronous and returns a [Future] containing the device name as a [String].
-  /// Ensure to use `await` or handle the returned [Future] appropriately.
   @async
   String deviceName();
   @async
