@@ -599,6 +599,174 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     }
   }
   
+  ///
+  /// - Parameters:
+  ///   - model: The model variant to use
+  ///   - modelRepo: The repository to download the model from
+  ///   - modelToken: An access token for the repository
+  ///   - modelFolder: A local folder containing the model files
+  ///   - download: Whether to download the model if not available locally
+  ///   - completion: Callback with the result of the operation
+  func setupModels(
+    model: String?, downloadBase: String?, modelRepo: String?,
+    modelToken: String?, modelFolder: String?, download: Bool,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        guard let whisperKit = whisperKit else {
+          throw NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized."])
+        }
+        
+        let downloadBaseURL = downloadBase != nil ? URL(string: downloadBase!) : nil
+        let modelFolderURL = modelFolder != nil ? URL(fileURLWithPath: modelFolder!) : nil
+        
+        try await whisperKit.setupModels(
+          model: model,
+          downloadBase: downloadBaseURL,
+          modelRepo: modelRepo,
+          modelToken: modelToken,
+          modelFolder: modelFolderURL,
+          download: download
+        )
+        
+        completion(.success("Models set up successfully"))
+      } catch {
+        print("Error setting up models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - variant: The model variant to download
+  ///   - repo: The repository to download from
+  ///   - completion: Callback with the result of the operation
+  func download(
+    variant: String, downloadBase: String?, useBackgroundSession: Bool,
+    repo: String, token: String?,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        let downloadBaseURL = downloadBase != nil ? URL(string: downloadBase!) : nil
+        
+        let downloadURL = try await WhisperKit.download(
+          variant: variant,
+          downloadBase: downloadBaseURL,
+          useBackgroundSession: useBackgroundSession,
+          from: repo,
+          token: token,
+          progressCallback: { [weak self] progress in
+            if let modelProgressHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
+              modelProgressHandler.sendProgress(progress)
+            }
+          }
+        )
+        
+        completion(.success(downloadURL.path))
+      } catch {
+        print("Error downloading model: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameter completion: Callback with the result of the operation
+  func prewarmModels(
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        guard let whisperKit = whisperKit else {
+          throw NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])
+        }
+        
+        try await whisperKit.prewarmModels()
+        
+        completion(.success("Models prewarmed successfully"))
+      } catch {
+        print("Error prewarming models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameter completion: Callback with the result of the operation
+  func unloadModels(
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        guard let whisperKit = whisperKit else {
+          throw NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])
+        }
+        
+        await whisperKit.unloadModels()
+        
+        completion(.success("Models unloaded successfully"))
+      } catch {
+        print("Error unloading models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameter completion: Callback with the result of the operation
+  func clearState(
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    do {
+      guard let whisperKit = whisperKit else {
+        throw NSError(
+          domain: "WhisperKitError", code: 3001,
+          userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])
+      }
+      
+      whisperKit.clearState()
+      
+      completion(.success("State cleared successfully"))
+    } catch {
+      print("Error clearing state: \(error.localizedDescription)")
+      completion(.failure(error))
+    }
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - completion: Callback after setting the logging callback
+  func loggingCallback(
+    level: String?,
+    completion: @escaping (Result<Void, Error>) -> Void
+  ) {
+    do {
+      guard let whisperKit = whisperKit else {
+        throw NSError(
+          domain: "WhisperKitError", code: 3001,
+          userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])
+      }
+      
+      whisperKit.loggingCallback { message in
+        print("WhisperKit log: \(message)")
+      }
+      
+      completion(.success(()))
+    } catch {
+      print("Error setting logging callback: \(error.localizedDescription)")
+      completion(.failure(error))
+    }
+  }
+  
   /// Starts recording audio for transcription
   ///
   /// - Parameters:
