@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -242,4 +243,218 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
   @override
   Stream<Progress> get modelProgressStream =>
       _modelProgressStreamController.stream;
+
+  /// Fetches available WhisperKit models from a repository.
+  ///
+  /// - [modelRepo]: The repository to fetch models from (default: "argmaxinc/whisperkit-coreml").
+  /// - [matching]: Optional list of glob patterns to filter models by.
+  /// - [token]: Optional access token for private repositories.
+  ///
+  /// Returns a list of available model names.
+  @override
+  Future<List<String>> fetchAvailableModels({
+    String modelRepo = 'argmaxinc/whisperkit-coreml',
+    List<String> matching = const ['*'],
+    String? token,
+  }) async {
+    try {
+      final result = await _whisperKitMessage.fetchAvailableModels(
+        modelRepo,
+        matching.map((e) => e).toList(),
+        token,
+      );
+      return result.whereType<String>().toList();
+    } catch (e) {
+      // Error is propagated to the caller
+      rethrow;
+    }
+  }
+
+  /// Gets the recommended models for the current device.
+  ///
+  /// Returns information about which models are supported on the current device,
+  /// including the default recommended model and any disabled models.
+  @override
+  Future<ModelSupport> recommendedModels() async {
+    final result = await _whisperKitMessage.recommendedModels();
+    if (result == null) {
+      throw Exception('Failed to get recommended models');
+    }
+
+    // Parse the JSON string into a ModelSupport object
+    final Map<String, dynamic> json = Map<String, dynamic>.from(
+      jsonDecode(result) as Map,
+    );
+    return ModelSupport.fromJson(json);
+  }
+
+  /// Gets the current device name.
+  ///
+  /// Returns the name of the current device as recognized by WhisperKit.
+  /// This is useful for determining which models are compatible with the device.
+  @override
+  Future<String> deviceName() async {
+    return _whisperKitMessage.deviceName();
+  }
+
+  @override
+  Future<List<String>> formatModelFiles(List<String> modelFiles) async {
+    try {
+      final result = await _whisperKitMessage.formatModelFiles(modelFiles);
+      return result.whereType<String>().toList();
+    } catch (e) {
+      debugPrint('Error formatting model files: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<LanguageDetectionResult> detectLanguage(String audioPath) async {
+    try {
+      final result = await _whisperKitMessage.detectLanguage(audioPath);
+      if (result == null) {
+        throw Exception('Failed to detect language');
+      }
+
+      // Parse the JSON string into a LanguageDetectionResult object
+      final Map<String, dynamic> json = Map<String, dynamic>.from(
+        jsonDecode(result) as Map,
+      );
+      return LanguageDetectionResult.fromJson(json);
+    } catch (e) {
+      debugPrint('Error detecting language: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<ModelSupportConfig> fetchModelSupportConfig({
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? downloadBase,
+    String? token,
+  }) async {
+    try {
+      final result = await _whisperKitMessage.fetchModelSupportConfig(
+        repo,
+        downloadBase,
+        token,
+      );
+
+      if (result == null) {
+        throw Exception('Failed to fetch model support configuration');
+      }
+
+      // Parse the JSON string into a ModelSupportConfig object
+      final Map<String, dynamic> json = Map<String, dynamic>.from(
+        jsonDecode(result) as Map,
+      );
+
+      return ModelSupportConfig.fromJson(json);
+    } catch (e) {
+      debugPrint('Error fetching model support configuration: $e');
+      rethrow;
+    }
+  }
+
+  /// Fetches recommended models for the current device from a remote repository.
+  ///
+  /// This method retrieves model support information specifically tailored for
+  /// the current device from a remote repository.
+  ///
+  /// Parameters:
+  /// - [repo]: The repository name (default: "argmaxinc/whisperkit-coreml").
+  /// - [downloadBase]: The base URL for downloads (optional).
+  /// - [token]: An access token for the repository (optional).
+  ///
+  /// Returns a [Future] that completes with a [ModelSupport] object containing
+  /// information about supported models for the current device.
+  @override
+  Future<ModelSupport> recommendedRemoteModels({
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? downloadBase,
+    String? token,
+  }) async {
+    try {
+      final result = await _whisperKitMessage.recommendedRemoteModels(
+        repo,
+        downloadBase,
+        token,
+      );
+
+      if (result == null) {
+        throw Exception('Failed to fetch recommended remote models');
+      }
+
+      // Parse the JSON string into a ModelSupport object
+      final Map<String, dynamic> json = Map<String, dynamic>.from(
+        jsonDecode(result) as Map,
+      );
+
+      return ModelSupport.fromJson(json);
+    } catch (e) {
+      debugPrint('Error fetching recommended remote models: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String?> setupModels({
+    String? model,
+    String? downloadBase,
+    String? modelRepo,
+    String? modelToken,
+    String? modelFolder,
+    bool download = true,
+  }) async {
+    final response = await _whisperKitMessage.setupModels(
+      model,
+      downloadBase,
+      modelRepo,
+      modelToken,
+      modelFolder,
+      download,
+    );
+    return response;
+  }
+
+  @override
+  Future<String?> download({
+    required String variant,
+    String? downloadBase,
+    bool useBackgroundSession = false,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+  }) async {
+    final response = await _whisperKitMessage.download(
+      variant,
+      downloadBase,
+      useBackgroundSession,
+      repo,
+      token,
+    );
+    return response;
+  }
+
+  @override
+  Future<String?> prewarmModels() async {
+    final response = await _whisperKitMessage.prewarmModels();
+    return response;
+  }
+
+  @override
+  Future<String?> unloadModels() async {
+    final response = await _whisperKitMessage.unloadModels();
+    return response;
+  }
+
+  @override
+  Future<String?> clearState() async {
+    final response = await _whisperKitMessage.clearState();
+    return response;
+  }
+
+  @override
+  Future<void> loggingCallback({String? level}) async {
+    await _whisperKitMessage.loggingCallback(level);
+  }
 }

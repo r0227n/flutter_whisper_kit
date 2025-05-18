@@ -7,67 +7,90 @@ import 'package:flutter_whisper_kit_example/main.dart';
 
 void main() {
   group('FileTranscriptionSection', () {
-    testWidgets('displays initial state correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: FileTranscriptionSection(
-            isModelLoaded: false,
-            isTranscribingFile: false,
-            fileTranscriptionText: '',
-            fileTranscriptionResult: null,
-            onTranscribePressed: () {},
+    testWidgets('displays initial state correctly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: FileTranscriptionSection(
+              isModelLoaded: false,
+              isTranscribingFile: false,
+              fileTranscriptionText: '',
+              fileTranscriptionResult: null,
+              onTranscribePressed: () {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Verify initial UI elements
       expect(find.text('File Transcription'), findsOneWidget);
-      expect(find.text('Press the button to transcribe a file'), findsOneWidget);
-      
+      expect(
+        find.text('Press the button to transcribe a file'),
+        findsOneWidget,
+      );
+
       // Button should be disabled when model is not loaded
-      final buttonFinder = find.widgetWithText(ElevatedButton, 'Transcribe from File');
+      final buttonFinder = find.widgetWithText(
+        ElevatedButton,
+        'Transcribe from File',
+      );
       expect(buttonFinder, findsOneWidget);
       expect(tester.widget<ElevatedButton>(buttonFinder).enabled, isFalse);
     });
 
-    testWidgets('enables button when model is loaded', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: FileTranscriptionSection(
-            isModelLoaded: true,
-            isTranscribingFile: false,
-            fileTranscriptionText: '',
-            fileTranscriptionResult: null,
-            onTranscribePressed: () {},
+    testWidgets('enables button when model is loaded', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: FileTranscriptionSection(
+              isModelLoaded: true,
+              isTranscribingFile: false,
+              fileTranscriptionText: '',
+              fileTranscriptionResult: null,
+              onTranscribePressed: () {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Button should be enabled when model is loaded
-      final buttonFinder = find.widgetWithText(ElevatedButton, 'Transcribe from File');
+      final buttonFinder = find.widgetWithText(
+        ElevatedButton,
+        'Transcribe from File',
+      );
       expect(buttonFinder, findsOneWidget);
       expect(tester.widget<ElevatedButton>(buttonFinder).enabled, isTrue);
     });
 
-    testWidgets('shows loading state during transcription', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: FileTranscriptionSection(
-            isModelLoaded: true,
-            isTranscribingFile: true,
-            fileTranscriptionText: 'Transcribing file...',
-            fileTranscriptionResult: null,
-            onTranscribePressed: () {},
+    testWidgets('shows loading state during transcription', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: FileTranscriptionSection(
+              isModelLoaded: true,
+              isTranscribingFile: true,
+              fileTranscriptionText: 'Transcribing file...',
+              fileTranscriptionResult: null,
+              onTranscribePressed: () {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Button should show loading text
       expect(find.text('Transcribing...'), findsOneWidget);
       expect(find.text('Transcribing file...'), findsOneWidget);
     });
 
-    testWidgets('displays transcription results correctly', (WidgetTester tester) async {
+    testWidgets('displays transcription results correctly', (
+      WidgetTester tester,
+    ) async {
       final mockResult = TranscriptionResult(
         text: 'Hello world',
         segments: [
@@ -90,30 +113,32 @@ void main() {
           inputAudioSeconds: 0.75, // This will give a realTimeFactor of 2.0
         ),
       );
-      
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: FileTranscriptionSection(
-            isModelLoaded: true,
-            isTranscribingFile: false,
-            fileTranscriptionText: 'Hello world',
-            fileTranscriptionResult: mockResult,
-            onTranscribePressed: () {},
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: FileTranscriptionSection(
+              isModelLoaded: true,
+              isTranscribingFile: false,
+              fileTranscriptionText: 'Hello world',
+              fileTranscriptionResult: mockResult,
+              onTranscribePressed: () {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Verify transcription text is displayed
       expect(find.text('Hello world'), findsOneWidget);
-      
+
       // Verify language detection is displayed
       expect(find.text('Detected Language:'), findsOneWidget);
       expect(find.text('en'), findsOneWidget);
-      
+
       // Verify segments are displayed
       expect(find.text('Segments:'), findsOneWidget);
       expect(find.text('[0.00s - 2.00s]: Hello world'), findsOneWidget);
-      
+
       // Verify performance metrics are displayed
       expect(find.text('Performance:'), findsOneWidget);
       expect(find.text('Real-time factor: 2.00x'), findsOneWidget);

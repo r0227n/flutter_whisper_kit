@@ -1,0 +1,44 @@
+name: Version Validation
+
+on:
+  workflow_call:
+    inputs:
+      pubspec_path:
+        description: 'Path to the pubspec.yaml file'
+        required: true
+        type: string
+      podspec_path:
+        description: 'Path to the podspec file'
+        required: true
+        type: string
+
+jobs:
+  validate-versions:
+    name: Validate Package Versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract versions
+        id: extract_versions
+        run: |
+          # Extract version from pubspec.yaml
+          PUBSPEC_VERSION=$(grep -m 1 "version:" ${{ inputs.pubspec_path }} | awk '{print $2}' | tr -d "'\"")
+          echo "PUBSPEC_VERSION=$PUBSPEC_VERSION" >> $GITHUB_OUTPUT
+          
+          # Extract version from podspec
+          PODSPEC_VERSION=$(grep -m 1 "s.version" ${{ inputs.podspec_path }} | awk -F"'" '{print $2}' | tr -d "'\"")
+          echo "PODSPEC_VERSION=$PODSPEC_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        id: compare_versions
+        run: |
+          if [ "${{ steps.extract_versions.outputs.PUBSPEC_VERSION }}" == "${{ steps.extract_versions.outputs.PODSPEC_VERSION }}" ]; then
+            echo "VERSIONS_MATCH=true" >> $GITHUB_OUTPUT
+            echo "Version check passed: pubspec.yaml and podspec versions match (${{ steps.extract_versions.outputs.PUBSPEC_VERSION }})"
+          else
+            echo "VERSIONS_MATCH=false" >> $GITHUB_OUTPUT
+            echo "Version check failed: pubspec.yaml version (${{ steps.extract_versions.outputs.PUBSPEC_VERSION }}) does not match podspec version (${{ steps.extract_versions.outputs.PODSPEC_VERSION }})"
+            exit 1
+          fi

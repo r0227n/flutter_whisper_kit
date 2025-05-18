@@ -7,68 +7,86 @@ import 'package:flutter_whisper_kit_example/main.dart';
 
 void main() {
   group('RealTimeTranscriptionSection', () {
-    testWidgets('displays initial state correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: RealTimeTranscriptionSection(
-            isModelLoaded: false,
-            isRecording: false,
-            transcriptionText: '',
-            segments: const [],
-            onRecordPressed: () {},
+    testWidgets('displays initial state correctly', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: RealTimeTranscriptionSection(
+              isModelLoaded: false,
+              isRecording: false,
+              transcriptionText: '',
+              segments: const [],
+              onRecordPressed: () {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Verify initial UI elements
       expect(find.text('Real-time Transcription'), findsOneWidget);
       expect(find.text('No segments'), findsOneWidget);
       expect(find.text('Press the button to start recording'), findsOneWidget);
-      
+
       // Button should be disabled when model is not loaded
-      final buttonFinder = find.widgetWithText(ElevatedButton, 'Start Recording');
+      final buttonFinder = find.widgetWithText(
+        ElevatedButton,
+        'Start Recording',
+      );
       expect(buttonFinder, findsOneWidget);
       expect(tester.widget<ElevatedButton>(buttonFinder).enabled, isFalse);
     });
 
-    testWidgets('enables button when model is loaded', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: RealTimeTranscriptionSection(
-            isModelLoaded: true,
-            isRecording: false,
-            transcriptionText: '',
-            segments: const [],
-            onRecordPressed: () {},
+    testWidgets('enables button when model is loaded', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: RealTimeTranscriptionSection(
+              isModelLoaded: true,
+              isRecording: false,
+              transcriptionText: '',
+              segments: const [],
+              onRecordPressed: () {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Button should be enabled when model is loaded
-      final buttonFinder = find.widgetWithText(ElevatedButton, 'Start Recording');
+      final buttonFinder = find.widgetWithText(
+        ElevatedButton,
+        'Start Recording',
+      );
       expect(buttonFinder, findsOneWidget);
       expect(tester.widget<ElevatedButton>(buttonFinder).enabled, isTrue);
     });
 
     testWidgets('shows recording state correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: RealTimeTranscriptionSection(
-            isModelLoaded: true,
-            isRecording: true,
-            transcriptionText: 'Test recording',
-            segments: const [],
-            onRecordPressed: () {},
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: RealTimeTranscriptionSection(
+              isModelLoaded: true,
+              isRecording: true,
+              transcriptionText: 'Test recording',
+              segments: const [],
+              onRecordPressed: () {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Button should show stop recording text
       expect(find.text('Stop Recording'), findsOneWidget);
       expect(find.text('Test recording'), findsOneWidget);
     });
 
-    testWidgets('displays transcription segments correctly', (WidgetTester tester) async {
+    testWidgets('displays transcription segments correctly', (
+      WidgetTester tester,
+    ) async {
       final segments = [
         TranscriptionSegment(
           id: 0,
@@ -95,22 +113,24 @@ void main() {
           noSpeechProb: 0.1,
         ),
       ];
-      
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: RealTimeTranscriptionSection(
-            isModelLoaded: true,
-            isRecording: true,
-            transcriptionText: 'Hello World',
-            segments: segments,
-            onRecordPressed: () {},
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: RealTimeTranscriptionSection(
+              isModelLoaded: true,
+              isRecording: true,
+              transcriptionText: 'Hello World',
+              segments: segments,
+              onRecordPressed: () {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Verify transcription text is displayed
       expect(find.text('Hello World'), findsOneWidget);
-      
+
       // Verify segments are displayed
       expect(find.text('[0.00s - 2.00s]: Hello'), findsOneWidget);
       expect(find.text('[2.00s - 4.00s]: World'), findsOneWidget);

@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
+import 'test_utils/mocks.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('DecodingOptions', () {
     test('creates correct options object with default values', () {
       // Act
@@ -217,6 +219,42 @@ void main() {
       expect(json['totalUnitCount'], 100);
       expect(json['completedUnitCount'], 25);
       expect(json['fractionCompleted'], 0.25);
+    });
+  });
+
+  group('fetchAvailableModels', () {
+    setUp(() {
+      setUpMockPlatform();
+    });
+
+    test('returns list of available models', () async {
+      // Arrange
+      final flutterWhisperKit = FlutterWhisperKit();
+
+      // Act
+      final models = await flutterWhisperKit.fetchAvailableModels();
+
+      // Assert
+      expect(models, isA<List<String>>());
+      expect(models, isNotEmpty);
+      expect(
+        models,
+        contains(matches(RegExp(r'(tiny|base|small|medium|large)'))),
+      );
+    });
+
+    test('accepts custom repository and matching patterns', () async {
+      // Arrange
+      final flutterWhisperKit = FlutterWhisperKit();
+
+      // Act
+      final models = await flutterWhisperKit.fetchAvailableModels(
+        modelRepo: 'custom/repo',
+        matching: ['tiny*', 'base*'],
+      );
+
+      // Assert
+      expect(models, isA<List<String>>());
     });
   });
 }

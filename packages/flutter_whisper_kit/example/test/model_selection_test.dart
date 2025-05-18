@@ -7,34 +7,40 @@ import 'package:flutter_whisper_kit_example/main.dart';
 void main() {
   group('ModelSelectionDropdown', () {
     testWidgets('displays correct initial model', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: ModelSelectionDropdown(
-            selectedModel: 'tiny-en',
-            modelVariants: const ['tiny-en', 'base', 'small'],
-            onModelChanged: (_) {},
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: ModelSelectionDropdown(
+              selectedModel: 'tiny-en',
+              modelVariants: const ['tiny-en', 'base', 'small'],
+              onModelChanged: (_) {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Verify the selected model is displayed
       expect(find.text('tiny-en'), findsOneWidget);
     });
 
-    testWidgets('calls onModelChanged when selection changes', (WidgetTester tester) async {
+    testWidgets('calls onModelChanged when selection changes', (
+      WidgetTester tester,
+    ) async {
       String selectedModel = 'tiny-en';
-      
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: ModelSelectionDropdown(
-            selectedModel: selectedModel,
-            modelVariants: const ['tiny-en', 'base', 'small'],
-            onModelChanged: (String newModel) {
-              selectedModel = newModel;
-            },
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: ModelSelectionDropdown(
+              selectedModel: selectedModel,
+              modelVariants: const ['tiny-en', 'base', 'small'],
+              onModelChanged: (String newModel) {
+                selectedModel = newModel;
+              },
+            ),
           ),
         ),
-      ));
+      );
 
       // Open the dropdown
       await tester.tap(find.byType(DropdownButton<String>));
@@ -50,33 +56,41 @@ void main() {
   });
 
   group('LanguageSelectionDropdown', () {
-    testWidgets('displays correct initial language', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: LanguageSelectionDropdown(
-            selectedLanguage: 'en',
-            onLanguageChanged: (_) {},
+    testWidgets('displays correct initial language', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: LanguageSelectionDropdown(
+              selectedLanguage: 'en',
+              onLanguageChanged: (_) {},
+            ),
           ),
         ),
-      ));
+      );
 
       // Verify the selected language is displayed (in dropdown format)
       expect(find.text('en (English)'), findsOneWidget);
     });
 
-    testWidgets('calls onLanguageChanged when selection changes', (WidgetTester tester) async {
+    testWidgets('calls onLanguageChanged when selection changes', (
+      WidgetTester tester,
+    ) async {
       String selectedLanguage = 'en';
-      
-      await tester.pumpWidget(MaterialApp(
-        home: Material(
-          child: LanguageSelectionDropdown(
-            selectedLanguage: selectedLanguage,
-            onLanguageChanged: (String newLanguage) {
-              selectedLanguage = newLanguage;
-            },
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: LanguageSelectionDropdown(
+              selectedLanguage: selectedLanguage,
+              onLanguageChanged: (String newLanguage) {
+                selectedLanguage = newLanguage;
+              },
+            ),
           ),
         ),
-      ));
+      );
 
       // Open the dropdown
       await tester.tap(find.byType(DropdownButton<String>));

@@ -3,7 +3,7 @@ description: "Demonstrates how to use the flutter_whisper_kit plugin."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: ^3.7.2
+  sdk: '>=3.6.0 <4.0.0'
 
 resolution: workspace
 

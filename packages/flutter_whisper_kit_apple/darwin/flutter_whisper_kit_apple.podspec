@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_whisper_kit_apple'
-  s.version          = '0.0.1'
+  s.version          = '0.1.0'
   s.summary          = 'iOS and macOS implementation of the flutter_whisper_kit plugin for on-device speech recognition.'
   s.description      = <<-DESC
 iOS and macOS implementation of the flutter_whisper_kit plugin, providing on-device speech recognition and transcription capabilities using WhisperKit.

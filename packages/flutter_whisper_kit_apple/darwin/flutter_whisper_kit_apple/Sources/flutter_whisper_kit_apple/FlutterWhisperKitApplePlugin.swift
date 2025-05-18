@@ -420,6 +420,353 @@ private class WhisperKitApiImpl: WhisperKitMessage {
     return WhisperKit.formatModelFiles(localModels)
   }
   
+  ///
+  /// - Parameters:
+  ///   - modelRepo: The repository to fetch models from
+  ///   - completion: Callback with result of the operation
+  func fetchAvailableModels(
+    modelRepo: String, matching: [String], token: String?,
+    completion: @escaping (Result<[String?], Error>) -> Void
+  ) {
+    Task {
+      do {
+        
+        let models = try await WhisperKit.fetchAvailableModels(
+          from: modelRepo,
+          matching: matching,
+          token: token
+        )
+        
+        completion(.success(models))
+      } catch {
+        print("Error fetching available models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - completion: Callback with the detected language result
+  
+  /// Gets the recommended models for the current device
+  ///
+  /// - Parameter completion: Callback with the recommended models
+  func recommendedModels(completion: @escaping (Result<String?, Error>) -> Void) {
+    Task {
+      do {
+        let modelSupport = WhisperKit.recommendedModels()
+        
+        let defaultModel = modelSupport.default
+        let supportedModels = modelSupport.supported
+        let disabledModels = modelSupport.disabled
+        
+        let modelSupportDict: [String: Any] = [
+          "default": defaultModel,
+          "supported": supportedModels,
+          "disabled": disabledModels
+        ]
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: modelSupportDict, options: [])
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        
+        completion(.success(jsonString))
+      } catch {
+        print("Error getting recommended models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  /// Gets the current device name
+  ///
+  /// - Parameter completion: Callback with the device name
+  func deviceName(completion: @escaping (Result<String, Error>) -> Void) {
+    Task {
+      do {
+        let deviceName = WhisperKit.deviceName()
+        completion(.success(deviceName))
+      } catch {
+        print("Error getting device name: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - modelFiles: Array of model file names to format
+  ///   - completion: Callback with the formatted model file names
+  func formatModelFiles(
+    modelFiles: [String],
+    completion: @escaping (Result<[String], Error>) -> Void
+  ) {
+    let formattedFiles = WhisperKit.formatModelFiles(modelFiles)
+    completion(.success(formattedFiles))
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - completion: Callback with the detected language result
+  func detectLanguage(
+    audioPath: String,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        // Ensure WhisperKit is initialized
+        guard let whisperKit = whisperKit else {
+          throw NSError(
+            domain: "WhisperKitError", code: 1002,
+            userInfo: [
+              NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."
+            ])
+        }
+        
+        let result = try await whisperKit.detectLanguage(audioPath: audioPath)
+        
+        let resultDict: [String: Any] = [
+          "language": result.language,
+          "probabilities": result.langProbs
+        ]
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: resultDict, options: [])
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        
+        completion(.success(jsonString))
+      } catch {
+        print("Error detecting language: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - repo: The repository name to fetch from
+  ///   - completion: Callback with the model support configuration
+  func fetchModelSupportConfig(
+    repo: String, downloadBase: String?, token: String?,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        let downloadBaseURL = downloadBase != nil ? URL(string: downloadBase!) : nil
+        
+        let config = try await WhisperKit.fetchModelSupportConfig(
+          from: repo,
+          downloadBase: downloadBaseURL,
+          token: token
+        )
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: config.toJson(), options: [])
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        
+        completion(.success(jsonString))
+      } catch {
+        print("Error fetching model support config: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - repo: The repository name to fetch from
+  ///   - completion: Callback with the recommended models for the current device
+  func recommendedRemoteModels(
+    repo: String, downloadBase: String?, token: String?,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        let downloadBaseURL = downloadBase != nil ? URL(string: downloadBase!) : nil
+        
+        let modelSupport = try await WhisperKit.recommendedRemoteModels(
+          from: repo,
+          downloadBase: downloadBaseURL,
+          token: token
+        )
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: modelSupport.toJson(), options: [])
+        let jsonString = String(data: jsonData, encoding: .utf8)
+        
+        completion(.success(jsonString))
+      } catch {
+        print("Error fetching recommended remote models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - model: The model variant to use
+  ///   - modelRepo: The repository to download the model from
+  ///   - modelToken: An access token for the repository
+  ///   - modelFolder: A local folder containing the model files
+  ///   - download: Whether to download the model if not available locally
+  ///   - completion: Callback with the result of the operation
+  func setupModels(
+    model: String?, downloadBase: String?, modelRepo: String?,
+    modelToken: String?, modelFolder: String?, download: Bool,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        guard let whisperKit = whisperKit else {
+          throw NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized."])
+        }
+        
+        let downloadBaseURL = downloadBase != nil ? URL(string: downloadBase!) : nil
+        let modelFolderURL = modelFolder != nil ? URL(fileURLWithPath: modelFolder!) : nil
+        
+        try await whisperKit.setupModels(
+          model: model,
+          downloadBase: downloadBaseURL,
+          modelRepo: modelRepo,
+          modelToken: modelToken,
+          modelFolder: modelFolderURL?.path,
+          download: download
+        )
+        
+        completion(.success("Models set up successfully"))
+      } catch {
+        print("Error setting up models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - variant: The model variant to download
+  ///   - repo: The repository to download from
+  ///   - completion: Callback with the result of the operation
+  func download(
+    variant: String, downloadBase: String?, useBackgroundSession: Bool,
+    repo: String, token: String?,
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        let downloadBaseURL = downloadBase != nil ? URL(string: downloadBase!) : nil
+        
+        let downloadURL = try await WhisperKit.download(
+          variant: variant,
+          downloadBase: downloadBaseURL,
+          useBackgroundSession: useBackgroundSession,
+          from: repo,
+          token: token,
+          progressCallback: { [weak self] progress in
+            if let modelProgressHandler = WhisperKitApiImpl.modelProgressStreamHandler as? ModelProgressStreamHandler {
+              modelProgressHandler.sendProgress(progress)
+            }
+          }
+        )
+        
+        completion(.success(downloadURL.path))
+      } catch {
+        print("Error downloading model: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameter completion: Callback with the result of the operation
+  func prewarmModels(
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        guard let whisperKit = whisperKit else {
+          throw NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])
+        }
+        
+        try await whisperKit.prewarmModels()
+        
+        completion(.success("Models prewarmed successfully"))
+      } catch {
+        print("Error prewarming models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameter completion: Callback with the result of the operation
+  func unloadModels(
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    Task {
+      do {
+        guard let whisperKit = whisperKit else {
+          throw NSError(
+            domain: "WhisperKitError", code: 3001,
+            userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])
+        }
+        
+        await whisperKit.unloadModels()
+        
+        completion(.success("Models unloaded successfully"))
+      } catch {
+        print("Error unloading models: \(error.localizedDescription)")
+        completion(.failure(error))
+      }
+    }
+  }
+  
+  ///
+  /// - Parameter completion: Callback with the result of the operation
+  func clearState(
+    completion: @escaping (Result<String?, Error>) -> Void
+  ) {
+    do {
+      guard let whisperKit = whisperKit else {
+        throw NSError(
+          domain: "WhisperKitError", code: 3001,
+          userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])
+      }
+      
+      whisperKit.clearState()
+      
+      completion(.success("State cleared successfully"))
+    } catch {
+      print("Error clearing state: \(error.localizedDescription)")
+      completion(.failure(error))
+    }
+  }
+  
+  ///
+  /// - Parameters:
+  ///   - completion: Callback after setting the logging callback
+  func loggingCallback(
+    level: String?,
+    completion: @escaping (Result<Void, Error>) -> Void
+  ) {
+    do {
+      guard let whisperKit = whisperKit else {
+        throw NSError(
+          domain: "WhisperKitError", code: 3001,
+          userInfo: [NSLocalizedDescriptionKey: "WhisperKit instance not initialized. Call loadModel first."])
+      }
+      
+      whisperKit.loggingCallback { message in
+        print("WhisperKit log: \(message)")
+      }
+      
+      completion(.success(()))
+    } catch {
+      print("Error setting logging callback: \(error.localizedDescription)")
+      completion(.failure(error))
+    }
+  }
+  
   /// Starts recording audio for transcription
   ///
   /// - Parameters:

@@ -17,6 +17,17 @@ import 'platform_specifics/flutter_whisper_kit_platform_interface.dart';
 /// [FlutterWhisperKitPlatform] instance, ensuring consistent behavior
 /// across different platforms while abstracting away the platform-specific code.
 class FlutterWhisperKit {
+  /// Helper function to handle platform calls with error handling
+  Future<T> _handlePlatformCall<T>(Future<T> Function() platformCall) async {
+    try {
+      return await platformCall();
+    } on PlatformException catch (e) {
+      throw WhisperKitError.fromPlatformException(e);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// Loads a WhisperKit model.
   ///
   /// Downloads and initializes a WhisperKit model for speech recognition.
@@ -47,26 +58,21 @@ class FlutterWhisperKit {
     try {
       if (onProgress != null) {
         progressSubscription = FlutterWhisperKitPlatform
-            .instance
-            .modelProgressStream
+            .instance.modelProgressStream
             .listen((progress) {
-              // Convert the Progress object to a simple double for the callback
-              onProgress(progress);
-            });
+          // Convert the Progress object to a simple double for the callback
+          onProgress(progress);
+        });
       }
 
       // Delegate to the platform implementation
-      return await FlutterWhisperKitPlatform.instance.loadModel(
-        variant,
-        modelRepo: modelRepo,
-        redownload: redownload,
+      return await _handlePlatformCall(
+        () => FlutterWhisperKitPlatform.instance.loadModel(
+          variant,
+          modelRepo: modelRepo,
+          redownload: redownload,
+        ),
       );
-    } on PlatformException catch (e) {
-      // Convert platform exceptions to WhisperKitError for better error handling
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      // Rethrow other exceptions
-      rethrow;
     } finally {
       // Ensure the progress subscription is cancelled to prevent memory leaks
       progressSubscription?.cancel();
@@ -109,19 +115,12 @@ class FlutterWhisperKit {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
   }) async {
-    try {
-      // Delegate to the platform implementation
-      return await FlutterWhisperKitPlatform.instance.transcribeFromFile(
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.transcribeFromFile(
         filePath,
         options: options,
-      );
-    } on PlatformException catch (e) {
-      // Convert platform exceptions to WhisperKitError for better error handling
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      // Rethrow other exceptions
-      rethrow;
-    }
+      ),
+    );
   }
 
   /// Starts recording audio from the microphone for real-time transcription.
@@ -158,19 +157,12 @@ class FlutterWhisperKit {
     ),
     bool loop = true,
   }) async {
-    try {
-      // Delegate to the platform implementation
-      return await FlutterWhisperKitPlatform.instance.startRecording(
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.startRecording(
         options: options,
         loop: loop,
-      );
-    } on PlatformException catch (e) {
-      // Convert platform exceptions to WhisperKitError for better error handling
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      // Rethrow other exceptions
-      rethrow;
-    }
+      ),
+    );
   }
 
   /// Stops recording audio and optionally triggers transcription.
@@ -186,16 +178,9 @@ class FlutterWhisperKit {
   /// is stopped. If [loop] is false, also triggers transcription of the recorded audio.
   /// Throws a [WhisperKitError] if stopping recording fails.
   Future<String?> stopRecording({bool loop = true}) async {
-    try {
-      // Delegate to the platform implementation
-      return await FlutterWhisperKitPlatform.instance.stopRecording(loop: loop);
-    } on PlatformException catch (e) {
-      // Convert platform exceptions to WhisperKitError for better error handling
-      throw WhisperKitError.fromPlatformException(e);
-    } catch (e) {
-      // Rethrow other exceptions
-      rethrow;
-    }
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.stopRecording(loop: loop),
+    );
   }
 
   /// Stream of real-time transcription results.
@@ -235,4 +220,294 @@ class FlutterWhisperKit {
   /// feedback to the user about the download status.
   Stream<Progress> get modelProgressStream =>
       FlutterWhisperKitPlatform.instance.modelProgressStream;
+
+  /// Fetches available WhisperKit models from a repository.
+  ///
+  /// - [modelRepo]: The repository to fetch models from (default: "argmaxinc/whisperkit-coreml").
+  /// - [matching]: Optional list of glob patterns to filter models by.
+  /// - [token]: Optional access token for private repositories.
+  ///
+  /// Returns a list of available model names.
+  ///
+  /// Example:
+  /// ```dart
+  /// final models = await flutterWhisperKit.fetchAvailableModels();
+  /// print('Available models: $models');
+  /// ```
+  Future<List<String>> fetchAvailableModels({
+    String modelRepo = 'argmaxinc/whisperkit-coreml',
+    List<String> matching = const ['*'],
+    String? token,
+  }) async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.fetchAvailableModels(
+        modelRepo: modelRepo,
+        matching: matching,
+        token: token,
+      ),
+    );
+  }
+
+  /// Returns the name of the device.
+  ///
+  /// This method returns the name of the device running the application.
+  /// It uses the `deviceName` method from the platform interface to get
+  /// the device name.
+  ///
+  /// Returns the name of the device.
+  ///
+  /// Example:
+  /// ```dart
+  /// final deviceName = await flutterWhisperKit.deviceName();
+  /// print('Device name: $deviceName');
+  /// ```
+  Future<String> deviceName() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.deviceName(),
+    );
+  }
+
+  /// Returns a list of recommended models for the current device.
+  ///
+  /// This method returns a list of model variants that are recommended for
+  /// the current device based on its hardware capabilities and WhisperKit's
+  /// model compatibility matrix.
+  ///
+  /// Returns a [ModelSupport] object containing the default model, supported models, and disabled models.
+  ///
+  /// Example:
+  /// ```dart
+  /// final modelSupport = await flutterWhisperKit.recommendedModels();
+  /// print('Default model: ${modelSupport.defaultModel}');
+  /// print('Supported models: ${modelSupport.supported}');
+  /// print('Disabled models: ${modelSupport.disabled}');
+  /// ```
+  Future<ModelSupport> recommendedModels() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.recommendedModels(),
+    );
+  }
+
+  /// Detects the language of an audio file.
+  ///
+  /// This method analyzes the audio content and determines the most likely
+  /// language being spoken, along with confidence scores for various languages.
+  ///
+  /// Returns a [Future] that completes with a [LanguageDetectionResult] containing
+  /// the detected language code and a map of language probabilities.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await flutterWhisperKit.detectLanguage(filePath);
+  /// print('Detected language: ${result.language}');
+  /// print('Language probabilities: ${result.probabilities}');
+  /// ```
+  Future<LanguageDetectionResult> detectLanguage(String audioPath) async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.detectLanguage(audioPath),
+    );
+  }
+
+  /// Formats model files.
+  ///
+  /// This method formats model files for consistent handling across the plugin.
+  ///
+  /// Parameters:
+  /// - [modelFiles]: A list of model file names to format.
+  ///
+  /// Returns a list of formatted model file names.
+  ///
+  /// Example:
+  /// ```dart
+  /// final formattedModelFiles = await flutterWhisperKit.formatModelFiles(modelFiles);
+  /// print('Formatted model files: $formattedModelFiles');
+  /// ```
+  Future<List<String>> formatModelFiles(List<String> modelFiles) async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.formatModelFiles(modelFiles),
+    );
+  }
+
+  /// Fetches model support configuration from a remote repository.
+  ///
+  /// This method retrieves a configuration file from the specified repository
+  /// that contains information about which models are supported on different devices.
+  ///
+  /// Parameters:
+  /// - [repo]: The repository name (default: "argmaxinc/whisperkit-coreml").
+  /// - [downloadBase]: The base URL for downloads (optional).
+  /// - [token]: An access token for the repository (optional).
+  ///
+  /// Returns a [Future] that completes with a [ModelSupportConfig] object containing
+  /// information about supported models for different devices.
+  ///
+  /// Example:
+  /// ```dart
+  /// final modelSupportConfig = await flutterWhisperKit.fetchModelSupportConfig();
+  /// print('Model support config: $modelSupportConfig');
+  /// ```
+  Future<ModelSupportConfig> fetchModelSupportConfig() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.fetchModelSupportConfig(),
+    );
+  }
+
+  /// Fetches recommended models for the current device from a remote repository.
+  ///
+  /// This method retrieves model support information specifically tailored for
+  /// the current device from a remote repository.
+  ///
+  /// Returns a [Future] that completes with a [ModelSupport] object containing
+  /// information about supported models for the current device.
+  ///
+  /// Example:
+  /// ```dart
+  /// final modelSupport = await flutterWhisperKit.recommendedRemoteModels();
+  /// print('Recommended models: $modelSupport');
+  /// ```
+  Future<ModelSupport> recommendedRemoteModels() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.recommendedRemoteModels(),
+    );
+  }
+
+  /// Sets up WhisperKit models with the given parameters.
+  ///
+  /// This method initializes the WhisperKit framework with the specified configuration.
+  /// It either uses a local model folder if provided or downloads the model.
+  ///
+  /// Parameters:
+  /// - [model]: The model variant to use.
+  /// - [downloadBase]: The base URL for downloads.
+  /// - [modelRepo]: The repository to download the model from.
+  /// - [modelToken]: An access token for the repository.
+  /// - [modelFolder]: A local folder containing the model files.
+  /// - [download]: Whether to download the model if not available locally.
+  ///
+  /// Returns a [Future] that completes with a success message if the models are set up successfully,
+  /// or throws a [WhisperKitError] if setup fails.
+  Future<String?> setupModels({
+    String? model,
+    String? downloadBase,
+    String? modelRepo,
+    String? modelToken,
+    String? modelFolder,
+    bool download = true,
+  }) async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.setupModels(
+        model: model,
+        downloadBase: downloadBase,
+        modelRepo: modelRepo,
+        modelToken: modelToken,
+        modelFolder: modelFolder,
+        download: download,
+      ),
+    );
+  }
+
+  /// Downloads a WhisperKit model from a repository.
+  ///
+  /// This method downloads a model variant from the specified repository
+  /// and tracks the progress through the [modelProgressStream].
+  ///
+  /// Parameters:
+  /// - [variant]: The model variant to download.
+  /// - [downloadBase]: The base URL for downloads.
+  /// - [useBackgroundSession]: Whether to use a background session for the download.
+  /// - [repo]: The repository to download from.
+  /// - [token]: An access token for the repository.
+  /// - [onProgress]: A callback function that receives download progress updates.
+  ///
+  /// Returns a [Future] that completes with the path to the downloaded model,
+  /// or throws a [WhisperKitError] if download fails.
+  Future<String?> download({
+    required String variant,
+    String? downloadBase,
+    bool useBackgroundSession = false,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+    Function(Progress progress)? onProgress,
+  }) async {
+    // Subscribe to the progress stream if a callback is provided
+    StreamSubscription<Progress>? progressSubscription;
+
+    try {
+      if (onProgress != null) {
+        progressSubscription = FlutterWhisperKitPlatform
+            .instance.modelProgressStream
+            .listen((progress) {
+          onProgress(progress);
+        });
+      }
+
+      return await _handlePlatformCall(
+        () => FlutterWhisperKitPlatform.instance.download(
+          variant: variant,
+          downloadBase: downloadBase,
+          useBackgroundSession: useBackgroundSession,
+          repo: repo,
+          token: token,
+        ),
+      );
+    } finally {
+      // Ensure the progress subscription is cancelled to prevent memory leaks
+      progressSubscription?.cancel();
+    }
+  }
+
+  /// Preloads models into memory for faster inference.
+  ///
+  /// This method prepares the models for use by loading them into memory
+  /// but does not perform any inference. It is useful for reducing the
+  /// latency of the first transcription.
+  ///
+  /// Returns a [Future] that completes with a success message if the models are prewarmed successfully,
+  /// or throws a [WhisperKitError] if prewarming fails.
+  Future<String?> prewarmModels() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.prewarmModels(),
+    );
+  }
+
+  /// Releases model resources when they are no longer needed.
+  ///
+  /// This method unloads the models from memory to free up resources.
+  /// It should be called when the models are no longer needed.
+  ///
+  /// Returns a [Future] that completes with a success message if the models are unloaded successfully,
+  /// or throws a [WhisperKitError] if unloading fails.
+  Future<String?> unloadModels() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.unloadModels(),
+    );
+  }
+
+  /// Resets the transcription state.
+  ///
+  /// This method stops recording and resets the transcription timings.
+  /// It should be called when starting a new transcription session.
+  ///
+  /// Returns a [Future] that completes with a success message if the state is cleared successfully,
+  /// or throws a [WhisperKitError] if clearing fails.
+  Future<String?> clearState() async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.clearState(),
+    );
+  }
+
+  /// Sets the logging callback for WhisperKit.
+  ///
+  /// This method configures a callback function for tracking progress and debugging.
+  /// The callback receives log messages with the specified level.
+  ///
+  /// Parameters:
+  /// - [level]: The logging level (e.g., "debug", "info", "warning", "error").
+  ///
+  /// Throws a [WhisperKitError] if setting the logging callback fails.
+  Future<void> loggingCallback({String? level}) async {
+    return _handlePlatformCall(
+      () => FlutterWhisperKitPlatform.instance.loggingCallback(level: level),
+    );
+  }
 }

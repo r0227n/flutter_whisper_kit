@@ -18,4 +18,45 @@ abstract class WhisperKitMessage {
   String? startRecording(Map<String, Object?> options, bool loop);
   @async
   String? stopRecording(bool loop);
+  @async
+  List<String> fetchAvailableModels(
+    String modelRepo,
+    List<String> matching,
+    String? token,
+  );
+
+  @async
+  String deviceName();
+  @async
+  String? recommendedModels();
+  @async
+  List<String> formatModelFiles(List<String> modelFiles);
+  @async
+  String? detectLanguage(String audioPath);
+  @async
+  String? fetchModelSupportConfig(
+    String repo,
+    String? downloadBase,
+    String? token,
+  );
+  @async
+  String? recommendedRemoteModels(
+    String repo,
+    String? downloadBase,
+    String? token,
+  );
+  @async
+  String? setupModels(String? model, String? downloadBase, String? modelRepo,
+      String? modelToken, String? modelFolder, bool download);
+  @async
+  String? download(String variant, String? downloadBase,
+      bool useBackgroundSession, String repo, String? token);
+  @async
+  String? prewarmModels();
+  @async
+  String? unloadModels();
+  @async
+  String? clearState();
+  @async
+  void loggingCallback(String? level);
 }

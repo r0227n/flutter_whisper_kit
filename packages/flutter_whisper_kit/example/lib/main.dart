@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
 import 'package:file_picker/file_picker.dart';
 
+// Import widget files
+import 'widgets/device_information_section.dart';
+import 'widgets/model_discovery_section.dart';
+import 'widgets/language_detection_section.dart';
+import 'widgets/model_configuration_section.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -40,6 +46,29 @@ class _MyAppState extends State<MyApp> {
     'large-v2',
     'large-v3',
   ];
+
+  // State variables for device information
+  String _deviceNameResult = '';
+  bool _isLoadingDeviceName = false;
+
+  // State variables for model discovery
+  List<String> _availableModels = [];
+  bool _isLoadingAvailableModels = false;
+  ModelSupport? _recommendedModels;
+  bool _isLoadingRecommendedModels = false;
+  ModelSupport? _recommendedRemoteModels;
+  bool _isLoadingRecommendedRemoteModels = false;
+
+  // State variables for language detection
+  LanguageDetectionResult? _languageDetectionResult;
+  bool _isDetectingLanguage = false;
+
+  // State variables for model configuration
+  List<String> _modelFilesToFormat = ['tiny.mlmodelc', 'base.mlmodelc'];
+  List<String> _formattedModelFiles = [];
+  bool _isFormattingModelFiles = false;
+  ModelSupportConfig? _modelSupportConfig;
+  bool _isLoadingModelSupportConfig = false;
 
   final _flutterWhisperkitPlugin = FlutterWhisperKit();
   StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
@@ -89,8 +118,8 @@ class _MyAppState extends State<MyApp> {
 
     try {
       final filePath = await FilePicker.platform.pickFiles().then(
-        (file) => file?.files.firstOrNull?.path,
-      );
+            (file) => file?.files.firstOrNull?.path,
+          );
 
       if (filePath == null) {
         setState(() {
@@ -103,10 +132,9 @@ class _MyAppState extends State<MyApp> {
       final options = DecodingOptions(
         verbose: true,
         task: DecodingTask.transcribe,
-        language:
-            _selectedLanguage == 'auto'
-                ? null
-                : _selectedLanguage, // Use selected language or null for auto-detection
+        language: _selectedLanguage == 'auto'
+            ? null
+            : _selectedLanguage, // Use selected language or null for auto-detection
         temperature: 0.0,
         temperatureFallbackCount: 5,
         wordTimestamps: true,
@@ -149,10 +177,9 @@ class _MyAppState extends State<MyApp> {
         final options = DecodingOptions(
           verbose: true,
           task: DecodingTask.transcribe,
-          language:
-              _selectedLanguage == 'auto'
-                  ? null
-                  : _selectedLanguage, // Use selected language or null for auto-detection
+          language: _selectedLanguage == 'auto'
+              ? null
+              : _selectedLanguage, // Use selected language or null for auto-detection
           temperature: 0.0,
           temperatureFallbackCount: 5,
           wordTimestamps: true,
@@ -160,23 +187,21 @@ class _MyAppState extends State<MyApp> {
         );
 
         await _flutterWhisperkitPlugin.startRecording(options: options);
-        _transcriptionSubscription = _flutterWhisperkitPlugin
-            .transcriptionStream
-            .listen((result) {
-              setState(() {
-                _transcriptionText = result.text;
-                // Only add segments that don't already exist in the result
-                for (final segment in result.segments) {
-                  if (!_transcriptionResult.any(
-                    (existing) =>
-                        existing.id == segment.id &&
-                        existing.text == segment.text,
-                  )) {
-                    _transcriptionResult.add(segment);
-                  }
-                }
-              });
-            });
+        _transcriptionSubscription =
+            _flutterWhisperkitPlugin.transcriptionStream.listen((result) {
+          setState(() {
+            _transcriptionText = result.text;
+            // Only add segments that don't already exist in the result
+            for (final segment in result.segments) {
+              if (!_transcriptionResult.any(
+                (existing) =>
+                    existing.id == segment.id && existing.text == segment.text,
+              )) {
+                _transcriptionResult.add(segment);
+              }
+            }
+          });
+        });
       }
 
       setState(() {
@@ -186,6 +211,201 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         _transcriptionText = 'Error: $e';
         _transcriptionResult = [];
+      });
+    }
+  }
+
+  // Device Information Methods
+  Future<void> _getDeviceName() async {
+    setState(() {
+      _isLoadingDeviceName = true;
+      _deviceNameResult = 'Loading device name...';
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.deviceName();
+      setState(() {
+        _deviceNameResult = result;
+      });
+    } catch (e) {
+      setState(() {
+        _deviceNameResult = 'Error getting device name: $e';
+      });
+    } finally {
+      setState(() {
+        _isLoadingDeviceName = false;
+      });
+    }
+  }
+
+  // Model Discovery Methods
+  Future<void> _fetchAvailableModels() async {
+    setState(() {
+      _isLoadingAvailableModels = true;
+      _availableModels = [];
+    });
+
+    try {
+      final models = await _flutterWhisperkitPlugin.fetchAvailableModels(
+        modelRepo: 'argmaxinc/whisperkit-coreml',
+        matching: ['*'],
+      );
+      setState(() {
+        _availableModels = models;
+      });
+    } catch (e) {
+      setState(() {
+        _availableModels = ['Error fetching models: $e'];
+      });
+    } finally {
+      setState(() {
+        _isLoadingAvailableModels = false;
+      });
+    }
+  }
+
+  Future<void> _getRecommendedModels() async {
+    setState(() {
+      _isLoadingRecommendedModels = true;
+      _recommendedModels = null;
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.recommendedModels();
+      setState(() {
+        _recommendedModels = result;
+      });
+    } catch (e) {
+      setState(() {
+        // Create an error model support
+        _recommendedModels = ModelSupport(
+          defaultModel: 'Error',
+          supported: ['Error getting recommended models: $e'],
+          disabled: [],
+        );
+      });
+    } finally {
+      setState(() {
+        _isLoadingRecommendedModels = false;
+      });
+    }
+  }
+
+  Future<void> _getRecommendedRemoteModels() async {
+    setState(() {
+      _isLoadingRecommendedRemoteModels = true;
+      _recommendedRemoteModels = null;
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.recommendedRemoteModels();
+      setState(() {
+        _recommendedRemoteModels = result;
+      });
+    } catch (e) {
+      setState(() {
+        // Create an error model support
+        _recommendedRemoteModels = ModelSupport(
+          defaultModel: 'Error',
+          supported: ['Error getting recommended remote models: $e'],
+          disabled: [],
+        );
+      });
+    } finally {
+      setState(() {
+        _isLoadingRecommendedRemoteModels = false;
+      });
+    }
+  }
+
+  // Language Detection Methods
+  Future<void> _detectLanguage() async {
+    if (!_isModelLoaded) {
+      setState(() {
+        _languageDetectionResult = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _isDetectingLanguage = true;
+    });
+
+    try {
+      final filePath = await FilePicker.platform.pickFiles().then(
+            (file) => file?.files.firstOrNull?.path,
+          );
+
+      if (filePath == null) {
+        setState(() {
+          _isDetectingLanguage = false;
+        });
+        return;
+      }
+
+      final result = await _flutterWhisperkitPlugin.detectLanguage(filePath);
+      setState(() {
+        _languageDetectionResult = result;
+      });
+    } catch (e) {
+      setState(() {
+        // Create an error language detection result
+        _languageDetectionResult = LanguageDetectionResult(
+          language: 'Error',
+          probabilities: {'error': 1.0},
+        );
+      });
+    } finally {
+      setState(() {
+        _isDetectingLanguage = false;
+      });
+    }
+  }
+
+  // Model Configuration Methods
+  Future<void> _formatModelFiles() async {
+    setState(() {
+      _isFormattingModelFiles = true;
+      _formattedModelFiles = [];
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.formatModelFiles(
+        _modelFilesToFormat,
+      );
+      setState(() {
+        _formattedModelFiles = result;
+      });
+    } catch (e) {
+      setState(() {
+        _formattedModelFiles = ['Error formatting model files: $e'];
+      });
+    } finally {
+      setState(() {
+        _isFormattingModelFiles = false;
+      });
+    }
+  }
+
+  Future<void> _fetchModelSupportConfig() async {
+    setState(() {
+      _isLoadingModelSupportConfig = true;
+      _modelSupportConfig = null;
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.fetchModelSupportConfig();
+      setState(() {
+        _modelSupportConfig = result;
+      });
+    } catch (e) {
+      setState(() {
+        // We can't create a proper error ModelSupportConfig, so we'll just set it to null
+        _modelSupportConfig = null;
+      });
+    } finally {
+      setState(() {
+        _isLoadingModelSupportConfig = false;
       });
     }
   }
@@ -211,7 +431,7 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
         body: ListView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           children: [
             // Model and language selection
             ModelSelectionDropdown(
@@ -248,6 +468,65 @@ class _MyAppState extends State<MyApp> {
               modelProgressStream: _flutterWhisperkitPlugin.modelProgressStream,
             ),
 
+            const SizedBox(height: 16),
+
+            // Device Information Section
+            DeviceInformationSection(
+              deviceNameResult: _deviceNameResult,
+              isLoadingDeviceName: _isLoadingDeviceName,
+              onGetDeviceNamePressed: _getDeviceName,
+            ),
+
+            const SizedBox(height: 16),
+
+            // Model Discovery Section
+            ModelDiscoverySection(
+              availableModels: _availableModels,
+              isLoadingAvailableModels: _isLoadingAvailableModels,
+              recommendedModels: _recommendedModels,
+              isLoadingRecommendedModels: _isLoadingRecommendedModels,
+              recommendedRemoteModels: _recommendedRemoteModels,
+              isLoadingRecommendedRemoteModels:
+                  _isLoadingRecommendedRemoteModels,
+              onFetchAvailableModelsPressed: _fetchAvailableModels,
+              onGetRecommendedModelsPressed: _getRecommendedModels,
+              onGetRecommendedRemoteModelsPressed: _getRecommendedRemoteModels,
+            ),
+
+            const SizedBox(height: 16),
+
+            // Language Detection Section
+            LanguageDetectionSection(
+              isModelLoaded: _isModelLoaded,
+              isDetectingLanguage: _isDetectingLanguage,
+              languageDetectionResult: _languageDetectionResult,
+              onDetectLanguagePressed: _detectLanguage,
+            ),
+
+            const SizedBox(height: 16),
+
+            // Model Configuration Section
+            ModelConfigurationSection(
+              modelFilesToFormat: _modelFilesToFormat,
+              formattedModelFiles: _formattedModelFiles,
+              isFormattingModelFiles: _isFormattingModelFiles,
+              modelSupportConfig: _modelSupportConfig,
+              isLoadingModelSupportConfig: _isLoadingModelSupportConfig,
+              onFormatModelFilesPressed: _formatModelFiles,
+              onFetchModelSupportConfigPressed: _fetchModelSupportConfig,
+              onModelFilesChanged: (value) {
+                setState(() {
+                  _modelFilesToFormat = value
+                      .split(',')
+                      .map((e) => e.trim())
+                      .where((e) => e.isNotEmpty)
+                      .toList();
+                });
+              },
+            ),
+
+            const SizedBox(height: 16),
+
             // File transcription section
             FileTranscriptionSection(
               isModelLoaded: _isModelLoaded,
@@ -256,6 +535,8 @@ class _MyAppState extends State<MyApp> {
               fileTranscriptionResult: _fileTranscriptionResult,
               onTranscribePressed: _transcribeFromFile,
             ),
+
+            const SizedBox(height: 16),
 
             // Real-time transcription section
             RealTimeTranscriptionSection(
@@ -302,13 +583,12 @@ class ModelSelectionDropdown extends StatelessWidget {
                 onModelChanged(newValue);
               }
             },
-            items:
-                modelVariants.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+            items: modelVariants.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -323,23 +603,23 @@ class LanguageSelectionDropdown extends StatelessWidget {
     required this.selectedLanguage,
     required this.onLanguageChanged,
   }) : _languages = const [
-         'auto', // Auto-detect
-         'en', // English
-         'ja', // Japanese
-         'zh', // Chinese
-         'de', // German
-         'es', // Spanish
-         'ru', // Russian
-         'ko', // Korean
-         'fr', // French
-         'it', // Italian
-         'pt', // Portuguese
-         'tr', // Turkish
-         'pl', // Polish
-         'nl', // Dutch
-         'ar', // Arabic
-         'hi', // Hindi
-       ];
+          'auto', // Auto-detect
+          'en', // English
+          'ja', // Japanese
+          'zh', // Chinese
+          'de', // German
+          'es', // Spanish
+          'ru', // Russian
+          'ko', // Korean
+          'fr', // French
+          'it', // Italian
+          'pt', // Portuguese
+          'tr', // Turkish
+          'pl', // Polish
+          'nl', // Dutch
+          'ar', // Arabic
+          'hi', // Hindi
+        ];
 
   final String selectedLanguage;
   final List<String> _languages;
@@ -362,34 +642,33 @@ class LanguageSelectionDropdown extends StatelessWidget {
                 onLanguageChanged(newValue);
               }
             },
-            items:
-                _languages.map<DropdownMenuItem<String>>((String value) {
-                  // Show language code and name for better readability
-                  String displayText = switch (value) {
-                    'auto' => 'auto (Auto-detect)',
-                    'en' => 'en (English)',
-                    'ja' => 'ja (Japanese)',
-                    'zh' => 'zh (Chinese)',
-                    'de' => 'de (German)',
-                    'es' => 'es (Spanish)',
-                    'ru' => 'ru (Russian)',
-                    'ko' => 'ko (Korean)',
-                    'fr' => 'fr (French)',
-                    'it' => 'it (Italian)',
-                    'pt' => 'pt (Portuguese)',
-                    'tr' => 'tr (Turkish)',
-                    'pl' => 'pl (Polish)',
-                    'nl' => 'nl (Dutch)',
-                    'ar' => 'ar (Arabic)',
-                    'hi' => 'hi (Hindi)',
-                    _ => throw UnimplementedError(),
-                  };
+            items: _languages.map<DropdownMenuItem<String>>((String value) {
+              // Show language code and name for better readability
+              String displayText = switch (value) {
+                'auto' => 'auto (Auto-detect)',
+                'en' => 'en (English)',
+                'ja' => 'ja (Japanese)',
+                'zh' => 'zh (Chinese)',
+                'de' => 'de (German)',
+                'es' => 'es (Spanish)',
+                'ru' => 'ru (Russian)',
+                'ko' => 'ko (Korean)',
+                'fr' => 'fr (French)',
+                'it' => 'it (Italian)',
+                'pt' => 'pt (Portuguese)',
+                'tr' => 'tr (Turkish)',
+                'pl' => 'pl (Polish)',
+                'nl' => 'nl (Dutch)',
+                'ar' => 'ar (Arabic)',
+                'hi' => 'hi (Hindi)',
+                _ => throw UnimplementedError(),
+              };
 
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(displayText),
-                  );
-                }).toList(),
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(displayText),
+              );
+            }).toList(),
           ),
         ),
       ],
@@ -477,14 +756,12 @@ class FileTranscriptionSection extends StatelessWidget {
           'File Transcription',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-
         ElevatedButton(
           onPressed: isModelLoaded ? onTranscribePressed : null,
           child: Text(
             isTranscribingFile ? 'Transcribing...' : 'Transcribe from File',
           ),
         ),
-
         Container(
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
@@ -506,7 +783,6 @@ class FileTranscriptionSection extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(fileTranscriptionResult?.language ?? 'Unknown'),
-
                 const Text(
                   'Segments:',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -519,7 +795,6 @@ class FileTranscriptionSection extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const Text(
                   'Performance:',
                   style: TextStyle(fontWeight: FontWeight.bold),
@@ -566,7 +841,6 @@ class RealTimeTranscriptionSection extends StatelessWidget {
           'Real-time Transcription',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-
         Container(
           height: 200,
           padding: const EdgeInsets.all(16.0),
@@ -574,19 +848,17 @@ class RealTimeTranscriptionSection extends StatelessWidget {
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(8.0),
           ),
-          child:
-              segments.isNotEmpty
-                  ? ListView.builder(
-                    itemCount: segments.length,
-                    itemBuilder: (context, index) {
-                      return Text(
-                        '[${segments[index].start.toStringAsFixed(2)}s - ${segments[index].end.toStringAsFixed(2)}s]: ${segments[index].text}',
-                      );
-                    },
-                  )
-                  : const Text('No segments'),
+          child: segments.isNotEmpty
+              ? ListView.builder(
+                  itemCount: segments.length,
+                  itemBuilder: (context, index) {
+                    return Text(
+                      '[${segments[index].start.toStringAsFixed(2)}s - ${segments[index].end.toStringAsFixed(2)}s]: ${segments[index].text}',
+                    );
+                  },
+                )
+              : const Text('No segments'),
         ),
-
         Container(
           height: 200,
           padding: const EdgeInsets.all(16.0),
@@ -603,7 +875,6 @@ class RealTimeTranscriptionSection extends StatelessWidget {
             ),
           ),
         ),
-
         ElevatedButton(
           onPressed: isModelLoaded ? onRecordPressed : null,
           child: Text(isRecording ? 'Stop Recording' : 'Start Recording'),

@@ -1,16 +1,23 @@
 # flutter_whisper_kit_apple
 
-A Flutter plugin that provides Apple platform (iOS and macOS) implementation for the flutter_whisper_kit package.
+A common Apple platform implementation for the [flutter_whisper_kit] plugin.
 
-## Overview
+## Usage
 
-This package is part of the flutter_whisper_kit plugin system and provides the Apple-specific implementation for WhisperKit integration. It is not intended for direct use by application developers but serves as a platform implementation for the main flutter_whisper_kit package.
+This package provides the iOS and macOS platform-specific implementation for the `flutter_whisper_kit` plugin. It is not intended for direct use by application developers.
+
+Platform-specific implementations are registered automatically and used by the main `flutter_whisper_kit` package. You do not need to interact with this package directly.
+
+### 🧠 [DeepWiki]
 
 ## Platform Support
 
 This package specifically supports:
-- iOS 14.0+
-- macOS 11.0+
+
+| Platform | Minimum Version |
+|----------|----------------|
+| iOS      | 16.0+         |
+| macOS    | 13.0+         |
 
 ## Implementation Details
 
@@ -78,7 +85,14 @@ The plugin uses the following error code system to report errors:
 
 ## References
 
-- [WhisperKit GitHub Repository](https://github.com/argmaxinc/WhisperKit)
-- [Flutter Plugin Development](https://docs.flutter.dev/packages-and-plugins/developing-packages)
-- [Pigeon Documentation](https://pub.dev/packages/pigeon)
+- [WhisperKit]
+- [Flutter Plugin Development]
+- [Pigeon Documentation]
 
+
+<!-- URLs -->
+[flutter_whisper_kit]: https://pub.dev/packages/flutter_whisper_kit
+[DeepWiki]: https://deepwiki.com/r0227n/flutter_whisper_kit
+[WhisperKit]: https://github.com/argmaxinc/WhisperKit
+[Flutter Plugin Development]: https://docs.flutter.dev/packages-and-plugins/developing-packages
+[Pigeon Documentation]: https://pub.dev/packages/pigeon
