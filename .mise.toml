@@ -1,0 +1,78 @@
+[tools]
+flutter = "3.32.2"
+bun = "1.2.17"
+
+# Development tasks
+[tasks.analyze]
+description = "Static analysis"
+run = "flutter analyze"
+
+[tasks.test]
+description = "Run tests"
+run = "flutter test"
+
+[tasks.format]
+description = "Format all files"
+run = """
+dart format .
+bun run format
+"""
+
+[tasks.build]
+description = "Build the application"
+run = "flutter build ios --no-codesign"
+
+[tasks.build-android]
+description = "Build Android APK"
+run = "flutter build apk"
+
+[tasks.run]
+description = "Run the application"
+run = "flutter run"
+
+[tasks.run-release]
+description = "Run the application in release mode"
+run = "flutter run --release"
+
+[tasks.deps]
+description = "Install dependencies"
+run = """
+flutter pub get
+cd ios && pod install --repo-update
+bun install
+"""
+
+[tasks.clean]
+description = "Clean build artifacts"
+run = """
+flutter clean
+cd ios && rm -rf Pods/ Podfile.lock
+rm -rf node_modules/
+"""
+
+[tasks.setup]
+description = "Initial project setup"
+run = """
+flutter pub get
+cd ios && pod install --repo-update
+bun install
+"""
+
+[tasks.quality]
+description = "Code quality workflow"
+run = """
+dart format --set-exit-if-changed .
+flutter analyze
+flutter test
+bun run lint
+"""
+
+[tasks.ci-check]
+description = "Complete CI workflow"
+run = """
+set -e
+dart format --output=none --set-exit-if-changed .
+flutter analyze
+flutter test
+bun run ci:check
+"""
