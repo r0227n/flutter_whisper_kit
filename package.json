@@ -1,21 +1,45 @@
 {
   "name": "flutter_whisper_kit",
   "version": "1.0.0",
-  "description": "[DeepWiki](https://deepwiki.com/r0227n/flutter_whisper_kit)",
-  "main": "index.js",
+  "description": "Flutter WhisperKit integration for speech-to-text functionality (using bun)",
+  "private": true,
+  "packageManager": "bun@1.2.17",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"No tests specified\"",
-    "prepare": "husky"
+    "commitlint": "bunx commitlint --edit",
+    "lint": "bunx prettier --check '**/*.{yml,yaml,md,json}'",
+    "format": "bunx prettier --write '**/*.{yml,yaml,md,json}'",
+    "postinstall": "echo 'Dependencies installed with bun'",
+    "clean": "bun run clean:node_modules",
+    "clean:node_modules": "rm -rf node_modules && bun install",
+    "dev:lint": "bun run lint",
+    "dev:format": "bun run format",
+    "dev:setup": "bun install && bun run format",
+    "ci:check": "bun run lint && echo 'All quality checks passed'",
+    "ci:verify": "bun --version && bunx prettier --version",
+    "prepare": "husky",
+    "test": "echo \"Use 'flutter test' for Flutter tests\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "flutter",
+    "whisperkit",
+    "speech-to-text",
+    "ios",
+    "apple",
+    "transcription",
+    "audio"
+  ],
+  "author": "r0227n",
+  "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "prettier": "3.6.1"
+  },
+  "engines": {
+    "bun": ">=1.2.0"
   }
 }
