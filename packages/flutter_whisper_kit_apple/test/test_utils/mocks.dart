@@ -1,28 +1,52 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:async';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
 import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
 
 /// Mock implementation of [FlutterWhisperKitPlatform] for testing.
 class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
+  final StreamController<Progress> _progressController =
+      StreamController<Progress>.broadcast();
+  final StreamController<TranscriptionResult> _transcriptionController =
+      StreamController<TranscriptionResult>.broadcast();
+
+  StreamController<Progress> get progressController => _progressController;
+  StreamController<TranscriptionResult> get transcriptionController =>
+      _transcriptionController;
   @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
     bool redownload = false,
-  }) {
-    return Future.value('Model loaded');
+  }) async {
+    // Emit progress updates when model loading starts
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (!_progressController.isClosed) {
+        _progressController.add(Progress(
+          completedUnitCount: 50,
+          totalUnitCount: 100,
+          fractionCompleted: 0.5,
+          isIndeterminate: false,
+        ));
+      }
+    });
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!_progressController.isClosed) {
+        _progressController.add(Progress(
+          completedUnitCount: 100,
+          totalUnitCount: 100,
+          fractionCompleted: 1.0,
+          isIndeterminate: false,
+        ));
+      }
+    });
+
+    return 'Model loaded';
   }
 
   /// Stream of model loading progress updates
   @override
-  Stream<Progress> get modelProgressStream => Stream<Progress>.fromIterable([
-        Progress(
-          completedUnitCount: 10,
-          totalUnitCount: 10,
-          fractionCompleted: 1.0,
-          isIndeterminate: false,
-        ),
-      ]);
+  Stream<Progress> get modelProgressStream => _progressController.stream;
 
   @override
   Future<TranscriptionResult?> transcribeFromFile(
@@ -46,7 +70,10 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
     ),
   }) {
     if (filePath.isEmpty) {
-      throw InvalidArgumentsError(message: 'File path cannot be empty');
+      throw InvalidArgumentsError(
+        message: 'File path cannot be empty',
+        errorCode: ErrorCode.invalidParameters,
+      );
     }
 
     // Mock JSON response for a successful transcription
@@ -161,8 +188,35 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
     bool loop = true,
-  }) =>
-      Future.value('Recording started');
+  }) async {
+    // Emit transcription result when recording starts
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (!_transcriptionController.isClosed) {
+        _transcriptionController.add(TranscriptionResult.fromJsonString('''
+        {
+          "text": "Test transcription",
+          "segments": [
+            {
+              "id": 0,
+              "seek": 0,
+              "text": "Test transcription",
+              "start": 0.0,
+              "end": 2.0,
+              "tokens": [1, 2, 3],
+              "temperature": 1.0,
+              "avgLogprob": -0.5,
+              "compressionRatio": 1.2,
+              "noSpeechProb": 0.1
+            }
+          ],
+          "language": "en"
+        }
+        '''));
+      }
+    });
+
+    return 'Recording started';
+  }
 
   @override
   Future<String?> stopRecording({bool loop = true}) =>
@@ -170,31 +224,146 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
 
   @override
   Stream<TranscriptionResult> get transcriptionStream =>
-      Stream<TranscriptionResult>.fromIterable([
-        TranscriptionResult.fromJsonString('''
-      {
-        "text": "Test transcription",
-        "segments": [
-          {
-            "id": 0,
-            "seek": 0,
-            "text": "Test transcription",
-            "start": 0.0,
-            "end": 2.0,
-            "tokens": [1, 2, 3],
-            "temperature": 1.0,
-            "avgLogprob": -0.5,
-            "compressionRatio": 1.2,
-            "noSpeechProb": 0.1
-          }
-        ],
-        "language": "en",
-        "timings": {
-          "fullPipeline": 1.0
-        }
-      }
-    '''),
-      ]);
+      _transcriptionController.stream;
+
+  @override
+  Future<List<String>> fetchAvailableModels({
+    String modelRepo = 'argmaxinc/whisperkit-coreml',
+    List<String> matching = const ['*'],
+    String? token,
+  }) {
+    return Future.value(['tiny', 'base', 'small', 'medium', 'large']);
+  }
+
+  @override
+  Future<LanguageDetectionResult> detectLanguage(String audioPath) {
+    return Future.value(
+      LanguageDetectionResult(
+        language: 'en',
+        probabilities: {'en': 0.95, 'ja': 0.05},
+      ),
+    );
+  }
+
+  @override
+  Future<String> deviceName() {
+    return Future.value('Mock Device');
+  }
+
+  @override
+  Future<ModelSupport> recommendedModels() {
+    return Future.value(
+      ModelSupport(
+        defaultModel: 'base',
+        supported: ['tiny', 'base', 'small'],
+        disabled: [],
+      ),
+    );
+  }
+
+  @override
+  Future<List<String>> formatModelFiles(List<String> modelFiles) {
+    return Future.value(modelFiles.map((f) => 'formatted_$f').toList());
+  }
+
+  @override
+  Future<ModelSupportConfig> fetchModelSupportConfig({
+    String? downloadBase,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+  }) {
+    return Future.value(
+      ModelSupportConfig(
+        repoName: repo,
+        repoVersion: '1.0.0',
+        knownModels: ['tiny', 'base', 'small'],
+        defaultSupport: ModelSupport(
+          defaultModel: 'base',
+          supported: ['tiny', 'base', 'small'],
+          disabled: [],
+        ),
+        deviceSupports: [],
+      ),
+    );
+  }
+
+  @override
+  Future<ModelSupport> recommendedRemoteModels({
+    String? downloadBase,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+  }) {
+    return Future.value(
+      ModelSupport(
+        defaultModel: 'base',
+        supported: ['tiny', 'base', 'small'],
+        disabled: [],
+      ),
+    );
+  }
+
+  @override
+  Future<String?> setupModels({
+    String? model,
+    String? downloadBase,
+    String? modelRepo,
+    String? modelFolder,
+    String? modelToken,
+    bool download = true,
+  }) {
+    return Future.value('Models setup successfully');
+  }
+
+  @override
+  Future<String?> download({
+    required String variant,
+    String? downloadBase,
+    bool useBackgroundSession = false,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+  }) {
+    return Future.value('/path/to/downloaded/model');
+  }
+
+  @override
+  Future<String?> prewarmModels() {
+    return Future.value('Models prewarmed');
+  }
+
+  @override
+  Future<String?> unloadModels() {
+    return Future.value('Models unloaded');
+  }
+
+  @override
+  Future<String?> clearState() {
+    return Future.value('State cleared');
+  }
+
+  @override
+  Future<void> loggingCallback({String? level}) {
+    return Future.value();
+  }
+
+  /// Emit test progress updates
+  void emitProgressUpdate(Progress progress) {
+    if (!_progressController.isClosed) {
+      _progressController.add(progress);
+    }
+  }
+
+  /// Emit test transcription results
+  void emitTranscriptionResult(TranscriptionResult result) {
+    if (!_transcriptionController.isClosed) {
+      _transcriptionController.add(result);
+    }
+  }
+
+  /// Dispose of stream controllers
+  void dispose() {
+    _progressController.close();
+    _transcriptionController.close();
+  }
 }
 
 /// Sets up a mock platform for testing.

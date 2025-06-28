@@ -1,4 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:async';
+
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
 import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -7,38 +8,115 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperKitPlatform {
-  @override
-  Future<String> deviceName() => Future.value('Mock Device');
+  /// Exception to throw for testing error handling
+  Exception? _throwError;
+
+  /// Stream controllers for testing
+  final StreamController<Progress> _progressController;
+  final StreamController<TranscriptionResult> _transcriptionController;
+
+  MockFlutterWhisperkitPlatform()
+      : _progressController = StreamController<Progress>.broadcast(),
+        _transcriptionController =
+            StreamController<TranscriptionResult>.broadcast();
+
+  /// Stream controller getter for testing
+  StreamController<Progress> get progressController => _progressController;
+
+  /// Stream controller getter for testing
+  StreamController<TranscriptionResult> get transcriptionController =>
+      _transcriptionController;
+
+  /// Set an error to throw for testing error handling
+  void setThrowError(Exception? error) {
+    _throwError = error;
+  }
+
+  /// Emit progress updates for testing
+  void emitProgressUpdates() {
+    Future.delayed(const Duration(milliseconds: 10), () {
+      _progressController.add(const Progress(
+        fractionCompleted: 0.25,
+        completedUnitCount: 25,
+        totalUnitCount: 100,
+      ));
+    });
+    Future.delayed(const Duration(milliseconds: 20), () {
+      _progressController.add(const Progress(
+        fractionCompleted: 0.5,
+        completedUnitCount: 50,
+        totalUnitCount: 100,
+      ));
+    });
+    Future.delayed(const Duration(milliseconds: 30), () {
+      _progressController.add(const Progress(
+        fractionCompleted: 1.0,
+        completedUnitCount: 100,
+        totalUnitCount: 100,
+      ));
+    });
+  }
+
+  /// Check if an error should be thrown
+  void _checkThrowError() {
+    if (_throwError != null) {
+      final error = _throwError!;
+      _throwError = null; // Reset after throwing
+      throw error;
+    }
+  }
 
   @override
-  Future<ModelSupport> recommendedModels() => Future.value(
-        ModelSupport(
-          defaultModel: 'tiny',
-          supported: ['tiny', 'base', 'small', 'medium', 'large'],
-          disabled: [],
-        ),
-      );
+  Future<String> deviceName() {
+    _checkThrowError();
+    return Future.value('Mock Device');
+  }
 
   @override
-  Future<LanguageDetectionResult> detectLanguage(String audioPath) =>
-      Future.value(
-        LanguageDetectionResult(
-          language: 'en',
-          probabilities: {'en': 0.95, 'ja': 0.05},
-        ),
-      );
+  Future<ModelSupport> recommendedModels() {
+    _checkThrowError();
+    return Future.value(
+      ModelSupport(
+        defaultModel: 'openai_whisper-base',
+        supported: [
+          'openai_whisper-tiny',
+          'openai_whisper-base',
+          'openai_whisper-small'
+        ],
+        disabled: [],
+      ),
+    );
+  }
 
   @override
-  Future<List<String>> formatModelFiles(List<String> modelPaths) =>
-      Future.value(modelPaths);
+  Future<LanguageDetectionResult> detectLanguage(String audioPath) {
+    _checkThrowError();
+    return Future.value(
+      LanguageDetectionResult(
+        language: 'en',
+        probabilities: {'en': 0.95, 'ja': 0.05},
+      ),
+    );
+  }
+
+  @override
+  Future<List<String>> formatModelFiles(List<String> modelPaths) {
+    _checkThrowError();
+    return Future.value(
+      modelPaths.map((path) => 'formatted_$path').toList(),
+    );
+  }
 
   @override
   Future<String?> loadModel(
     String? variant, {
     String? modelRepo,
     bool redownload = false,
-  }) =>
-      Future.value('Model loaded');
+  }) {
+    _checkThrowError();
+    final modelPath = 'whisperkit-coreml/openai_whisper-${variant ?? 'base'}';
+    return Future.value(modelPath);
+  }
 
   @override
   Future<TranscriptionResult?> transcribeFromFile(
@@ -61,8 +139,11 @@ class MockFlutterWhisperkitPlatform
       chunkingStrategy: ChunkingStrategy.vad,
     ),
   }) {
-    if (filePath.isEmpty) {
-      throw InvalidArgumentsError(message: 'File path cannot be empty');
+    _checkThrowError();
+
+    if (filePath.isEmpty || filePath.contains('../')) {
+      throw InvalidArgumentsError(
+          message: 'File path cannot be empty', errorCode: 5003);
     }
 
     // Mock JSON response for a successful transcription
@@ -131,99 +212,81 @@ class MockFlutterWhisperkitPlatform
       chunkingStrategy: ChunkingStrategy.vad,
     ),
     bool loop = true,
-  }) =>
-      Future.value('Recording started');
+  }) {
+    _checkThrowError();
+    return Future.value('Recording started');
+  }
 
   @override
-  Future<String?> stopRecording({bool loop = true}) =>
-      Future.value('Recording stopped');
+  Future<String?> stopRecording({bool loop = true}) {
+    _checkThrowError();
+    return Future.value('Recording stopped');
+  }
 
   @override
   Stream<TranscriptionResult> get transcriptionStream =>
-      Stream<TranscriptionResult>.fromIterable([
-        TranscriptionResult.fromJsonString('''
-      {
-        "text": "Test transcription",
-        "segments": [
-          {
-            "id": 0,
-            "seek": 0,
-            "text": "Test transcription",
-            "start": 0.0,
-            "end": 2.0,
-            "tokens": [1, 2, 3],
-            "temperature": 1.0,
-            "avgLogprob": -0.5,
-            "compressionRatio": 1.2,
-            "noSpeechProb": 0.1
-          }
-        ],
-        "language": "en",
-        "timings": {
-          "fullPipeline": 1.0
-        }
-      }
-    '''),
-      ]);
+      _transcriptionController.stream;
 
   @override
-  Stream<Progress> get modelProgressStream => Stream<Progress>.fromIterable([
-        const Progress(
-          totalUnitCount: 100,
-          completedUnitCount: 50,
-          fractionCompleted: 0.5,
-          isIndeterminate: false,
-        ),
-      ]);
+  Stream<Progress> get modelProgressStream => _progressController.stream;
 
   @override
   Future<List<String>> fetchAvailableModels({
     String modelRepo = 'argmaxinc/whisperkit-coreml',
     List<String> matching = const ['*'],
     String? token,
-  }) =>
-      Future.value([
-        'tiny',
-        'tiny.en',
-        'base',
-        'base.en',
-        'small',
-        'small.en',
-        'medium',
-        'medium.en',
-        'large-v2',
-        'large-v3',
-      ]);
+  }) {
+    _checkThrowError();
+    if (modelRepo.startsWith('http://127.0.0.1') ||
+        modelRepo.startsWith('file://')) {
+      throw InvalidArgumentsError(
+          message: 'Invalid modelRepo', errorCode: 5002);
+    }
+    return Future.value([
+      'tiny',
+      'tiny.en',
+      'base',
+      'base.en',
+      'small',
+      'small.en',
+      'medium',
+      'medium.en',
+      'large-v2',
+      'large-v3',
+    ]);
+  }
 
   @override
   Future<ModelSupportConfig> fetchModelSupportConfig({
     String? downloadBase,
     String repo = 'argmaxinc/whisperkit-coreml',
     String? token,
-  }) =>
-      Future.value(
-        ModelSupportConfig(
-          repoName: repo,
-          repoVersion: '1.0.0',
-          deviceSupports: [
-            DeviceSupport(
-              chips: 'A12, A13',
-              identifiers: ['iPhone12,1', 'iPhone12,3'],
-              models: ModelSupport(
-                defaultModel: 'tiny',
-                supported: ['tiny', 'base', 'small', 'medium', 'large'],
-                disabled: [],
-              ),
+  }) {
+    _checkThrowError();
+    return Future.value(
+      ModelSupportConfig(
+        repoName: repo,
+        repoVersion: '1.0.0',
+        deviceSupports: [
+          DeviceSupport(
+            chips: 'A12, A13',
+            identifiers: ['iPhone12,1', 'iPhone12,3'],
+            models: ModelSupport(
+              defaultModel: 'tiny',
+              supported: ['tiny', 'base', 'small', 'medium', 'large'],
+              disabled: [],
             ),
-          ],
-          knownModels: ['tiny', 'base', 'small', 'medium', 'large'],
-          defaultSupport: ModelSupport(
-            defaultModel: 'tiny',
-            supported: ['tiny', 'base', 'small', 'medium', 'large'],
-            disabled: [],
           ),
+        ],
+        knownModels: ['tiny', 'base', 'small', 'medium', 'large'],
+        defaultSupport: ModelSupport(
+          defaultModel: 'tiny',
+          supported: ['tiny', 'base', 'small', 'medium', 'large'],
+          disabled: [],
         ),
-      );
+      ),
+    );
+  }
 
   @override
   Future<ModelSupport> recommendedRemoteModels({
@@ -247,8 +310,10 @@ class MockFlutterWhisperkitPlatform
     String? modelToken,
     String? modelFolder,
     bool download = true,
-  }) =>
-      Future.value('Models set up successfully');
+  }) {
+    _checkThrowError();
+    return Future.value('Models set up successfully');
+  }
 
   @override
   Future<String?> download({
@@ -257,22 +322,34 @@ class MockFlutterWhisperkitPlatform
     bool useBackgroundSession = false,
     String repo = 'argmaxinc/whisperkit-coreml',
     String? token,
-  }) =>
-      Future.value('/path/to/downloaded/model');
+  }) {
+    _checkThrowError();
+    return Future.value('/path/to/downloaded/$variant');
+  }
 
   @override
-  Future<String?> prewarmModels() =>
-      Future.value('Models prewarmed successfully');
+  Future<String?> prewarmModels() {
+    _checkThrowError();
+    return Future.value('Models prewarmed successfully');
+  }
 
   @override
-  Future<String?> unloadModels() =>
-      Future.value('Models unloaded successfully');
+  Future<String?> unloadModels() {
+    _checkThrowError();
+    return Future.value('Models unloaded successfully');
+  }
 
   @override
-  Future<String?> clearState() => Future.value('State cleared successfully');
+  Future<String?> clearState() {
+    _checkThrowError();
+    return Future.value('State cleared successfully');
+  }
 
   @override
-  Future<void> loggingCallback({String? level}) => Future.value();
+  Future<void> loggingCallback({String? level}) {
+    _checkThrowError();
+    return Future.value();
+  }
 }
 
 /// Sets up a mock platform for testing.

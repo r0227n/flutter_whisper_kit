@@ -14,21 +14,28 @@ void main() {
       platform = setUpMockPlatform();
     });
 
+    tearDown(() {
+      platform.progressController.close();
+    });
+
     test('modelProgressStream emits progress updates', () async {
-      // Act
+      // Arrange
       final stream = platform.modelProgressStream;
+      final firstProgressFuture = stream.first;
+
+      // Act
+      platform.emitProgressUpdates();
 
       // Assert
-      expect(
+      final firstProgress = await firstProgressFuture;
+      expect(firstProgress.fractionCompleted, 0.25);
+
+      expectLater(
         stream,
-        emitsThrough(
-          predicate<Progress>(
-            (progress) =>
-                progress.totalUnitCount == 100 &&
-                progress.completedUnitCount == 50 &&
-                progress.fractionCompleted == 0.5,
-          ),
-        ),
+        emitsInOrder([
+          predicate<Progress>((progress) => progress.fractionCompleted == 0.5),
+          predicate<Progress>((progress) => progress.fractionCompleted == 1.0),
+        ]),
       );
     });
   });

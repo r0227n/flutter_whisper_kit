@@ -17,12 +17,17 @@ import 'platform_specifics/flutter_whisper_kit_platform_interface.dart';
 /// [FlutterWhisperKitPlatform] instance, ensuring consistent behavior
 /// across different platforms while abstracting away the platform-specific code.
 class FlutterWhisperKit {
+  /// Helper method to convert typed error to error code
+  int _getErrorCodeFromType(WhisperKitErrorType error) {
+    return error.errorCode; // Now preserve the original error code
+  }
+
   /// Helper function to handle platform calls with error handling
   Future<T> _handlePlatformCall<T>(Future<T> Function() platformCall) async {
     try {
       return await platformCall();
     } on PlatformException catch (e) {
-      throw WhisperKitError.fromPlatformException(e);
+      throw WhisperKitErrorType.fromPlatformException(e);
     } catch (e) {
       rethrow;
     }
@@ -509,5 +514,154 @@ class FlutterWhisperKit {
     return _handlePlatformCall(
       () => FlutterWhisperKitPlatform.instance.loggingCallback(level: level),
     );
+  }
+
+  // ===== Result-based API methods (new API design) =====
+
+  /// Loads a WhisperKit model using the Result pattern.
+  ///
+  /// This is a new API that returns a Result type instead of throwing exceptions,
+  /// providing better error handling and more explicit success/failure states.
+  ///
+  /// Parameters:
+  /// - [variant]: The model variant to load.
+  /// - [modelRepo]: The repository to download the model from.
+  /// - [redownload]: Whether to force redownload the model.
+  /// - [onProgress]: A callback function for download progress updates.
+  ///
+  /// Returns a [Result] containing either:
+  /// - Success: The path to the loaded model folder
+  /// - Failure: A [WhisperKitError] describing what went wrong
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await whisperKit.loadModelWithResult('tiny-en');
+  /// result.when(
+  ///   success: (modelPath) => print('Model loaded at: $modelPath'),
+  ///   failure: (error) => print('Failed to load model: $error'),
+  /// );
+  /// ```
+  Future<Result<String, WhisperKitError>> loadModelWithResult(
+    String? variant, {
+    String? modelRepo,
+    bool redownload = false,
+    Function(Progress progress)? onProgress,
+  }) async {
+    try {
+      final modelPath = await loadModel(
+        variant,
+        modelRepo: modelRepo,
+        redownload: redownload,
+        onProgress: onProgress,
+      );
+
+      if (modelPath == null) {
+        return Failure(
+          WhisperKitError(
+            code: 1001,
+            message: 'Model loading returned null',
+          ),
+        );
+      }
+
+      return Success(modelPath);
+    } on WhisperKitError catch (e) {
+      return Failure(e);
+    } on WhisperKitErrorType catch (e) {
+      // Convert typed error to WhisperKitError for Result API
+      return Failure(
+        WhisperKitError(
+          code: _getErrorCodeFromType(e),
+          message: e.message,
+          details: e.details,
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: 1000,
+          message: 'Unexpected error: $e',
+        ),
+      );
+    }
+  }
+
+  /// Transcribes an audio file using the Result pattern.
+  ///
+  /// This method provides a safer alternative to the throwing version,
+  /// returning a Result that explicitly represents success or failure.
+  ///
+  /// Parameters:
+  /// - [path]: The path to the audio file to transcribe.
+  /// - [options]: Optional decoding options for transcription.
+  /// - [onProgress]: Optional callback for transcription progress.
+  ///
+  /// Returns a [Result] containing either:
+  /// - Success: A [TranscriptionResult] with the transcribed text
+  /// - Failure: A [WhisperKitError] describing what went wrong
+  Future<Result<TranscriptionResult?, WhisperKitError>>
+      transcribeFileWithResult(
+    String path, {
+    DecodingOptions? options,
+    Function(Progress progress)? onProgress,
+  }) async {
+    try {
+      final result = await transcribeFromFile(
+        path,
+        options: options ?? const DecodingOptions(),
+      );
+      return Success(result);
+    } on WhisperKitError catch (e) {
+      return Failure(e);
+    } on WhisperKitErrorType catch (e) {
+      // Convert typed error to WhisperKitError for Result API
+      return Failure(
+        WhisperKitError(
+          code: _getErrorCodeFromType(e),
+          message: e.message,
+          details: e.details,
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: 2001,
+          message: 'Transcription failed: $e',
+        ),
+      );
+    }
+  }
+
+  /// Detects the language of an audio file using the Result pattern.
+  ///
+  /// Returns a [Result] containing either:
+  /// - Success: A [LanguageDetectionResult] with detected language info
+  /// - Failure: A [WhisperKitError] describing what went wrong
+  Future<Result<LanguageDetectionResult?, WhisperKitError>>
+      detectLanguageWithResult(
+    String audioPath,
+  ) async {
+    try {
+      final result = await detectLanguage(audioPath);
+      return Success(result);
+    } on WhisperKitError catch (e) {
+      return Failure(e);
+    } on WhisperKitErrorType catch (e) {
+      // Convert typed error to WhisperKitError for Result API
+      return Failure(
+        WhisperKitError(
+          code: _getErrorCodeFromType(e),
+          message: e.message,
+          details: e.details,
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: 2002,
+          message: 'Language detection failed: $e',
+        ),
+      );
+    }
   }
 }

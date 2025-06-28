@@ -8,6 +8,17 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('FlutterWhisperKit Platform Tests', () {
+    late MockFlutterWhisperkitPlatform mockPlatform;
+
+    setUp(() {
+      mockPlatform = setUpMockPlatform();
+    });
+
+    tearDown(() {
+      mockPlatform.progressController.close();
+      mockPlatform.transcriptionController.close();
+    });
+
     test('Platform can be set to mock implementation', () {
       final mockPlatform = setUpMockPlatform();
       expect(FlutterWhisperKitPlatform.instance, mockPlatform);

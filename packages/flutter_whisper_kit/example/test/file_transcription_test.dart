@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
-import 'package:flutter_whisper_kit_example/main.dart';
-
-// Import removed to fix unused import warning
+import 'package:flutter_whisper_kit_example/widgets/file_transcription_section.dart';
 
 void main() {
   group('FileTranscriptionSection', () {
