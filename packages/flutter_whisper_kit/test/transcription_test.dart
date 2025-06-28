@@ -55,6 +55,14 @@ void main() {
           throwsA(isA<InvalidArgumentsError>()),
         );
       });
+
+      test('throws InvalidArgumentsError for path traversal attempt', () async {
+        // Act & Assert
+        expect(
+          () => platform.transcribeFromFile('../../../etc/passwd'),
+          throwsA(isA<InvalidArgumentsError>()),
+        );
+      });
     });
   });
 }

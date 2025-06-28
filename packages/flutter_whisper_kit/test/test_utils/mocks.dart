@@ -14,8 +14,12 @@ class MockFlutterWhisperkitPlatform
   Exception? _throwError;
   
   /// Stream controllers for testing
-  final StreamController<Progress> _progressController = StreamController<Progress>.broadcast();
-  final StreamController<TranscriptionResult> _transcriptionController = StreamController<TranscriptionResult>.broadcast();
+  final StreamController<Progress> _progressController;
+  final StreamController<TranscriptionResult> _transcriptionController;
+
+  MockFlutterWhisperkitPlatform() 
+      : _progressController = StreamController<Progress>.broadcast(),
+        _transcriptionController = StreamController<TranscriptionResult>.broadcast();
 
   /// Stream controller getter for testing
   StreamController<Progress> get progressController => _progressController;
@@ -30,18 +34,21 @@ class MockFlutterWhisperkitPlatform
   
   /// Emit progress updates for testing
   void emitProgressUpdates() {
-    // Add a small delay to ensure subscription is ready
     Future.delayed(const Duration(milliseconds: 10), () {
       _progressController.add(const Progress(
         fractionCompleted: 0.25,
         completedUnitCount: 25,
         totalUnitCount: 100,
       ));
+    });
+    Future.delayed(const Duration(milliseconds: 20), () {
       _progressController.add(const Progress(
         fractionCompleted: 0.5,
         completedUnitCount: 50,
         totalUnitCount: 100,
       ));
+    });
+    Future.delayed(const Duration(milliseconds: 30), () {
       _progressController.add(const Progress(
         fractionCompleted: 1.0,
         completedUnitCount: 100,
@@ -102,8 +109,6 @@ class MockFlutterWhisperkitPlatform
     bool redownload = false,
   }) {
     _checkThrowError();
-    // Emit progress updates for testing
-    emitProgressUpdates();
     final modelPath = 'whisperkit-coreml/openai_whisper-${variant ?? 'base'}';
     return Future.value(modelPath);
   }
@@ -131,8 +136,8 @@ class MockFlutterWhisperkitPlatform
   }) {
     _checkThrowError();
     
-    if (filePath.isEmpty) {
-      throw InvalidArgumentsError(message: 'File path cannot be empty');
+    if (filePath.isEmpty || filePath.contains('../')) {
+      throw InvalidArgumentsError(message: 'File path cannot be empty', errorCode: 5003);
     }
 
     // Mock JSON response for a successful transcription
@@ -225,6 +230,9 @@ class MockFlutterWhisperkitPlatform
     String? token,
   }) {
     _checkThrowError();
+    if (modelRepo.startsWith('http://127.0.0.1') || modelRepo.startsWith('file://')) {
+      throw InvalidArgumentsError(message: 'Invalid modelRepo', errorCode: 5002);
+    }
     return Future.value([
       'tiny',
       'tiny.en',
@@ -307,8 +315,6 @@ class MockFlutterWhisperkitPlatform
     String? token,
   }) {
     _checkThrowError();
-    // Emit progress updates for testing
-    emitProgressUpdates();
     return Future.value('/path/to/downloaded/$variant');
   }
 

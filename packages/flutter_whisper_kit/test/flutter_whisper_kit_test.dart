@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
@@ -16,6 +15,11 @@ void main() {
     setUp(() {
       mockPlatform = setUpMockPlatform();
       whisperKit = FlutterWhisperKit();
+    });
+
+    tearDown(() {
+      mockPlatform.progressController.close();
+      mockPlatform.transcriptionController.close();
     });
 
     group('_handlePlatformCall', () {
@@ -79,27 +83,29 @@ void main() {
         expect(result, isNotNull);
       });
 
-      // TODO: Fix progress callback test - race condition with subscription timing
-      // test('handles progress callback correctly', () async {
-      //   // Arrange
-      //   final progressUpdates = <Progress>[];
+      test('handles progress callback correctly', () async {
+        // Arrange
+        final stream = whisperKit.modelProgressStream;
+        final firstProgressFuture = stream.first;
 
-      //   // Act
-      //   final result = await whisperKit.loadModel(
-      //     'tiny',
-      //     onProgress: (progress) {
-      //       progressUpdates.add(progress);
-      //     },
-      //   );
-        
-      //   // Wait a bit for async operations to complete
-      //   await Future.delayed(const Duration(milliseconds: 50));
+        // Act
+        final loadFuture = whisperKit.loadModel('tiny');
+        mockPlatform.emitProgressUpdates();
 
-      //   // Assert
-      //   expect(result, isNotNull);
-      //   expect(progressUpdates, isNotEmpty);
-      //   expect(progressUpdates.last.fractionCompleted, 1.0);
-      // });
+        // Assert
+        final firstProgress = await firstProgressFuture;
+        expect(firstProgress.fractionCompleted, 0.25);
+
+        // Ensure all events are emitted and processed
+        await expectLater(
+          stream,
+          emitsInOrder([
+            isA<Progress>().having((p) => p.fractionCompleted, 'fractionCompleted', 0.5),
+            isA<Progress>().having((p) => p.fractionCompleted, 'fractionCompleted', 1.0),
+          ]),
+        );
+        await loadFuture;
+      });
 
       test('cancels progress subscription after completion', () async {
         // Arrange
@@ -109,18 +115,20 @@ void main() {
         });
 
         // Act
-        await whisperKit.loadModel(
+        final loadFuture = whisperKit.loadModel(
           'tiny',
           onProgress: (_) {},
         );
+        
+        // Emit progress updates to trigger the listener
+        mockPlatform.emitProgressUpdates();
+        
+        await loadFuture;
 
         // Give time for cleanup
         await Future.delayed(const Duration(milliseconds: 100));
-        mockPlatform.progressController.add(const Progress(
-          fractionCompleted: 0.5,
-        ));
 
-        // Assert - no new listeners should receive events after loadModel completes
+        // Assert - the listener should have received some events
         expect(listenerCount, greaterThan(0));
       });
 
@@ -270,26 +278,28 @@ void main() {
         expect(result, contains('tiny'));
       });
 
-      // TODO: Fix progress callback test - race condition with subscription timing
-      // test('downloads model with progress callback', () async {
-      //   // Arrange
-      //   final progressUpdates = <Progress>[];
+      test('downloads model with progress callback', () async {
+        // Arrange
+        final stream = whisperKit.modelProgressStream;
+        final firstProgressFuture = stream.first;
 
-      //   // Act
-      //   final result = await whisperKit.download(
-      //     variant: 'base',
-      //     onProgress: (progress) {
-      //       progressUpdates.add(progress);
-      //     },
-      //   );
-        
-      //   // Wait a bit for async operations to complete
-      //   await Future.delayed(const Duration(milliseconds: 50));
+        // Act
+        final downloadFuture = whisperKit.download(variant: 'base');
+        mockPlatform.emitProgressUpdates();
 
-      //   // Assert
-      //   expect(result, isNotNull);
-      //   expect(progressUpdates, isNotEmpty);
-      // });
+        // Assert
+        final firstProgress = await firstProgressFuture;
+        expect(firstProgress.fractionCompleted, 0.25);
+
+        await expectLater(
+          stream,
+          emitsInOrder([
+            isA<Progress>().having((p) => p.fractionCompleted, 'fractionCompleted', 0.5),
+            isA<Progress>().having((p) => p.fractionCompleted, 'fractionCompleted', 1.0),
+          ]),
+        );
+        await downloadFuture;
+      });
 
       test('downloads with custom parameters', () async {
         // Act

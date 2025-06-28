@@ -14,6 +14,11 @@ void main() {
       platform = setUpMockPlatform();
     });
 
+    tearDown(() {
+      (platform as MockFlutterWhisperkitPlatform).transcriptionController.close();
+      (platform as MockFlutterWhisperkitPlatform).progressController.close();
+    });
+
     group('transcribeFromFile', () {
       test('returns TranscriptionResult for valid file path', () async {
         final result = await platform.transcribeFromFile('test.wav');
