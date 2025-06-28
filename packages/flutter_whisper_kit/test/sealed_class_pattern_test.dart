@@ -103,7 +103,6 @@ void main() {
       final value = switch (result) {
         Success(value: Success(value: final v)) => v,
         Success(value: Failure(exception: final _)) => -1,
-        Failure(exception: final _) => -2,
       };
 
       expect(value, equals(42));

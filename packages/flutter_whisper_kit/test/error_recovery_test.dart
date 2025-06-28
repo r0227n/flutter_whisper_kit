@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/src/error_recovery.dart';
-import 'package:flutter_whisper_kit/src/error_codes.dart';
 import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 import 'package:flutter_whisper_kit/src/models.dart';
 

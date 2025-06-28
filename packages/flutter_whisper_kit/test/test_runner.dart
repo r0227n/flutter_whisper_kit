@@ -1,5 +1,7 @@
 /// Test runner for comprehensive test validation
 /// This file helps verify F.I.R.S.T. principles compliance
+library;
+
 import 'package:flutter_test/flutter_test.dart';
 
 /// F.I.R.S.T. Principles Test Compliance Checker

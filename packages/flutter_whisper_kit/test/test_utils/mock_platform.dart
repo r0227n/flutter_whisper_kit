@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
 import 'package:flutter_whisper_kit/src/models.dart';
 import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
-import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 /// Enhanced mock implementation for testing with error code support
@@ -114,7 +113,6 @@ class MockFlutterWhisperKitPlatform
     return _loadModelResponse ?? '/path/to/model';
   }
 
-  @override
   Future<TranscriptionResult?> transcribeFile(
     String path, {
     DecodingOptions? options,
