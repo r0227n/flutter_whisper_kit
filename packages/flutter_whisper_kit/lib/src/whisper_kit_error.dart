@@ -25,7 +25,8 @@ class WhisperKitError implements Exception {
 /// A sealed class hierarchy for WhisperKit errors
 sealed class WhisperKitErrorType implements Exception {
   /// Creates a new WhisperKitErrorType
-  const WhisperKitErrorType({required this.message, this.details, required this.errorCode});
+  const WhisperKitErrorType(
+      {required this.message, this.details, required this.errorCode});
 
   /// A human-readable error message
   final String message;
@@ -88,7 +89,8 @@ sealed class WhisperKitErrorType implements Exception {
             ),
 
           // Default case for unhandled numeric error codes
-          _ => UnknownError(message: errorMessage, details: details, errorCode: errorCode),
+          _ => UnknownError(
+              message: errorMessage, details: details, errorCode: errorCode),
         };
       }
     }
@@ -114,14 +116,14 @@ class WhisperKitErrorFactory {
     if (match != null) {
       final errorCode = int.tryParse(match.group(2) ?? '') ?? 0;
       final errorMessage = match.group(3) ?? message;
-      
+
       return WhisperKitError(
         code: errorCode,
         message: errorMessage,
         details: details,
       );
     }
-    
+
     // Default error code based on message content
     int errorCode = 1000; // Default to general initialization error
     if (message.toLowerCase().contains('transcription')) {
@@ -131,7 +133,7 @@ class WhisperKitErrorFactory {
     } else if (message.toLowerCase().contains('network')) {
       errorCode = 3001;
     }
-    
+
     return WhisperKitError(
       code: errorCode,
       message: message,
@@ -143,35 +145,41 @@ class WhisperKitErrorFactory {
 /// Error when model loading fails
 class ModelLoadingFailedError extends WhisperKitErrorType {
   /// Creates a new ModelLoadingFailedError
-  const ModelLoadingFailedError({required super.message, super.details, required super.errorCode});
+  const ModelLoadingFailedError(
+      {required super.message, super.details, required super.errorCode});
 }
 
 /// Error when transcription fails
 class TranscriptionFailedError extends WhisperKitErrorType {
   /// Creates a new TranscriptionFailedError
-  const  TranscriptionFailedError({required super.message, super.details, required super.errorCode});
+  const TranscriptionFailedError(
+      {required super.message, super.details, required super.errorCode});
 }
 
 /// Error when recording fails
 class RecordingFailedError extends WhisperKitErrorType {
   /// Creates a new RecordingFailedError
-  const RecordingFailedError({required super.message, super.details, required super.errorCode});
+  const RecordingFailedError(
+      {required super.message, super.details, required super.errorCode});
 }
 
 /// Error when arguments are invalid
 class InvalidArgumentsError extends WhisperKitErrorType {
   /// Creates a new InvalidArgumentsError
-  const InvalidArgumentsError({required super.message, super.details, required super.errorCode});
+  const InvalidArgumentsError(
+      {required super.message, super.details, required super.errorCode});
 }
 
 /// Error when permission is denied
 class PermissionDeniedError extends WhisperKitErrorType {
   /// Creates a new PermissionDeniedError
-  const PermissionDeniedError({required super.message, super.details, required super.errorCode});
+  const PermissionDeniedError(
+      {required super.message, super.details, required super.errorCode});
 }
 
 /// Error when the cause is unknown
 class UnknownError extends WhisperKitErrorType {
   /// Creates a new UnknownError
-  const UnknownError({required super.message, super.details, required super.errorCode});
+  const UnknownError(
+      {required super.message, super.details, required super.errorCode});
 }

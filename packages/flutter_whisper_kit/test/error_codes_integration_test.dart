@@ -15,7 +15,8 @@ void main() {
   });
 
   group('Error codes integration', () {
-    test('should use standardized error codes for model loading failures', () async {
+    test('should use standardized error codes for model loading failures',
+        () async {
       // Given
       mockPlatform.setShouldThrowOnLoadModel(true);
       mockPlatform.setErrorCode(ErrorCode.modelNotFound);
@@ -29,21 +30,24 @@ void main() {
         failure: (exception) {
           expect(exception.code, ErrorCode.modelNotFound);
           expect(exception.message, contains('Model not found'));
-          expect(ErrorCategory.fromCode(exception.code), ErrorCategory.initialization);
+          expect(ErrorCategory.fromCode(exception.code),
+              ErrorCategory.initialization);
           expect(ErrorCode.isRecoverable(exception.code), false);
-          expect(ErrorCode.getSuggestedAction(exception.code), 
-                 contains('Check model path'));
+          expect(ErrorCode.getSuggestedAction(exception.code),
+              contains('Check model path'));
         },
       );
     });
 
-    test('should use standardized error codes for transcription failures', () async {
+    test('should use standardized error codes for transcription failures',
+        () async {
       // Given
       mockPlatform.setShouldThrowOnTranscribeFile(true);
       mockPlatform.setErrorCode(ErrorCode.audioProcessingError);
 
       // When
-      final result = await whisperKit.transcribeFileWithResult('/path/to/audio.mp3');
+      final result =
+          await whisperKit.transcribeFileWithResult('/path/to/audio.mp3');
 
       // Then
       result.when(
@@ -71,8 +75,8 @@ void main() {
           expect(exception.code, ErrorCode.networkTimeout);
           expect(ErrorCategory.fromCode(exception.code), ErrorCategory.network);
           expect(ErrorCode.isRecoverable(exception.code), true);
-          expect(ErrorCode.getSuggestedAction(exception.code), 
-                 contains('Check network connection'));
+          expect(ErrorCode.getSuggestedAction(exception.code),
+              contains('Check network connection'));
         },
       );
     });
@@ -90,8 +94,8 @@ void main() {
         // Then - now we catch the typed error and check its errorCode property
         expect(e.errorCode, ErrorCode.microphonePermissionDenied);
         expect(ErrorCategory.fromCode(e.errorCode), ErrorCategory.permission);
-        expect(ErrorCode.getSuggestedAction(e.errorCode), 
-               contains('Grant microphone permission'));
+        expect(ErrorCode.getSuggestedAction(e.errorCode),
+            contains('Grant microphone permission'));
       }
     });
 
@@ -101,21 +105,24 @@ void main() {
       mockPlatform.setErrorCode(ErrorCode.invalidAudioFormat);
 
       // When
-      final result = await whisperKit.transcribeFileWithResult('/path/to/invalid.txt');
+      final result =
+          await whisperKit.transcribeFileWithResult('/path/to/invalid.txt');
 
       // Then
       result.when(
         success: (_) => fail('Should not succeed'),
         failure: (exception) {
           expect(exception.code, ErrorCode.invalidAudioFormat);
-          expect(ErrorCategory.fromCode(exception.code), ErrorCategory.validation);
-          expect(ErrorCode.getSuggestedAction(exception.code), 
-                 contains('Convert audio to supported format'));
+          expect(
+              ErrorCategory.fromCode(exception.code), ErrorCategory.validation);
+          expect(ErrorCode.getSuggestedAction(exception.code),
+              contains('Convert audio to supported format'));
         },
       );
     });
 
-    test('should create errors with custom messages while preserving codes', () {
+    test('should create errors with custom messages while preserving codes',
+        () {
       // Given
       final customError = ErrorCode.createError(
         ErrorCode.transcriptionFailed,

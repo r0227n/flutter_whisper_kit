@@ -337,8 +337,18 @@ void main() {
         compressionRatio: 1.2,
         noSpeechProb: 0.1,
         words: [
-          WordTiming(word: 'Test', tokens: [1], start: 2.0, end: 2.5, probability: 0.9),
-          WordTiming(word: 'segment', tokens: [2], start: 2.5, end: 4.0, probability: 0.95),
+          WordTiming(
+              word: 'Test',
+              tokens: [1],
+              start: 2.0,
+              end: 2.5,
+              probability: 0.9),
+          WordTiming(
+              word: 'segment',
+              tokens: [2],
+              start: 2.5,
+              end: 4.0,
+              probability: 0.95),
         ],
       );
 

@@ -79,7 +79,8 @@ void main() {
         );
 
         // Apply fallback options
-        final fallbackDecodingOptions = fallbackOptions.applyToDecodingOptions(originalOptions);
+        final fallbackDecodingOptions =
+            fallbackOptions.applyToDecodingOptions(originalOptions);
 
         // Verify fallback options are applied correctly
         expect(fallbackDecodingOptions.wordTimestamps, isFalse);
@@ -93,16 +94,17 @@ void main() {
           options: fallbackDecodingOptions,
         );
 
-        expect(transcriptionResult, isA<Result<TranscriptionResult?, WhisperKitError>>());
+        expect(transcriptionResult,
+            isA<Result<TranscriptionResult?, WhisperKitError>>());
       });
 
       test('should handle custom recovery strategy', () async {
         int recoveryAttempts = 0;
-        
+
         final customStrategy = ErrorRecoveryStrategy.custom(
           onError: (error) async {
             recoveryAttempts++;
-            
+
             // Custom recovery logic based on error type
             if (error.code == ErrorCode.networkTimeout) {
               // Wait and retry
@@ -129,19 +131,22 @@ void main() {
           code: ErrorCode.networkTimeout,
           message: 'Network timeout',
         );
-        
+
         final action = await customStrategy.onError!(networkError);
         expect(action, equals(RecoveryAction.retry));
         expect(recoveryAttempts, equals(1));
       });
 
-      test('should use production configuration for robust error handling', () async {
+      test('should use production configuration for robust error handling',
+          () async {
         final prodConfig = WhisperKitConfiguration.production();
 
         expect(prodConfig.errorRecovery.type, equals(RecoveryType.automatic));
         expect(prodConfig.errorRecovery.retryPolicy.maxAttempts, equals(3));
-        expect(prodConfig.errorRecovery.fallbackOptions?.useOfflineModel, isTrue);
-        expect(prodConfig.errorRecovery.fallbackOptions?.degradeQuality, isTrue);
+        expect(
+            prodConfig.errorRecovery.fallbackOptions?.useOfflineModel, isTrue);
+        expect(
+            prodConfig.errorRecovery.fallbackOptions?.degradeQuality, isTrue);
         expect(prodConfig.enableLogging, isTrue);
         expect(prodConfig.logLevel, equals(LogLevel.warning));
 
@@ -160,10 +165,11 @@ void main() {
 
         final result = await executor.executeWithRetry<TranscriptionResult?>(
           () async {
-            final transcriptionResult = await whisperKit.transcribeFileWithResult(
+            final transcriptionResult =
+                await whisperKit.transcribeFileWithResult(
               '/path/to/audio.wav',
             );
-            
+
             return transcriptionResult.when(
               success: (result) => result,
               failure: (exception) => throw exception,
@@ -185,7 +191,7 @@ void main() {
         );
 
         final delays = <Duration>[];
-        
+
         // Simulate multiple attempts
         for (int i = 0; i < 3; i++) {
           final delay = retryPolicy.getDelayForAttempt(i);
@@ -193,19 +199,24 @@ void main() {
         }
 
         // Verify delays increase with backoff
-        expect(delays[0].inMilliseconds, greaterThanOrEqualTo(80)); // 100ms - 20%
+        expect(
+            delays[0].inMilliseconds, greaterThanOrEqualTo(80)); // 100ms - 20%
         expect(delays[0].inMilliseconds, lessThanOrEqualTo(120)); // 100ms + 20%
-        
-        expect(delays[1].inMilliseconds, greaterThanOrEqualTo(160)); // 200ms - 20%
+
+        expect(
+            delays[1].inMilliseconds, greaterThanOrEqualTo(160)); // 200ms - 20%
         expect(delays[1].inMilliseconds, lessThanOrEqualTo(240)); // 200ms + 20%
-        
-        expect(delays[2].inMilliseconds, greaterThanOrEqualTo(320)); // 400ms - 20%
+
+        expect(
+            delays[2].inMilliseconds, greaterThanOrEqualTo(320)); // 400ms - 20%
         expect(delays[2].inMilliseconds, lessThanOrEqualTo(480)); // 400ms + 20%
       });
 
-      test('should combine Result API with recovery for complete error handling', () async {
+      test(
+          'should combine Result API with recovery for complete error handling',
+          () async {
         final logMessages = <String>[];
-        
+
         final executor = RecoveryExecutor(
           retryPolicy: const RetryPolicy(
             maxAttempts: 2,
@@ -215,12 +226,13 @@ void main() {
         );
 
         // Simulate language detection with recovery
-        final result = await executor.executeWithRetry<LanguageDetectionResult?>(
+        final result =
+            await executor.executeWithRetry<LanguageDetectionResult?>(
           () async {
             final detectionResult = await whisperKit.detectLanguageWithResult(
               '/path/to/audio.wav',
             );
-            
+
             return detectionResult.when(
               success: (result) => result,
               failure: (exception) {
@@ -238,8 +250,10 @@ void main() {
         );
 
         // Verify logging occurred
-        expect(logMessages.any((msg) => msg.contains('language detection')), isTrue);
-        expect(result, isA<Result<LanguageDetectionResult?, WhisperKitError>>());
+        expect(logMessages.any((msg) => msg.contains('language detection')),
+            isTrue);
+        expect(
+            result, isA<Result<LanguageDetectionResult?, WhisperKitError>>());
       });
     });
 
@@ -255,7 +269,7 @@ void main() {
 
         for (final errorCode in recoverableErrors) {
           expect(ErrorCode.isRecoverable(errorCode), isTrue);
-          
+
           final error = ErrorCode.createError(errorCode);
           expect(error.code, equals(errorCode));
           expect(error.message, equals(ErrorCode.getDescription(errorCode)));
@@ -272,7 +286,7 @@ void main() {
 
         for (final errorCode in nonRecoverableErrors) {
           expect(ErrorCode.isRecoverable(errorCode), isFalse);
-          
+
           final suggestedAction = ErrorCode.getSuggestedAction(errorCode);
           expect(suggestedAction, isNotEmpty);
         }
@@ -282,7 +296,7 @@ void main() {
     group('Integration with WhisperKit configuration', () {
       test('should create default configuration with basic recovery', () {
         final config = WhisperKitConfiguration.defaultConfig();
-        
+
         expect(config.errorRecovery.type, equals(RecoveryType.automatic));
         expect(config.retryPolicy.maxAttempts, equals(3));
         expect(config.fallbackOptions.useOfflineModel, isFalse);
@@ -295,7 +309,7 @@ void main() {
           retryPolicy: const RetryPolicy(maxAttempts: 0),
           fallbackOptions: const FallbackOptions(),
         );
-        
+
         expect(config.errorRecovery.type, equals(RecoveryType.manual));
         expect(config.errorRecovery.retryPolicy.maxAttempts, equals(0));
       });

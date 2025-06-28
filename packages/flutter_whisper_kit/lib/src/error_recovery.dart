@@ -8,10 +8,10 @@ import 'whisper_kit_error.dart';
 enum RecoveryType {
   /// Automatically retry with exponential backoff
   automatic,
-  
+
   /// Let the user handle the error
   manual,
-  
+
   /// Custom recovery logic
   custom,
 }
@@ -20,10 +20,10 @@ enum RecoveryType {
 enum RecoveryAction {
   /// Retry the operation
   retry,
-  
+
   /// Use fallback options
   fallback,
-  
+
   /// Fail immediately
   fail,
 }
@@ -32,16 +32,16 @@ enum RecoveryAction {
 enum LogLevel {
   /// No logging
   none,
-  
+
   /// Only errors
   error,
-  
+
   /// Warnings and errors
   warning,
-  
+
   /// Info, warnings, and errors
   info,
-  
+
   /// All logs including debug
   debug,
 }
@@ -50,19 +50,19 @@ enum LogLevel {
 class RetryPolicy {
   /// Maximum number of retry attempts
   final int maxAttempts;
-  
+
   /// Initial delay before first retry
   final Duration initialDelay;
-  
+
   /// Maximum delay between retries
   final Duration maxDelay;
-  
+
   /// Multiplier for exponential backoff
   final double backoffMultiplier;
-  
+
   /// Jitter factor (0.0 to 1.0) to randomize delays
   final double jitterFactor;
-  
+
   const RetryPolicy({
     this.maxAttempts = 3,
     this.initialDelay = const Duration(seconds: 1),
@@ -70,28 +70,30 @@ class RetryPolicy {
     this.backoffMultiplier = 2.0,
     this.jitterFactor = 0.1,
   });
-  
+
   /// Calculate delay for a given attempt number (0-based)
   Duration getDelayForAttempt(int attempt) {
     if (attempt < 0) return initialDelay;
-    
+
     // Calculate exponential backoff
-    final exponentialDelay = initialDelay.inMilliseconds * 
-        pow(backoffMultiplier, attempt);
-    
+    final exponentialDelay =
+        initialDelay.inMilliseconds * pow(backoffMultiplier, attempt);
+
     // Apply max delay cap
-    final cappedDelay = exponentialDelay.clamp(
-      initialDelay.inMilliseconds,
-      maxDelay.inMilliseconds,
-    ).toInt();
-    
+    final cappedDelay = exponentialDelay
+        .clamp(
+          initialDelay.inMilliseconds,
+          maxDelay.inMilliseconds,
+        )
+        .toInt();
+
     // Add jitter
-    final jitter = (cappedDelay * jitterFactor * 
-        (Random().nextDouble() * 2 - 1)).toInt();
-    
+    final jitter =
+        (cappedDelay * jitterFactor * (Random().nextDouble() * 2 - 1)).toInt();
+
     return Duration(milliseconds: cappedDelay + jitter);
   }
-  
+
   /// Check if an error code should be retried
   bool shouldRetry(int errorCode) {
     return ErrorCode.isRecoverable(errorCode);
@@ -102,19 +104,19 @@ class RetryPolicy {
 class FallbackOptions {
   /// Use offline model if available
   final bool useOfflineModel;
-  
+
   /// Offline model variant to use
   final String offlineModelVariant;
-  
+
   /// Degrade quality for better performance
   final bool degradeQuality;
-  
+
   /// Skip word timestamps to speed up processing
   final bool skipWordTimestamps;
-  
+
   /// Reduce concurrent workers
   final bool reduceConcurrency;
-  
+
   const FallbackOptions({
     this.useOfflineModel = false,
     this.offlineModelVariant = 'tiny',
@@ -122,7 +124,7 @@ class FallbackOptions {
     this.skipWordTimestamps = false,
     this.reduceConcurrency = false,
   });
-  
+
   /// Apply fallback options to decoding options
   DecodingOptions applyToDecodingOptions(DecodingOptions original) {
     return DecodingOptions(
@@ -135,7 +137,8 @@ class FallbackOptions {
       chunkingStrategy: original.chunkingStrategy,
       wordTimestamps: skipWordTimestamps ? false : original.wordTimestamps,
       topK: degradeQuality ? 1 : original.topK,
-      concurrentWorkerCount: reduceConcurrency ? 1 : original.concurrentWorkerCount,
+      concurrentWorkerCount:
+          reduceConcurrency ? 1 : original.concurrentWorkerCount,
       temperatureIncrementOnFallback: original.temperatureIncrementOnFallback,
       temperatureFallbackCount: original.temperatureFallbackCount,
       usePrefillPrompt: original.usePrefillPrompt,
@@ -160,23 +163,23 @@ class FallbackOptions {
 class ErrorRecoveryStrategy {
   /// Type of recovery strategy
   final RecoveryType type;
-  
+
   /// Retry policy for automatic recovery
   final RetryPolicy retryPolicy;
-  
+
   /// Fallback options
   final FallbackOptions? fallbackOptions;
-  
+
   /// Custom error handler
   final Future<RecoveryAction> Function(WhisperKitError error)? onError;
-  
+
   const ErrorRecoveryStrategy._({
     required this.type,
     required this.retryPolicy,
     this.fallbackOptions,
     this.onError,
   });
-  
+
   /// Create automatic recovery strategy
   factory ErrorRecoveryStrategy.automatic({
     RetryPolicy? retryPolicy,
@@ -188,7 +191,7 @@ class ErrorRecoveryStrategy {
       fallbackOptions: fallbackOptions,
     );
   }
-  
+
   /// Create manual recovery strategy (no automatic retry)
   factory ErrorRecoveryStrategy.manual() {
     return ErrorRecoveryStrategy._(
@@ -196,7 +199,7 @@ class ErrorRecoveryStrategy {
       retryPolicy: const RetryPolicy(maxAttempts: 0),
     );
   }
-  
+
   /// Create custom recovery strategy
   factory ErrorRecoveryStrategy.custom({
     required Future<RecoveryAction> Function(WhisperKitError error) onError,
@@ -216,19 +219,19 @@ class ErrorRecoveryStrategy {
 class WhisperKitConfiguration {
   /// Error recovery strategy
   final ErrorRecoveryStrategy errorRecovery;
-  
+
   /// Retry policy
   final RetryPolicy retryPolicy;
-  
+
   /// Fallback options
   final FallbackOptions fallbackOptions;
-  
+
   /// Enable logging
   final bool enableLogging;
-  
+
   /// Log level
   final LogLevel logLevel;
-  
+
   const WhisperKitConfiguration({
     required this.errorRecovery,
     required this.retryPolicy,
@@ -236,7 +239,7 @@ class WhisperKitConfiguration {
     this.enableLogging = false,
     this.logLevel = LogLevel.error,
   });
-  
+
   /// Create default configuration
   factory WhisperKitConfiguration.defaultConfig() {
     return WhisperKitConfiguration(
@@ -245,7 +248,7 @@ class WhisperKitConfiguration {
       fallbackOptions: const FallbackOptions(),
     );
   }
-  
+
   /// Create production-ready configuration
   factory WhisperKitConfiguration.production() {
     return WhisperKitConfiguration(
@@ -277,13 +280,13 @@ class RecoveryExecutor {
   final RetryPolicy retryPolicy;
   final FallbackOptions? fallbackOptions;
   final void Function(String message, LogLevel level)? logger;
-  
+
   RecoveryExecutor({
     required this.retryPolicy,
     this.fallbackOptions,
     this.logger,
   });
-  
+
   /// Execute an operation with retry logic
   Future<Result<T, WhisperKitError>> executeWithRetry<T>(
     Future<T> Function() operation, {
@@ -291,37 +294,38 @@ class RecoveryExecutor {
   }) async {
     int attempt = 0;
     WhisperKitError? lastError;
-    
+
     while (attempt < retryPolicy.maxAttempts) {
       try {
-        _log('Executing ${operationName ?? 'operation'} (attempt ${attempt + 1}/${retryPolicy.maxAttempts})', 
-             LogLevel.debug);
-        
+        _log(
+            'Executing ${operationName ?? 'operation'} (attempt ${attempt + 1}/${retryPolicy.maxAttempts})',
+            LogLevel.debug);
+
         final result = await operation();
         return Success(result);
       } on WhisperKitError catch (e) {
         lastError = e;
-        
-        _log('Error on attempt ${attempt + 1}: ${e.message} (code: ${e.code})', 
-             LogLevel.warning);
-        
+
+        _log('Error on attempt ${attempt + 1}: ${e.message} (code: ${e.code})',
+            LogLevel.warning);
+
         // Check if error is retryable
         if (!retryPolicy.shouldRetry(e.code)) {
           _log('Error code ${e.code} is not retryable', LogLevel.info);
           return Failure(e);
         }
-        
+
         // Check if we have more attempts
         if (attempt + 1 >= retryPolicy.maxAttempts) {
           _log('Max retry attempts reached', LogLevel.error);
           return Failure(e);
         }
-        
+
         // Calculate and apply delay
         final delay = retryPolicy.getDelayForAttempt(attempt);
         _log('Waiting ${delay.inMilliseconds}ms before retry', LogLevel.debug);
         await Future.delayed(delay);
-        
+
         attempt++;
       } catch (e) {
         // Handle non-WhisperKitError exceptions
@@ -332,14 +336,15 @@ class RecoveryExecutor {
         return Failure(error);
       }
     }
-    
+
     // Should not reach here, but return last error if we do
-    return Failure(lastError ?? WhisperKitError(
-      code: ErrorCode.transcriptionFailed,
-      message: 'Operation failed after retries',
-    ));
+    return Failure(lastError ??
+        WhisperKitError(
+          code: ErrorCode.transcriptionFailed,
+          message: 'Operation failed after retries',
+        ));
   }
-  
+
   void _log(String message, LogLevel level) {
     logger?.call('[RecoveryExecutor] $message', level);
   }

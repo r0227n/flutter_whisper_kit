@@ -4,11 +4,14 @@ import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_p
 
 /// Mock implementation of [FlutterWhisperKitPlatform] for testing.
 class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
-  final StreamController<Progress> _progressController = StreamController<Progress>.broadcast();
-  final StreamController<TranscriptionResult> _transcriptionController = StreamController<TranscriptionResult>.broadcast();
+  final StreamController<Progress> _progressController =
+      StreamController<Progress>.broadcast();
+  final StreamController<TranscriptionResult> _transcriptionController =
+      StreamController<TranscriptionResult>.broadcast();
 
   StreamController<Progress> get progressController => _progressController;
-  StreamController<TranscriptionResult> get transcriptionController => _transcriptionController;
+  StreamController<TranscriptionResult> get transcriptionController =>
+      _transcriptionController;
   @override
   Future<String?> loadModel(
     String? variant, {
@@ -26,7 +29,7 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
         ));
       }
     });
-    
+
     Future.delayed(const Duration(milliseconds: 100), () {
       if (!_progressController.isClosed) {
         _progressController.add(Progress(
@@ -37,7 +40,7 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
         ));
       }
     });
-    
+
     return 'Model loaded';
   }
 
@@ -211,7 +214,7 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
         '''));
       }
     });
-    
+
     return 'Recording started';
   }
 
@@ -220,7 +223,8 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
       Future.value('Recording stopped');
 
   @override
-  Stream<TranscriptionResult> get transcriptionStream => _transcriptionController.stream;
+  Stream<TranscriptionResult> get transcriptionStream =>
+      _transcriptionController.stream;
 
   @override
   Future<List<String>> fetchAvailableModels({

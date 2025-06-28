@@ -257,13 +257,15 @@ void main() {
       expect(models, isA<List<String>>());
     });
 
-    test('throws InvalidArgumentsError for local IP address in modelRepo', () async {
+    test('throws InvalidArgumentsError for local IP address in modelRepo',
+        () async {
       // Arrange
       final flutterWhisperKit = FlutterWhisperKit();
 
       // Act & Assert
       expect(
-        () => flutterWhisperKit.fetchAvailableModels(modelRepo: 'http://127.0.0.1/models'),
+        () => flutterWhisperKit.fetchAvailableModels(
+            modelRepo: 'http://127.0.0.1/models'),
         throwsA(isA<InvalidArgumentsError>()),
       );
     });
@@ -274,7 +276,8 @@ void main() {
 
       // Act & Assert
       expect(
-        () => flutterWhisperKit.fetchAvailableModels(modelRepo: 'file:///etc/passwd'),
+        () => flutterWhisperKit.fetchAvailableModels(
+            modelRepo: 'file:///etc/passwd'),
         throwsA(isA<InvalidArgumentsError>()),
       );
     });

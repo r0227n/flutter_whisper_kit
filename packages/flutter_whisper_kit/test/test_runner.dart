@@ -3,7 +3,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 /// F.I.R.S.T. Principles Test Compliance Checker
-/// 
+///
 /// F - Fast: Tests should run quickly (< 0.1 seconds each)
 /// I - Independent: Tests don't depend on other tests
 /// R - Repeatable: Tests give same results every time

@@ -36,8 +36,9 @@ void main() {
               (error) => error.message == 'Model not found',
             ),
             predicate<ModelLoadingFailedError>(
-              (error) => error.details != null && 
-                         error.details['variant'] == 'invalid-model',
+              (error) =>
+                  error.details != null &&
+                  error.details['variant'] == 'invalid-model',
             ),
           )),
         );
@@ -114,7 +115,8 @@ void main() {
         // Arrange
         mockPlatform.setThrowError(
           PlatformException(
-            code: 'Domain=WhisperKitError Code=2300 "Language detection failed"',
+            code:
+                'Domain=WhisperKitError Code=2300 "Language detection failed"',
             message: 'Unable to detect language from audio',
           ),
         );
@@ -182,7 +184,8 @@ void main() {
         // Arrange
         mockPlatform.setThrowError(
           PlatformException(
-            code: 'Domain=WhisperKitError Code=4100 "Microphone permission denied"',
+            code:
+                'Domain=WhisperKitError Code=4100 "Microphone permission denied"',
             message: 'Microphone permission is required for recording',
           ),
         );
@@ -214,7 +217,8 @@ void main() {
         // Arrange
         mockPlatform.setThrowError(
           PlatformException(
-            code: 'Domain=WhisperKitError Code=4300 "Storage permission denied"',
+            code:
+                'Domain=WhisperKitError Code=4300 "Storage permission denied"',
             message: 'Permission denied to write model files',
           ),
         );
@@ -395,7 +399,8 @@ void main() {
           () => whisperKit.setupModels(),
           throwsA(allOf(
             isA<UnknownError>(),
-            predicate<UnknownError>((error) => error.message == 'Mystery error'),
+            predicate<UnknownError>(
+                (error) => error.message == 'Mystery error'),
           )),
         );
       });
@@ -476,7 +481,7 @@ void main() {
           'context': 'test context',
           'additionalInfo': ['info1', 'info2'],
         };
-        
+
         mockPlatform.setThrowError(
           PlatformException(
             code: 'Domain=WhisperKitError Code=2000 "Detailed error"',

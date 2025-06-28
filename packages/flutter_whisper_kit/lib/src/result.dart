@@ -41,7 +41,8 @@ sealed class Result<S, E extends Exception> {
   }
 
   /// Maps the failure exception to a new exception
-  Result<S, F> mapError<F extends Exception>(F Function(E exception) transform) {
+  Result<S, F> mapError<F extends Exception>(
+      F Function(E exception) transform) {
     return switch (this) {
       Success(:final value) => Success(value),
       Failure(:final exception) => Failure(transform(exception)),

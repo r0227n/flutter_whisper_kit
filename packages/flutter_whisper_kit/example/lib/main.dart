@@ -119,8 +119,8 @@ class _MyAppState extends State<MyApp> {
       (progress) {
         setState(() {
           _progressEventCount++;
-          _streamEvents.insert(0, 
-            'Progress: ${(progress.fractionCompleted * 100).toStringAsFixed(1)}% (Event #$_progressEventCount)');
+          _streamEvents.insert(0,
+              'Progress: ${(progress.fractionCompleted * 100).toStringAsFixed(1)}% (Event #$_progressEventCount)');
           if (_streamEvents.length > 10) {
             _streamEvents = _streamEvents.take(10).toList();
           }
@@ -133,15 +133,16 @@ class _MyAppState extends State<MyApp> {
       },
     );
 
-    _transcriptionSubscription = _flutterWhisperkitPlugin.transcriptionStream.listen(
+    _transcriptionSubscription =
+        _flutterWhisperkitPlugin.transcriptionStream.listen(
       (result) {
         setState(() {
           _transcriptionEventCount++;
-          final truncatedText = result.text.length > 30 
+          final truncatedText = result.text.length > 30
               ? '${result.text.substring(0, 30)}...'
               : result.text;
-          _streamEvents.insert(0, 
-            'Transcription: "$truncatedText" (Event #$_transcriptionEventCount)');
+          _streamEvents.insert(0,
+              'Transcription: "$truncatedText" (Event #$_transcriptionEventCount)');
           if (_streamEvents.length > 10) {
             _streamEvents = _streamEvents.take(10).toList();
           }
@@ -259,7 +260,6 @@ class _MyAppState extends State<MyApp> {
         await _flutterWhisperkitPlugin.startRecording(options: options);
         _transcriptionSubscription =
             _flutterWhisperkitPlugin.transcriptionStream.listen((result) {
-  
           setState(() {
             _transcriptionText = result.text;
             // Only add segments that don't already exist in the result
@@ -520,7 +520,8 @@ class _MyAppState extends State<MyApp> {
         repo: 'argmaxinc/whisperkit-coreml',
         onProgress: (progress) {
           setState(() {
-            _downloadResult = 'Downloading: ${(progress.fractionCompleted * 100).toStringAsFixed(1)}%';
+            _downloadResult =
+                'Downloading: ${(progress.fractionCompleted * 100).toStringAsFixed(1)}%';
           });
         },
       );
@@ -655,7 +656,8 @@ class _MyAppState extends State<MyApp> {
       },
       failure: (error) {
         setState(() {
-          _resultApiTest += '❌ loadModelWithResult FAILED: ${error.message}\n\n';
+          _resultApiTest +=
+              '❌ loadModelWithResult FAILED: ${error.message}\n\n';
         });
       },
     );
@@ -671,22 +673,26 @@ class _MyAppState extends State<MyApp> {
           );
 
       if (filePath != null) {
-        final detectResult = await _flutterWhisperkitPlugin.detectLanguageWithResult(filePath);
+        final detectResult =
+            await _flutterWhisperkitPlugin.detectLanguageWithResult(filePath);
         detectResult.when(
           success: (result) {
             setState(() {
-              _resultApiTest += '✅ detectLanguageWithResult SUCCESS: ${result?.language}\n\n';
+              _resultApiTest +=
+                  '✅ detectLanguageWithResult SUCCESS: ${result?.language}\n\n';
             });
           },
           failure: (error) {
             setState(() {
-              _resultApiTest += '❌ detectLanguageWithResult FAILED: ${error.message}\n\n';
+              _resultApiTest +=
+                  '❌ detectLanguageWithResult FAILED: ${error.message}\n\n';
             });
           },
         );
       } else {
         setState(() {
-          _resultApiTest += '⚠️ detectLanguageWithResult SKIPPED: No file selected\n\n';
+          _resultApiTest +=
+              '⚠️ detectLanguageWithResult SKIPPED: No file selected\n\n';
         });
       }
 
@@ -696,22 +702,26 @@ class _MyAppState extends State<MyApp> {
       });
 
       if (filePath != null) {
-        final transcribeResult = await _flutterWhisperkitPlugin.transcribeFileWithResult(filePath);
+        final transcribeResult =
+            await _flutterWhisperkitPlugin.transcribeFileWithResult(filePath);
         transcribeResult.when(
           success: (result) {
             setState(() {
-              _resultApiTest += '✅ transcribeFileWithResult SUCCESS: "${result?.text.substring(0, 50)}..."\n\n';
+              _resultApiTest +=
+                  '✅ transcribeFileWithResult SUCCESS: "${result?.text.substring(0, 50)}..."\n\n';
             });
           },
           failure: (error) {
             setState(() {
-              _resultApiTest += '❌ transcribeFileWithResult FAILED: ${error.message}\n\n';
+              _resultApiTest +=
+                  '❌ transcribeFileWithResult FAILED: ${error.message}\n\n';
             });
           },
         );
       } else {
         setState(() {
-          _resultApiTest += '⚠️ transcribeFileWithResult SKIPPED: No file selected\n\n';
+          _resultApiTest +=
+              '⚠️ transcribeFileWithResult SKIPPED: No file selected\n\n';
         });
       }
     } catch (e) {
@@ -975,11 +985,13 @@ class AdditionalModelManagementSection extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: isDownloadingModel ? null : onDownloadModelPressed,
-              child: Text(isDownloadingModel ? 'Downloading...' : 'Download Model'),
+              child: Text(
+                  isDownloadingModel ? 'Downloading...' : 'Download Model'),
             ),
             ElevatedButton(
               onPressed: isPrewarmingModels ? null : onPrewarmModelsPressed,
-              child: Text(isPrewarmingModels ? 'Prewarming...' : 'Prewarm Models'),
+              child:
+                  Text(isPrewarmingModels ? 'Prewarming...' : 'Prewarm Models'),
             ),
             ElevatedButton(
               onPressed: isUnloadingModels ? null : onUnloadModelsPressed,
@@ -1004,7 +1016,8 @@ class AdditionalModelManagementSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (setupModelsResult.isNotEmpty) Text('Setup: $setupModelsResult'),
+              if (setupModelsResult.isNotEmpty)
+                Text('Setup: $setupModelsResult'),
               if (downloadResult.isNotEmpty) Text('Download: $downloadResult'),
               if (prewarmResult.isNotEmpty) Text('Prewarm: $prewarmResult'),
               if (unloadResult.isNotEmpty) Text('Unload: $unloadResult'),
@@ -1016,7 +1029,8 @@ class AdditionalModelManagementSection extends StatelessWidget {
                   unloadResult.isEmpty &&
                   clearStateResult.isEmpty &&
                   loggingResult.isEmpty)
-                const Text('Press buttons above to test additional model management functions'),
+                const Text(
+                    'Press buttons above to test additional model management functions'),
             ],
           ),
         ),
@@ -1112,7 +1126,8 @@ class StreamMonitoringSection extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Text(
                       streamEvents[index],
-                      style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                      style: const TextStyle(
+                          fontSize: 12, fontFamily: 'monospace'),
                     );
                   },
                 ),

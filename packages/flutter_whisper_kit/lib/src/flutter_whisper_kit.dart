@@ -21,6 +21,7 @@ class FlutterWhisperKit {
   int _getErrorCodeFromType(WhisperKitErrorType error) {
     return error.errorCode; // Now preserve the original error code
   }
+
   /// Helper function to handle platform calls with error handling
   Future<T> _handlePlatformCall<T>(Future<T> Function() platformCall) async {
     try {
@@ -553,7 +554,7 @@ class FlutterWhisperKit {
         redownload: redownload,
         onProgress: onProgress,
       );
-      
+
       if (modelPath == null) {
         return Failure(
           WhisperKitError(
@@ -562,7 +563,7 @@ class FlutterWhisperKit {
           ),
         );
       }
-      
+
       return Success(modelPath);
     } on WhisperKitError catch (e) {
       return Failure(e);
@@ -598,7 +599,8 @@ class FlutterWhisperKit {
   /// Returns a [Result] containing either:
   /// - Success: A [TranscriptionResult] with the transcribed text
   /// - Failure: A [WhisperKitError] describing what went wrong
-  Future<Result<TranscriptionResult?, WhisperKitError>> transcribeFileWithResult(
+  Future<Result<TranscriptionResult?, WhisperKitError>>
+      transcribeFileWithResult(
     String path, {
     DecodingOptions? options,
     Function(Progress progress)? onProgress,
@@ -635,7 +637,8 @@ class FlutterWhisperKit {
   /// Returns a [Result] containing either:
   /// - Success: A [LanguageDetectionResult] with detected language info
   /// - Failure: A [WhisperKitError] describing what went wrong
-  Future<Result<LanguageDetectionResult?, WhisperKitError>> detectLanguageWithResult(
+  Future<Result<LanguageDetectionResult?, WhisperKitError>>
+      detectLanguageWithResult(
     String audioPath,
   ) async {
     try {

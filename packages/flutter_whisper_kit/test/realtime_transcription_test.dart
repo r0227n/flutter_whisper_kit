@@ -63,20 +63,20 @@ void main() {
           fullPipeline: 0.5,
         ),
       );
-      
+
       // Act
       final stream = platform.transcriptionStream;
-      
+
       // Use a completer to properly handle the expectation
       final completer = Completer<void>();
-      
+
       // Listen to the stream
       stream.listen((result) {
         if (result.text == 'Test transcription' && result.language == 'en') {
           completer.complete();
         }
       });
-      
+
       // Emit test data after setting up the listener
       Future.microtask(() {
         platform.transcriptionController.add(expectedResult);

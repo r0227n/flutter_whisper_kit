@@ -15,7 +15,9 @@ void main() {
     });
 
     tearDown(() {
-      (platform as MockFlutterWhisperkitPlatform).transcriptionController.close();
+      (platform as MockFlutterWhisperkitPlatform)
+          .transcriptionController
+          .close();
       (platform as MockFlutterWhisperkitPlatform).progressController.close();
     });
 
@@ -61,7 +63,7 @@ void main() {
 
         expect(result?.text, 'Hello world. This is a test.');
         expect(result?.segments, hasLength(2));
-        
+
         // Check word timestamps in segments
         final segment1 = result!.segments[0];
         expect(segment1.words, hasLength(2));
@@ -141,7 +143,8 @@ void main() {
         expect(options.detectLanguage, false);
         expect(options.wordTimestamps, false);
         expect(options.withoutTimestamps, false);
-        expect(options.chunkingStrategy, ChunkingStrategy.vad); // Default is vad
+        expect(
+            options.chunkingStrategy, ChunkingStrategy.vad); // Default is vad
       });
 
       test('creates correct options object with custom values', () {
@@ -209,7 +212,8 @@ void main() {
       });
 
       test('creates options with various temperature values', () {
-        expect(() => DecodingOptions(temperature: -0.1), returnsNormally); // No validation in current implementation
+        expect(() => DecodingOptions(temperature: -0.1),
+            returnsNormally); // No validation in current implementation
         expect(() => DecodingOptions(temperature: 1.1), returnsNormally);
         expect(() => DecodingOptions(temperature: 0.0), returnsNormally);
         expect(() => DecodingOptions(temperature: 1.0), returnsNormally);
@@ -217,22 +221,32 @@ void main() {
       });
 
       test('validates temperature fallback settings', () {
-        expect(() => DecodingOptions(temperatureFallbackCount: -1), returnsNormally); // No validation in current implementation
-        expect(() => DecodingOptions(temperatureIncrementOnFallback: 0.1), returnsNormally);
-        expect(() => DecodingOptions(temperatureIncrementOnFallback: 0.5), returnsNormally);
+        expect(() => DecodingOptions(temperatureFallbackCount: -1),
+            returnsNormally); // No validation in current implementation
+        expect(() => DecodingOptions(temperatureIncrementOnFallback: 0.1),
+            returnsNormally);
+        expect(() => DecodingOptions(temperatureIncrementOnFallback: 0.5),
+            returnsNormally);
       });
 
       test('creates options with various worker counts', () {
-        expect(() => DecodingOptions(concurrentWorkerCount: 0), returnsNormally); // No validation in current implementation
-        expect(() => DecodingOptions(concurrentWorkerCount: -1), returnsNormally);
-        expect(() => DecodingOptions(concurrentWorkerCount: 1), returnsNormally);
-        expect(() => DecodingOptions(concurrentWorkerCount: 8), returnsNormally);
+        expect(() => DecodingOptions(concurrentWorkerCount: 0),
+            returnsNormally); // No validation in current implementation
+        expect(
+            () => DecodingOptions(concurrentWorkerCount: -1), returnsNormally);
+        expect(
+            () => DecodingOptions(concurrentWorkerCount: 1), returnsNormally);
+        expect(
+            () => DecodingOptions(concurrentWorkerCount: 8), returnsNormally);
       });
 
       test('validates compression ratio threshold', () {
-        expect(() => DecodingOptions(compressionRatioThreshold: 0.9), returnsNormally);
-        expect(() => DecodingOptions(compressionRatioThreshold: 1.0), returnsNormally);
-        expect(() => DecodingOptions(compressionRatioThreshold: 2.4), returnsNormally);
+        expect(() => DecodingOptions(compressionRatioThreshold: 0.9),
+            returnsNormally);
+        expect(() => DecodingOptions(compressionRatioThreshold: 1.0),
+            returnsNormally);
+        expect(() => DecodingOptions(compressionRatioThreshold: 2.4),
+            returnsNormally);
       });
 
       test('creates options with various timestamp configurations', () {

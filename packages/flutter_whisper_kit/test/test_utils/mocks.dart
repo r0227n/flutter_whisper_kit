@@ -9,29 +9,30 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperKitPlatform {
-  
   /// Exception to throw for testing error handling
   Exception? _throwError;
-  
+
   /// Stream controllers for testing
   final StreamController<Progress> _progressController;
   final StreamController<TranscriptionResult> _transcriptionController;
 
-  MockFlutterWhisperkitPlatform() 
+  MockFlutterWhisperkitPlatform()
       : _progressController = StreamController<Progress>.broadcast(),
-        _transcriptionController = StreamController<TranscriptionResult>.broadcast();
+        _transcriptionController =
+            StreamController<TranscriptionResult>.broadcast();
 
   /// Stream controller getter for testing
   StreamController<Progress> get progressController => _progressController;
-  
+
   /// Stream controller getter for testing
-  StreamController<TranscriptionResult> get transcriptionController => _transcriptionController;
-  
+  StreamController<TranscriptionResult> get transcriptionController =>
+      _transcriptionController;
+
   /// Set an error to throw for testing error handling
   void setThrowError(Exception? error) {
     _throwError = error;
   }
-  
+
   /// Emit progress updates for testing
   void emitProgressUpdates() {
     Future.delayed(const Duration(milliseconds: 10), () {
@@ -56,7 +57,7 @@ class MockFlutterWhisperkitPlatform
       ));
     });
   }
-  
+
   /// Check if an error should be thrown
   void _checkThrowError() {
     if (_throwError != null) {
@@ -65,6 +66,7 @@ class MockFlutterWhisperkitPlatform
       throw error;
     }
   }
+
   @override
   Future<String> deviceName() {
     _checkThrowError();
@@ -77,7 +79,11 @@ class MockFlutterWhisperkitPlatform
     return Future.value(
       ModelSupport(
         defaultModel: 'openai_whisper-base',
-        supported: ['openai_whisper-tiny', 'openai_whisper-base', 'openai_whisper-small'],
+        supported: [
+          'openai_whisper-tiny',
+          'openai_whisper-base',
+          'openai_whisper-small'
+        ],
         disabled: [],
       ),
     );
@@ -135,9 +141,10 @@ class MockFlutterWhisperkitPlatform
     ),
   }) {
     _checkThrowError();
-    
+
     if (filePath.isEmpty || filePath.contains('../')) {
-      throw InvalidArgumentsError(message: 'File path cannot be empty', errorCode: 5003);
+      throw InvalidArgumentsError(
+          message: 'File path cannot be empty', errorCode: 5003);
     }
 
     // Mock JSON response for a successful transcription
@@ -218,7 +225,8 @@ class MockFlutterWhisperkitPlatform
   }
 
   @override
-  Stream<TranscriptionResult> get transcriptionStream => _transcriptionController.stream;
+  Stream<TranscriptionResult> get transcriptionStream =>
+      _transcriptionController.stream;
 
   @override
   Stream<Progress> get modelProgressStream => _progressController.stream;
@@ -230,8 +238,10 @@ class MockFlutterWhisperkitPlatform
     String? token,
   }) {
     _checkThrowError();
-    if (modelRepo.startsWith('http://127.0.0.1') || modelRepo.startsWith('file://')) {
-      throw InvalidArgumentsError(message: 'Invalid modelRepo', errorCode: 5002);
+    if (modelRepo.startsWith('http://127.0.0.1') ||
+        modelRepo.startsWith('file://')) {
+      throw InvalidArgumentsError(
+          message: 'Invalid modelRepo', errorCode: 5002);
     }
     return Future.value([
       'tiny',

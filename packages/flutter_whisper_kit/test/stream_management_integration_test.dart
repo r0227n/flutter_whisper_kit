@@ -26,7 +26,7 @@ void main() {
         // Arrange
         final transcriptionResults = <TranscriptionResult>[];
         final completer = Completer<void>();
-        
+
         // Act
         final subscription = whisperKit.transcriptionStream.listen(
           (result) {
@@ -39,7 +39,7 @@ void main() {
 
         // Start recording
         await whisperKit.startRecording();
-        
+
         // Simulate transcription results
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 100));
@@ -71,7 +71,7 @@ void main() {
         // Arrange
         final errors = <dynamic>[];
         final results = <TranscriptionResult>[];
-        
+
         // Act
         final subscription = whisperKit.transcriptionStream.listen(
           (result) => results.add(result),
@@ -80,7 +80,7 @@ void main() {
 
         // Start recording
         await whisperKit.startRecording();
-        
+
         // Simulate error scenario
         // Mock platform would emit an error here
 
@@ -100,12 +100,12 @@ void main() {
         // Arrange
         final listener1Results = <TranscriptionResult>[];
         final listener2Results = <TranscriptionResult>[];
-        
+
         // Act
         final subscription1 = whisperKit.transcriptionStream.listen(
           (result) => listener1Results.add(result),
         );
-        
+
         final subscription2 = whisperKit.transcriptionStream.listen(
           (result) => listener2Results.add(result),
         );
@@ -125,14 +125,14 @@ void main() {
       test('should handle rapid start/stop cycles', () async {
         // Arrange
         final results = <String>[];
-        
+
         // Act
         for (int i = 0; i < 5; i++) {
           final result = await whisperKit.startRecording();
           if (result != null) results.add(result);
-          
+
           await Future.delayed(Duration(milliseconds: 50));
-          
+
           final stopResult = await whisperKit.stopRecording();
           if (stopResult != null) results.add(stopResult);
         }
@@ -147,7 +147,7 @@ void main() {
         // Arrange
         final progressUpdates = <Progress>[];
         final completer = Completer<void>();
-        
+
         // Act
         final subscription = whisperKit.modelProgressStream.listen(
           (progress) {
@@ -160,16 +160,16 @@ void main() {
 
         // Load model with progress tracking
         final loadFuture = whisperKit.loadModel('tiny');
-        
+
         // Emit progress updates
         mockPlatform.emitProgressUpdates();
-        
+
         // Wait for completion
         await Future.any([
           completer.future,
           Future.delayed(Duration(seconds: 2)),
         ]);
-        
+
         await loadFuture;
 
         // Cleanup
@@ -183,19 +183,19 @@ void main() {
       test('should handle progress stream with Result API', () async {
         // Arrange
         final progressUpdates = <Progress>[];
-        
+
         // Act
         final resultFuture = whisperKit.loadModelWithResult(
           'tiny',
           onProgress: (progress) => progressUpdates.add(progress),
         );
-        
+
         // Emit progress updates
         mockPlatform.emitProgressUpdates();
-        
+
         // Wait a bit for progress events to be processed
         await Future.delayed(Duration(milliseconds: 100));
-        
+
         final result = await resultFuture;
 
         // Assert
@@ -209,10 +209,10 @@ void main() {
         mockPlatform.setThrowError(
           ModelLoadingFailedError(message: 'Model not found', errorCode: 1001),
         );
-        
+
         final progressUpdates = <Progress>[];
         final errors = <dynamic>[];
-        
+
         // Act
         final subscription = whisperKit.modelProgressStream.listen(
           (progress) => progressUpdates.add(progress),
@@ -238,7 +238,7 @@ void main() {
         // Arrange
         final slowResults = <TranscriptionResult>[];
         final fastResults = <TranscriptionResult>[];
-        
+
         // Act
         // Slow consumer with processing delay
         final slowSubscription = whisperKit.transcriptionStream.listen(
@@ -254,7 +254,7 @@ void main() {
         );
 
         await whisperKit.startRecording();
-        
+
         // Simulate rapid transcription events
         for (int i = 0; i < 10; i++) {
           await Future.delayed(Duration(milliseconds: 50));
@@ -268,7 +268,7 @@ void main() {
             ),
           ));
         }
-        
+
         await whisperKit.stopRecording();
 
         // Wait for slow consumer to catch up
@@ -286,14 +286,14 @@ void main() {
         // Arrange
         final results = <TranscriptionResult>[];
         late StreamSubscription<TranscriptionResult> subscription;
-        
+
         // Act
         subscription = whisperKit.transcriptionStream.listen(
           (result) => results.add(result),
         );
 
         await whisperKit.startRecording();
-        
+
         // Emit some results before pause
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 50));
@@ -307,11 +307,11 @@ void main() {
             ),
           ));
         }
-        
+
         // Pause stream
         subscription.pause();
         final countAfterPause = results.length;
-        
+
         // Try to emit while paused
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 50));
@@ -325,10 +325,10 @@ void main() {
             ),
           ));
         }
-        
+
         // Resume stream
         subscription.resume();
-        
+
         // Emit after resume
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 50));
@@ -342,7 +342,7 @@ void main() {
             ),
           ));
         }
-        
+
         await whisperKit.stopRecording();
 
         // Cleanup
@@ -357,7 +357,7 @@ void main() {
       test('should clean up resources on dispose', () async {
         // Arrange
         final subscriptions = <StreamSubscription>[];
-        
+
         // Act
         for (int i = 0; i < 10; i++) {
           subscriptions.add(
@@ -381,7 +381,7 @@ void main() {
       test('should handle stream transformations', () async {
         // Arrange
         final transformedResults = <String>[];
-        
+
         // Act
         final subscription = whisperKit.transcriptionStream
             .map((result) => result.text)
@@ -390,7 +390,7 @@ void main() {
             .listen((text) => transformedResults.add(text));
 
         await whisperKit.startRecording();
-        
+
         // Emit some transcription results
         for (int i = 0; i < 5; i++) {
           await Future.delayed(Duration(milliseconds: 100));
@@ -404,7 +404,7 @@ void main() {
             ),
           ));
         }
-        
+
         await whisperKit.stopRecording();
 
         // Cleanup
@@ -412,7 +412,8 @@ void main() {
 
         // Assert
         expect(transformedResults, everyElement(isNotEmpty));
-        expect(transformedResults.toSet().length, equals(transformedResults.length));
+        expect(transformedResults.toSet().length,
+            equals(transformedResults.length));
       });
     });
 
@@ -423,16 +424,16 @@ void main() {
           retryPolicy: RetryPolicy(maxAttempts: 3),
         );
         final results = <TranscriptionResult>[];
-        
+
         // Act
         final result = await executor.executeWithRetry(
           () async {
             final subscription = whisperKit.transcriptionStream
                 .timeout(Duration(seconds: 1))
                 .listen((result) => results.add(result));
-            
+
             await whisperKit.startRecording();
-            
+
             // Emit some transcription results
             for (int i = 0; i < 3; i++) {
               await Future.delayed(Duration(milliseconds: 50));
@@ -446,9 +447,9 @@ void main() {
                 ),
               ));
             }
-            
+
             await whisperKit.stopRecording();
-            
+
             await subscription.cancel();
             return Success<bool, WhisperKitError>(true);
           },
@@ -462,17 +463,19 @@ void main() {
       test('should handle stream errors with Result pattern', () async {
         // Arrange
         final streamResults = <Result<TranscriptionResult, WhisperKitError>>[];
-        
+
         // Act
         final subscription = whisperKit.transcriptionStream
-            .map((result) => Success<TranscriptionResult, WhisperKitError>(result))
-            .handleError((error) => Failure<TranscriptionResult, WhisperKitError>(
-                  WhisperKitError(code: 2001, message: error.toString()),
-                ))
+            .map((result) =>
+                Success<TranscriptionResult, WhisperKitError>(result))
+            .handleError(
+                (error) => Failure<TranscriptionResult, WhisperKitError>(
+                      WhisperKitError(code: 2001, message: error.toString()),
+                    ))
             .listen((result) => streamResults.add(result));
 
         await whisperKit.startRecording();
-        
+
         // Emit some transcription results
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 50));
@@ -486,7 +489,7 @@ void main() {
             ),
           ));
         }
-        
+
         await whisperKit.stopRecording();
 
         // Cleanup

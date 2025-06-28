@@ -100,8 +100,10 @@ void main() {
         await expectLater(
           stream,
           emitsInOrder([
-            isA<Progress>().having((p) => p.fractionCompleted, 'fractionCompleted', 0.5),
-            isA<Progress>().having((p) => p.fractionCompleted, 'fractionCompleted', 1.0),
+            isA<Progress>()
+                .having((p) => p.fractionCompleted, 'fractionCompleted', 0.5),
+            isA<Progress>()
+                .having((p) => p.fractionCompleted, 'fractionCompleted', 1.0),
           ]),
         );
         await loadFuture;
@@ -119,10 +121,10 @@ void main() {
           'tiny',
           onProgress: (_) {},
         );
-        
+
         // Emit progress updates to trigger the listener
         mockPlatform.emitProgressUpdates();
-        
+
         await loadFuture;
 
         // Give time for cleanup
@@ -195,7 +197,8 @@ void main() {
         // Arrange
         mockPlatform.setThrowError(
           PlatformException(
-            code: 'Domain=WhisperKitError Code=2100 "Language detection failed"',
+            code:
+                'Domain=WhisperKitError Code=2100 "Language detection failed"',
           ),
         );
 
@@ -216,7 +219,8 @@ void main() {
         final formatted = await whisperKit.formatModelFiles(modelFiles);
 
         // Assert
-        expect(formatted, ['formatted_model1.mlmodel', 'formatted_model2.mlmodel']);
+        expect(formatted,
+            ['formatted_model1.mlmodel', 'formatted_model2.mlmodel']);
       });
     });
 
@@ -294,8 +298,10 @@ void main() {
         await expectLater(
           stream,
           emitsInOrder([
-            isA<Progress>().having((p) => p.fractionCompleted, 'fractionCompleted', 0.5),
-            isA<Progress>().having((p) => p.fractionCompleted, 'fractionCompleted', 1.0),
+            isA<Progress>()
+                .having((p) => p.fractionCompleted, 'fractionCompleted', 0.5),
+            isA<Progress>()
+                .having((p) => p.fractionCompleted, 'fractionCompleted', 1.0),
           ]),
         );
         await downloadFuture;

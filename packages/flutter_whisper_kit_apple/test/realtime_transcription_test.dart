@@ -15,17 +15,21 @@ void main() {
     });
 
     tearDown(() {
-      (platform as MockFlutterWhisperkitPlatform).transcriptionController.close();
+      (platform as MockFlutterWhisperkitPlatform)
+          .transcriptionController
+          .close();
       (platform as MockFlutterWhisperkitPlatform).progressController.close();
     });
 
-    test('startRecording initiates audio recording with default options', () async {
+    test('startRecording initiates audio recording with default options',
+        () async {
       final result = await platform.startRecording();
-      
+
       expect(result, equals('Recording started'));
     });
 
-    test('startRecording initiates audio recording with custom options', () async {
+    test('startRecording initiates audio recording with custom options',
+        () async {
       final options = DecodingOptions(
         language: 'en',
         temperature: 0.5,
@@ -34,19 +38,21 @@ void main() {
         chunkingStrategy: ChunkingStrategy.vad,
       );
 
-      final result = await platform.startRecording(options: options, loop: true);
+      final result =
+          await platform.startRecording(options: options, loop: true);
 
       expect(result, equals('Recording started'));
     });
 
     test('stopRecording ends audio recording', () async {
       final result = await platform.stopRecording();
-      
+
       expect(result, equals('Recording stopped'));
     });
 
     test('transcriptionStream emits transcription results', () async {
-      await platform.startRecording(); // This will trigger emission of test data
+      await platform
+          .startRecording(); // This will trigger emission of test data
       final stream = platform.transcriptionStream;
       final results = await stream.take(1).toList();
 
@@ -66,7 +72,7 @@ void main() {
 
     test('startRecording handles microphone permissions', () async {
       final result = await platform.startRecording();
-      
+
       expect(result, equals('Recording started'));
     });
 
@@ -96,7 +102,8 @@ void main() {
     });
 
     test('transcription stream with word timestamps', () async {
-      await platform.startRecording(); // This will trigger emission of test data
+      await platform
+          .startRecording(); // This will trigger emission of test data
       final stream = platform.transcriptionStream;
       final results = await stream.take(1).toList();
 
@@ -108,9 +115,10 @@ void main() {
 
     test('real-time transcription with language detection', () async {
       final options = DecodingOptions(detectLanguage: true);
-      
+
       await platform.startRecording(options: options);
-      final transcriptions = await platform.transcriptionStream.take(1).toList();
+      final transcriptions =
+          await platform.transcriptionStream.take(1).toList();
 
       expect(transcriptions, hasLength(1));
       expect(transcriptions[0].text, equals('Test transcription'));
