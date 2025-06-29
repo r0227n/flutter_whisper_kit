@@ -7,15 +7,6 @@ class ModelSupport {
     required this.disabled,
   });
 
-  /// List of model variants supported by the device.
-  final String defaultModel;
-
-  /// The default model variant recommended for the device.
-  final List<String> supported;
-
-  /// List of model variants that are explicitly disabled for the device.
-  final List<String> disabled;
-
   /// Creates a [ModelSupport] from a JSON map.
   factory ModelSupport.fromJson(Map<String, dynamic> json) {
     return ModelSupport(
@@ -26,6 +17,15 @@ class ModelSupport {
           (json['disabled'] as List?)?.map((e) => e as String).toList() ?? [],
     );
   }
+
+  /// List of model variants supported by the device.
+  final String defaultModel;
+
+  /// The default model variant recommended for the device.
+  final List<String> supported;
+
+  /// List of model variants that are explicitly disabled for the device.
+  final List<String> disabled;
 
   /// Converts this [ModelSupport] to a JSON map.
   Map<String, dynamic> toJson() {

@@ -1,8 +1,8 @@
-import '../models.dart';
-import '../whisper_kit_error.dart';
-import 'model_management_service.dart';
-import 'recording_service.dart';
-import 'transcription_service.dart';
+import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/src/services/model_management_service.dart';
+import 'package:flutter_whisper_kit/src/services/recording_service.dart';
+import 'package:flutter_whisper_kit/src/services/transcription_service.dart';
+import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 
 /// Service class for Result-based API methods.
 ///
@@ -10,10 +10,6 @@ import 'transcription_service.dart';
 /// offering better error handling and more explicit success/failure states
 /// instead of throwing exceptions.
 class ResultApiService {
-  final ModelManagementService _modelService;
-  final RecordingService _recordingService;
-  final TranscriptionService _transcriptionService;
-
   ResultApiService({
     required ModelManagementService modelService,
     required RecordingService recordingService,
@@ -21,6 +17,9 @@ class ResultApiService {
   })  : _modelService = modelService,
         _recordingService = recordingService,
         _transcriptionService = transcriptionService;
+  final ModelManagementService _modelService;
+  final RecordingService _recordingService;
+  final TranscriptionService _transcriptionService;
 
   /// Loads a WhisperKit model using the Result pattern.
   ///

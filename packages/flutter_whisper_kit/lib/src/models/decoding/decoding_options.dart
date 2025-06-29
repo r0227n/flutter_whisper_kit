@@ -35,6 +35,59 @@ class DecodingOptions {
     this.chunkingStrategy = ChunkingStrategy.vad,
   });
 
+  /// Creates a [DecodingOptions] from a JSON map.
+  factory DecodingOptions.fromJson(Map<String, dynamic> json) {
+    return DecodingOptions(
+      verbose: json['verbose'] as bool? ?? false,
+      task: json['task'] == 'translate'
+          ? DecodingTask.translate
+          : DecodingTask.transcribe,
+      language: json['language'] as String?,
+      temperature: json['temperature'] != null
+          ? (json['temperature'] as num).toDouble()
+          : 0.0,
+      temperatureIncrementOnFallback:
+          json['temperatureIncrementOnFallback'] != null
+              ? (json['temperatureIncrementOnFallback'] as num).toDouble()
+              : 0.2,
+      temperatureFallbackCount: json['temperatureFallbackCount'] as int? ?? 5,
+      sampleLength: json['sampleLength'] as int? ?? 224,
+      topK: json['topK'] as int? ?? 5,
+      usePrefillPrompt: json['usePrefillPrompt'] as bool? ?? false,
+      usePrefillCache: json['usePrefillCache'] as bool? ?? false,
+      detectLanguage: json['detectLanguage'] as bool? ?? false,
+      skipSpecialTokens: json['skipSpecialTokens'] as bool? ?? false,
+      withoutTimestamps: json['withoutTimestamps'] as bool? ?? false,
+      wordTimestamps: json['wordTimestamps'] as bool? ?? false,
+      maxInitialTimestamp: json['maxInitialTimestamp'] != null
+          ? (json['maxInitialTimestamp'] as num).toDouble()
+          : 1.0,
+      clipTimestamps:
+          (json['clipTimestamps'] as List<dynamic>?)?.cast<double>() ?? [],
+      promptTokens: (json['promptTokens'] as List<dynamic>?)?.cast<int>() ?? [],
+      prefixTokens: (json['prefixTokens'] as List<dynamic>?)?.cast<int>() ?? [],
+      suppressBlank: json['suppressBlank'] as bool? ?? false,
+      supressTokens:
+          (json['supressTokens'] as List<dynamic>?)?.cast<int>() ?? [],
+      compressionRatioThreshold: json['compressionRatioThreshold'] != null
+          ? (json['compressionRatioThreshold'] as num).toDouble()
+          : null,
+      logProbThreshold: json['logProbThreshold'] != null
+          ? (json['logProbThreshold'] as num).toDouble()
+          : null,
+      firstTokenLogProbThreshold: json['firstTokenLogProbThreshold'] != null
+          ? (json['firstTokenLogProbThreshold'] as num).toDouble()
+          : null,
+      noSpeechThreshold: json['noSpeechThreshold'] != null
+          ? (json['noSpeechThreshold'] as num).toDouble()
+          : null,
+      concurrentWorkerCount: json['concurrentWorkerCount'] as int? ?? 4,
+      chunkingStrategy: json['chunkingStrategy'] == 'vad'
+          ? ChunkingStrategy.vad
+          : ChunkingStrategy.none,
+    );
+  }
+
   /// Whether to print verbose output.
   final bool verbose;
 
@@ -112,59 +165,6 @@ class DecodingOptions {
 
   /// The chunking strategy.
   final ChunkingStrategy? chunkingStrategy;
-
-  /// Creates a [DecodingOptions] from a JSON map.
-  factory DecodingOptions.fromJson(Map<String, dynamic> json) {
-    return DecodingOptions(
-      verbose: json['verbose'] as bool? ?? false,
-      task: json['task'] == 'translate'
-          ? DecodingTask.translate
-          : DecodingTask.transcribe,
-      language: json['language'] as String?,
-      temperature: json['temperature'] != null
-          ? (json['temperature'] as num).toDouble()
-          : 0.0,
-      temperatureIncrementOnFallback:
-          json['temperatureIncrementOnFallback'] != null
-              ? (json['temperatureIncrementOnFallback'] as num).toDouble()
-              : 0.2,
-      temperatureFallbackCount: json['temperatureFallbackCount'] as int? ?? 5,
-      sampleLength: json['sampleLength'] as int? ?? 224,
-      topK: json['topK'] as int? ?? 5,
-      usePrefillPrompt: json['usePrefillPrompt'] as bool? ?? false,
-      usePrefillCache: json['usePrefillCache'] as bool? ?? false,
-      detectLanguage: json['detectLanguage'] as bool? ?? false,
-      skipSpecialTokens: json['skipSpecialTokens'] as bool? ?? false,
-      withoutTimestamps: json['withoutTimestamps'] as bool? ?? false,
-      wordTimestamps: json['wordTimestamps'] as bool? ?? false,
-      maxInitialTimestamp: json['maxInitialTimestamp'] != null
-          ? (json['maxInitialTimestamp'] as num).toDouble()
-          : 1.0,
-      clipTimestamps:
-          (json['clipTimestamps'] as List<dynamic>?)?.cast<double>() ?? [],
-      promptTokens: (json['promptTokens'] as List<dynamic>?)?.cast<int>() ?? [],
-      prefixTokens: (json['prefixTokens'] as List<dynamic>?)?.cast<int>() ?? [],
-      suppressBlank: json['suppressBlank'] as bool? ?? false,
-      supressTokens:
-          (json['supressTokens'] as List<dynamic>?)?.cast<int>() ?? [],
-      compressionRatioThreshold: json['compressionRatioThreshold'] != null
-          ? (json['compressionRatioThreshold'] as num).toDouble()
-          : null,
-      logProbThreshold: json['logProbThreshold'] != null
-          ? (json['logProbThreshold'] as num).toDouble()
-          : null,
-      firstTokenLogProbThreshold: json['firstTokenLogProbThreshold'] != null
-          ? (json['firstTokenLogProbThreshold'] as num).toDouble()
-          : null,
-      noSpeechThreshold: json['noSpeechThreshold'] != null
-          ? (json['noSpeechThreshold'] as num).toDouble()
-          : null,
-      concurrentWorkerCount: json['concurrentWorkerCount'] as int? ?? 4,
-      chunkingStrategy: json['chunkingStrategy'] == 'vad'
-          ? ChunkingStrategy.vad
-          : ChunkingStrategy.none,
-    );
-  }
 
   /// Converts this [DecodingOptions] to a JSON map.
   Map<String, dynamic> toJson() {

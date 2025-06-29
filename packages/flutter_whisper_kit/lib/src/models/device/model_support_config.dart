@@ -1,5 +1,5 @@
-import 'model_support.dart';
-import 'device_support.dart';
+import 'package:flutter_whisper_kit/src/models/device/device_support.dart';
+import 'package:flutter_whisper_kit/src/models/device/model_support.dart';
 
 /// Represents the model support configuration for WhisperKit.
 class ModelSupportConfig {
@@ -11,21 +11,6 @@ class ModelSupportConfig {
     required this.knownModels,
     required this.defaultSupport,
   });
-
-  /// The name of the repository containing the models.
-  final String repoName;
-
-  /// The version of the repository.
-  final String repoVersion;
-
-  /// List of device-specific model support configurations.
-  final List<DeviceSupport> deviceSupports;
-
-  /// List of all known model variants across all device supports.
-  final List<String> knownModels;
-
-  /// Default model support configuration for unknown devices.
-  final ModelSupport defaultSupport;
 
   /// Creates a [ModelSupportConfig] from a JSON map.
   factory ModelSupportConfig.fromJson(Map<String, dynamic> json) {
@@ -54,6 +39,21 @@ class ModelSupportConfig {
       defaultSupport: defaultSupport,
     );
   }
+
+  /// The name of the repository containing the models.
+  final String repoName;
+
+  /// The version of the repository.
+  final String repoVersion;
+
+  /// List of device-specific model support configurations.
+  final List<DeviceSupport> deviceSupports;
+
+  /// List of all known model variants across all device supports.
+  final List<String> knownModels;
+
+  /// Default model support configuration for unknown devices.
+  final ModelSupport defaultSupport;
 
   /// Converts this [ModelSupportConfig] to a JSON map.
   Map<String, dynamic> toJson() {

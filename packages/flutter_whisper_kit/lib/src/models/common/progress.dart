@@ -9,6 +9,18 @@ class Progress {
     this.isCancelled = false,
   });
 
+  /// Creates a [Progress] from a JSON map.
+  factory Progress.fromJson(Map<String, dynamic> json) {
+    return Progress(
+      totalUnitCount: json['totalUnitCount'] as int? ?? 0,
+      completedUnitCount: json['completedUnitCount'] as int? ?? 0,
+      fractionCompleted: (json['fractionCompleted'] as num?)?.toDouble() ?? 0.0,
+      isIndeterminate: json['isIndeterminate'] as bool? ?? false,
+      isPaused: json['isPaused'] as bool? ?? false,
+      isCancelled: json['isCancelled'] as bool? ?? false,
+    );
+  }
+
   /// The total number of units in the task.
   final int totalUnitCount;
 
@@ -26,18 +38,6 @@ class Progress {
 
   /// Whether the progress is cancelled.
   final bool isCancelled;
-
-  /// Creates a [Progress] from a JSON map.
-  factory Progress.fromJson(Map<String, dynamic> json) {
-    return Progress(
-      totalUnitCount: json['totalUnitCount'] as int? ?? 0,
-      completedUnitCount: json['completedUnitCount'] as int? ?? 0,
-      fractionCompleted: (json['fractionCompleted'] as num?)?.toDouble() ?? 0.0,
-      isIndeterminate: json['isIndeterminate'] as bool? ?? false,
-      isPaused: json['isPaused'] as bool? ?? false,
-      isCancelled: json['isCancelled'] as bool? ?? false,
-    );
-  }
 
   /// Converts this [Progress] to a JSON map.
   Map<String, dynamic> toJson() {

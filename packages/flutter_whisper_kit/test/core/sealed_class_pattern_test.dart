@@ -3,10 +3,9 @@ import 'package:flutter_whisper_kit/src/result.dart';
 import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 
 class TestException implements Exception {
+  const TestException(this.message, [this.code]);
   final String message;
   final int? code;
-
-  const TestException(this.message, [this.code]);
 
   @override
   String toString() => message;

@@ -1,9 +1,9 @@
-import 'models.dart';
-import 'services/model_management_service.dart';
-import 'services/recording_service.dart';
-import 'services/result_api_service.dart';
-import 'services/transcription_service.dart';
-import 'whisper_kit_error.dart';
+import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/src/services/model_management_service.dart';
+import 'package:flutter_whisper_kit/src/services/recording_service.dart';
+import 'package:flutter_whisper_kit/src/services/result_api_service.dart';
+import 'package:flutter_whisper_kit/src/services/transcription_service.dart';
+import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 
 /// The main entry point for the Flutter WhisperKit plugin.
 ///
@@ -18,11 +18,6 @@ import 'whisper_kit_error.dart';
 /// - [TranscriptionService]: File transcription and language detection
 /// - [ResultApiService]: Result-based API methods for better error handling
 class FlutterWhisperKit {
-  late final ModelManagementService _modelService;
-  late final RecordingService _recordingService;
-  late final TranscriptionService _transcriptionService;
-  late final ResultApiService _resultApiService;
-
   FlutterWhisperKit() {
     _modelService = ModelManagementService();
     _recordingService = RecordingService();
@@ -33,6 +28,10 @@ class FlutterWhisperKit {
       transcriptionService: _transcriptionService,
     );
   }
+  late final ModelManagementService _modelService;
+  late final RecordingService _recordingService;
+  late final TranscriptionService _transcriptionService;
+  late final ResultApiService _resultApiService;
 
   // ===== Model Management Methods =====
 

@@ -1,8 +1,8 @@
 import 'package:flutter/services.dart';
 
-import '../models.dart';
-import '../platform_specifics/flutter_whisper_kit_platform_interface.dart';
-import '../whisper_kit_error.dart';
+import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
+import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 
 /// Service class for managing audio transcription operations.
 ///
