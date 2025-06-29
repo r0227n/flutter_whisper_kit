@@ -10,15 +10,6 @@ sealed class WhisperKitError implements Exception {
     this.details,
   });
 
-  /// The error code
-  final int code;
-
-  /// A human-readable error message
-  final String message;
-
-  /// Additional error details
-  final dynamic details;
-
   /// Creates a WhisperKitError with the specified code and optional custom message
   factory WhisperKitError.fromCode(int code, [String? customMessage]) {
     // Import ErrorCode functionality here
@@ -114,6 +105,15 @@ sealed class WhisperKitError implements Exception {
       details: details,
     );
   }
+
+  /// The error code
+  final int code;
+
+  /// A human-readable error message
+  final String message;
+
+  /// Additional error details
+  final dynamic details;
 
   @override
   String toString() => '${runtimeType.toString()}($code): $message';

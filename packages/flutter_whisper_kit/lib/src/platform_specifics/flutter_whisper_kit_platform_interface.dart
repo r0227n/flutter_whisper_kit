@@ -1,9 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-
-import 'flutter_whisper_kit_method_channel.dart';
-import '../models.dart';
 
 /// The platform interface that all implementations of flutter_whisper_kit must implement.
 ///

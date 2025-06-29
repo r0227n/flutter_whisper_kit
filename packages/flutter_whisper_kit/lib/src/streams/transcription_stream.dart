@@ -1,22 +1,22 @@
 import 'dart:async';
 
-import '../models/transcription/transcription_result.dart';
+import 'package:flutter_whisper_kit/src/models/transcription/transcription_result.dart';
 
 /// Base event for transcription stream
 sealed class TranscriptionEvent {}
 
 /// Event carrying transcription result
 class TranscriptionResultEvent extends TranscriptionEvent {
-  final TranscriptionResult result;
 
   TranscriptionResultEvent(this.result);
+  final TranscriptionResult result;
 }
 
 /// Event carrying progress information
 class ProgressEvent extends TranscriptionEvent {
-  final double progress;
 
   ProgressEvent(this.progress);
+  final double progress;
 }
 
 /// Strategy for handling buffer overflow
@@ -28,12 +28,12 @@ enum OverflowStrategy {
 
 /// Reactive programming support for transcription events
 class TranscriptionStream implements IDisposable {
-  final StreamController<TranscriptionEvent> _controller;
-  bool _disposed = false;
 
   /// Creates a new TranscriptionStream
   TranscriptionStream()
       : _controller = StreamController<TranscriptionEvent>.broadcast();
+  final StreamController<TranscriptionEvent> _controller;
+  bool _disposed = false;
 
   /// Stream of transcription results filtered from events
   Stream<TranscriptionResult> get results => _controller.stream
@@ -73,17 +73,17 @@ abstract class IDisposable {
 
 /// Buffered transcription stream with backpressure support
 class BufferedTranscriptionStream implements IDisposable {
-  final int maxBufferSize;
-  final OverflowStrategy overflowStrategy;
-  final List<TranscriptionEvent> _buffer = [];
-  final StreamController<TranscriptionEvent> _controller;
-  bool _disposed = false;
 
   /// Creates a buffered transcription stream
   BufferedTranscriptionStream({
     this.maxBufferSize = 100,
     this.overflowStrategy = OverflowStrategy.drop,
   }) : _controller = StreamController<TranscriptionEvent>.broadcast();
+  final int maxBufferSize;
+  final OverflowStrategy overflowStrategy;
+  final List<TranscriptionEvent> _buffer = [];
+  final StreamController<TranscriptionEvent> _controller;
+  bool _disposed = false;
 
   /// Stream of buffered events
   Stream<TranscriptionEvent> get events => _controller.stream;

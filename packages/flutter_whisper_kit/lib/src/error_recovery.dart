@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'models.dart';
-import 'whisper_kit_error.dart';
+import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 
 /// Defines the type of recovery strategy
 enum RecoveryType {
@@ -48,6 +48,14 @@ enum LogLevel {
 
 /// Retry policy configuration
 class RetryPolicy {
+
+  const RetryPolicy({
+    this.maxAttempts = 3,
+    this.initialDelay = const Duration(seconds: 1),
+    this.maxDelay = const Duration(seconds: 30),
+    this.backoffMultiplier = 2.0,
+    this.jitterFactor = 0.1,
+  });
   /// Maximum number of retry attempts
   final int maxAttempts;
 
@@ -62,14 +70,6 @@ class RetryPolicy {
 
   /// Jitter factor (0.0 to 1.0) to randomize delays
   final double jitterFactor;
-
-  const RetryPolicy({
-    this.maxAttempts = 3,
-    this.initialDelay = const Duration(seconds: 1),
-    this.maxDelay = const Duration(seconds: 30),
-    this.backoffMultiplier = 2.0,
-    this.jitterFactor = 0.1,
-  });
 
   /// Calculate delay for a given attempt number (0-based)
   Duration getDelayForAttempt(int attempt) {
@@ -102,6 +102,14 @@ class RetryPolicy {
 
 /// Fallback options when primary operation fails
 class FallbackOptions {
+
+  const FallbackOptions({
+    this.useOfflineModel = false,
+    this.offlineModelVariant = 'tiny',
+    this.degradeQuality = false,
+    this.skipWordTimestamps = false,
+    this.reduceConcurrency = false,
+  });
   /// Use offline model if available
   final bool useOfflineModel;
 
@@ -116,14 +124,6 @@ class FallbackOptions {
 
   /// Reduce concurrent workers
   final bool reduceConcurrency;
-
-  const FallbackOptions({
-    this.useOfflineModel = false,
-    this.offlineModelVariant = 'tiny',
-    this.degradeQuality = false,
-    this.skipWordTimestamps = false,
-    this.reduceConcurrency = false,
-  });
 
   /// Apply fallback options to decoding options
   DecodingOptions applyToDecodingOptions(DecodingOptions original) {
@@ -161,17 +161,6 @@ class FallbackOptions {
 
 /// Error recovery strategy configuration
 class ErrorRecoveryStrategy {
-  /// Type of recovery strategy
-  final RecoveryType type;
-
-  /// Retry policy for automatic recovery
-  final RetryPolicy retryPolicy;
-
-  /// Fallback options
-  final FallbackOptions? fallbackOptions;
-
-  /// Custom error handler
-  final Future<RecoveryAction> Function(WhisperKitError error)? onError;
 
   const ErrorRecoveryStrategy._({
     required this.type,
@@ -213,24 +202,21 @@ class ErrorRecoveryStrategy {
       onError: onError,
     );
   }
+  /// Type of recovery strategy
+  final RecoveryType type;
+
+  /// Retry policy for automatic recovery
+  final RetryPolicy retryPolicy;
+
+  /// Fallback options
+  final FallbackOptions? fallbackOptions;
+
+  /// Custom error handler
+  final Future<RecoveryAction> Function(WhisperKitError error)? onError;
 }
 
 /// Main configuration for WhisperKit with error recovery
 class WhisperKitConfiguration {
-  /// Error recovery strategy
-  final ErrorRecoveryStrategy errorRecovery;
-
-  /// Retry policy
-  final RetryPolicy retryPolicy;
-
-  /// Fallback options
-  final FallbackOptions fallbackOptions;
-
-  /// Enable logging
-  final bool enableLogging;
-
-  /// Log level
-  final LogLevel logLevel;
 
   const WhisperKitConfiguration({
     required this.errorRecovery,
@@ -273,19 +259,33 @@ class WhisperKitConfiguration {
       logLevel: LogLevel.warning,
     );
   }
+  /// Error recovery strategy
+  final ErrorRecoveryStrategy errorRecovery;
+
+  /// Retry policy
+  final RetryPolicy retryPolicy;
+
+  /// Fallback options
+  final FallbackOptions fallbackOptions;
+
+  /// Enable logging
+  final bool enableLogging;
+
+  /// Log level
+  final LogLevel logLevel;
 }
 
 /// Executes operations with error recovery
 class RecoveryExecutor {
-  final RetryPolicy retryPolicy;
-  final FallbackOptions? fallbackOptions;
-  final void Function(String message, LogLevel level)? logger;
 
   RecoveryExecutor({
     required this.retryPolicy,
     this.fallbackOptions,
     this.logger,
   });
+  final RetryPolicy retryPolicy;
+  final FallbackOptions? fallbackOptions;
+  final void Function(String message, LogLevel level)? logger;
 
   /// Execute an operation with retry logic
   Future<Result<T, WhisperKitError>> executeWithRetry<T>(

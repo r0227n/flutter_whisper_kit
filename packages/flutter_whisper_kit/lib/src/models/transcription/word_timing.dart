@@ -8,6 +8,17 @@ class WordTiming {
     required this.probability,
   });
 
+  /// Creates a [WordTiming] from a JSON map.
+  factory WordTiming.fromJson(Map<String, dynamic> json) {
+    return WordTiming(
+      word: json['word'] as String,
+      tokens: (json['tokens'] as List).map((e) => e as int).toList(),
+      start: (json['start'] as num).toDouble(),
+      end: (json['end'] as num).toDouble(),
+      probability: (json['probability'] as num).toDouble(),
+    );
+  }
+
   /// The word text.
   final String word;
 
@@ -25,17 +36,6 @@ class WordTiming {
 
   /// Computed property for the duration of the word.
   double get duration => end - start;
-
-  /// Creates a [WordTiming] from a JSON map.
-  factory WordTiming.fromJson(Map<String, dynamic> json) {
-    return WordTiming(
-      word: json['word'] as String,
-      tokens: (json['tokens'] as List).map((e) => e as int).toList(),
-      start: (json['start'] as num).toDouble(),
-      end: (json['end'] as num).toDouble(),
-      probability: (json['probability'] as num).toDouble(),
-    );
-  }
 
   /// Converts this [WordTiming] to a JSON map.
   Map<String, dynamic> toJson() {

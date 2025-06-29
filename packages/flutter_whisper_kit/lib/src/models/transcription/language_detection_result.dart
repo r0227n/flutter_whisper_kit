@@ -6,12 +6,6 @@ class LanguageDetectionResult {
     required this.probabilities,
   });
 
-  /// The detected language code (e.g., 'en', 'ja', 'fr').
-  final String language;
-
-  /// A map of language codes to their detection probabilities.
-  final Map<String, double> probabilities;
-
   /// Creates a [LanguageDetectionResult] from a JSON map.
   factory LanguageDetectionResult.fromJson(Map<String, dynamic> json) {
     final Map<String, dynamic> rawProbs =
@@ -27,6 +21,12 @@ class LanguageDetectionResult {
       probabilities: probabilities,
     );
   }
+
+  /// The detected language code (e.g., 'en', 'ja', 'fr').
+  final String language;
+
+  /// A map of language codes to their detection probabilities.
+  final Map<String, double> probabilities;
 
   /// Converts this [LanguageDetectionResult] to a JSON map.
   Map<String, dynamic> toJson() {

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'word_timing.dart';
+import 'package:flutter_whisper_kit/src/models/transcription/word_timing.dart';
 
 /// Represents a segment in a transcription result.
 class TranscriptionSegment {
@@ -17,45 +17,6 @@ class TranscriptionSegment {
     this.noSpeechProb = 0.0,
     this.words,
   });
-
-  /// The segment ID.
-  final int id;
-
-  /// The seek position in the audio.
-  final int seek;
-
-  /// The start time of this segment in seconds.
-  final double start;
-
-  /// The end time of this segment in seconds.
-  final double end;
-
-  /// The transcribed text for this segment.
-  final String text;
-
-  /// The tokens for this segment.
-  final List<int> tokens;
-
-  /// The token log probabilities for this segment.
-  final List<Map<int, double>> tokenLogProbs;
-
-  /// The temperature used for sampling.
-  final double temperature;
-
-  /// The average log probability of the segment.
-  final double avgLogprob;
-
-  /// The compression ratio of the segment.
-  final double compressionRatio;
-
-  /// The no speech probability of the segment.
-  final double noSpeechProb;
-
-  /// The word timings for this segment, if available.
-  final List<WordTiming>? words;
-
-  /// Computed property for the duration of the segment.
-  double get duration => end - start;
 
   /// Creates a [TranscriptionSegment] from a JSON map.
   factory TranscriptionSegment.fromJson(Map<String, dynamic> json) {
@@ -100,6 +61,45 @@ class TranscriptionSegment {
           : null,
     );
   }
+
+  /// The segment ID.
+  final int id;
+
+  /// The seek position in the audio.
+  final int seek;
+
+  /// The start time of this segment in seconds.
+  final double start;
+
+  /// The end time of this segment in seconds.
+  final double end;
+
+  /// The transcribed text for this segment.
+  final String text;
+
+  /// The tokens for this segment.
+  final List<int> tokens;
+
+  /// The token log probabilities for this segment.
+  final List<Map<int, double>> tokenLogProbs;
+
+  /// The temperature used for sampling.
+  final double temperature;
+
+  /// The average log probability of the segment.
+  final double avgLogprob;
+
+  /// The compression ratio of the segment.
+  final double compressionRatio;
+
+  /// The no speech probability of the segment.
+  final double noSpeechProb;
+
+  /// The word timings for this segment, if available.
+  final List<WordTiming>? words;
+
+  /// Computed property for the duration of the segment.
+  double get duration => end - start;
 
   /// Converts this [TranscriptionSegment] to a JSON map.
   Map<String, dynamic> toJson() {
@@ -164,6 +164,111 @@ class TranscriptionTimings {
     this.totalDecodingWindows = 0.0,
     this.fullPipeline = 0.0,
   });
+
+  /// Creates a [TranscriptionTimings] from a JSON map.
+  factory TranscriptionTimings.fromJson(Map<String, dynamic> json) {
+    return TranscriptionTimings(
+      pipelineStart: json['pipelineStart'] != null
+          ? (json['pipelineStart'] as num).toDouble()
+          : 0.0,
+      firstTokenTime: json['firstTokenTime'] != null
+          ? (json['firstTokenTime'] as num).toDouble()
+          : 0.0,
+      inputAudioSeconds: json['inputAudioSeconds'] != null
+          ? (json['inputAudioSeconds'] as num).toDouble()
+          : 0.001,
+      modelLoading: json['modelLoading'] != null
+          ? (json['modelLoading'] as num).toDouble()
+          : 0.0,
+      prewarmLoadTime: json['prewarmLoadTime'] != null
+          ? (json['prewarmLoadTime'] as num).toDouble()
+          : 0.0,
+      encoderLoadTime: json['encoderLoadTime'] != null
+          ? (json['encoderLoadTime'] as num).toDouble()
+          : 0.0,
+      decoderLoadTime: json['decoderLoadTime'] != null
+          ? (json['decoderLoadTime'] as num).toDouble()
+          : 0.0,
+      encoderSpecializationTime: json['encoderSpecializationTime'] != null
+          ? (json['encoderSpecializationTime'] as num).toDouble()
+          : 0.0,
+      decoderSpecializationTime: json['decoderSpecializationTime'] != null
+          ? (json['decoderSpecializationTime'] as num).toDouble()
+          : 0.0,
+      tokenizerLoadTime: json['tokenizerLoadTime'] != null
+          ? (json['tokenizerLoadTime'] as num).toDouble()
+          : 0.0,
+      audioLoading: json['audioLoading'] != null
+          ? (json['audioLoading'] as num).toDouble()
+          : 0.0,
+      audioProcessing: json['audioProcessing'] != null
+          ? (json['audioProcessing'] as num).toDouble()
+          : 0.0,
+      logmels:
+          json['logmels'] != null ? (json['logmels'] as num).toDouble() : 0.0,
+      encoding:
+          json['encoding'] != null ? (json['encoding'] as num).toDouble() : 0.0,
+      prefill:
+          json['prefill'] != null ? (json['prefill'] as num).toDouble() : 0.0,
+      decodingInit: json['decodingInit'] != null
+          ? (json['decodingInit'] as num).toDouble()
+          : 0.0,
+      decodingLoop: json['decodingLoop'] != null
+          ? (json['decodingLoop'] as num).toDouble()
+          : 0.0,
+      decodingPredictions: json['decodingPredictions'] != null
+          ? (json['decodingPredictions'] as num).toDouble()
+          : 0.0,
+      decodingFiltering: json['decodingFiltering'] != null
+          ? (json['decodingFiltering'] as num).toDouble()
+          : 0.0,
+      decodingSampling: json['decodingSampling'] != null
+          ? (json['decodingSampling'] as num).toDouble()
+          : 0.0,
+      decodingFallback: json['decodingFallback'] != null
+          ? (json['decodingFallback'] as num).toDouble()
+          : 0.0,
+      decodingWindowing: json['decodingWindowing'] != null
+          ? (json['decodingWindowing'] as num).toDouble()
+          : 0.0,
+      decodingKvCaching: json['decodingKvCaching'] != null
+          ? (json['decodingKvCaching'] as num).toDouble()
+          : 0.0,
+      decodingWordTimestamps: json['decodingWordTimestamps'] != null
+          ? (json['decodingWordTimestamps'] as num).toDouble()
+          : 0.0,
+      decodingNonPrediction: json['decodingNonPrediction'] != null
+          ? (json['decodingNonPrediction'] as num).toDouble()
+          : 0.0,
+      totalAudioProcessingRuns: json['totalAudioProcessingRuns'] != null
+          ? (json['totalAudioProcessingRuns'] as num).toDouble()
+          : 0.0,
+      totalLogmelRuns: json['totalLogmelRuns'] != null
+          ? (json['totalLogmelRuns'] as num).toDouble()
+          : 0.0,
+      totalEncodingRuns: json['totalEncodingRuns'] != null
+          ? (json['totalEncodingRuns'] as num).toDouble()
+          : 0.0,
+      totalDecodingLoops: json['totalDecodingLoops'] != null
+          ? (json['totalDecodingLoops'] as num).toDouble()
+          : 0.0,
+      totalKVUpdateRuns: json['totalKVUpdateRuns'] != null
+          ? (json['totalKVUpdateRuns'] as num).toDouble()
+          : 0.0,
+      totalTimestampAlignmentRuns: json['totalTimestampAlignmentRuns'] != null
+          ? (json['totalTimestampAlignmentRuns'] as num).toDouble()
+          : 0.0,
+      totalDecodingFallbacks: json['totalDecodingFallbacks'] != null
+          ? (json['totalDecodingFallbacks'] as num).toDouble()
+          : 0.0,
+      totalDecodingWindows: json['totalDecodingWindows'] != null
+          ? (json['totalDecodingWindows'] as num).toDouble()
+          : 0.0,
+      fullPipeline: json['fullPipeline'] != null
+          ? (json['fullPipeline'] as num).toDouble()
+          : 0.0,
+    );
+  }
 
   /// Pipeline start time.
   final double pipelineStart;
@@ -276,111 +381,6 @@ class TranscriptionTimings {
   /// Speed factor (audio duration / total elapsed time).
   double get speedFactor => inputAudioSeconds / fullPipeline;
 
-  /// Creates a [TranscriptionTimings] from a JSON map.
-  factory TranscriptionTimings.fromJson(Map<String, dynamic> json) {
-    return TranscriptionTimings(
-      pipelineStart: json['pipelineStart'] != null
-          ? (json['pipelineStart'] as num).toDouble()
-          : 0.0,
-      firstTokenTime: json['firstTokenTime'] != null
-          ? (json['firstTokenTime'] as num).toDouble()
-          : 0.0,
-      inputAudioSeconds: json['inputAudioSeconds'] != null
-          ? (json['inputAudioSeconds'] as num).toDouble()
-          : 0.001,
-      modelLoading: json['modelLoading'] != null
-          ? (json['modelLoading'] as num).toDouble()
-          : 0.0,
-      prewarmLoadTime: json['prewarmLoadTime'] != null
-          ? (json['prewarmLoadTime'] as num).toDouble()
-          : 0.0,
-      encoderLoadTime: json['encoderLoadTime'] != null
-          ? (json['encoderLoadTime'] as num).toDouble()
-          : 0.0,
-      decoderLoadTime: json['decoderLoadTime'] != null
-          ? (json['decoderLoadTime'] as num).toDouble()
-          : 0.0,
-      encoderSpecializationTime: json['encoderSpecializationTime'] != null
-          ? (json['encoderSpecializationTime'] as num).toDouble()
-          : 0.0,
-      decoderSpecializationTime: json['decoderSpecializationTime'] != null
-          ? (json['decoderSpecializationTime'] as num).toDouble()
-          : 0.0,
-      tokenizerLoadTime: json['tokenizerLoadTime'] != null
-          ? (json['tokenizerLoadTime'] as num).toDouble()
-          : 0.0,
-      audioLoading: json['audioLoading'] != null
-          ? (json['audioLoading'] as num).toDouble()
-          : 0.0,
-      audioProcessing: json['audioProcessing'] != null
-          ? (json['audioProcessing'] as num).toDouble()
-          : 0.0,
-      logmels:
-          json['logmels'] != null ? (json['logmels'] as num).toDouble() : 0.0,
-      encoding:
-          json['encoding'] != null ? (json['encoding'] as num).toDouble() : 0.0,
-      prefill:
-          json['prefill'] != null ? (json['prefill'] as num).toDouble() : 0.0,
-      decodingInit: json['decodingInit'] != null
-          ? (json['decodingInit'] as num).toDouble()
-          : 0.0,
-      decodingLoop: json['decodingLoop'] != null
-          ? (json['decodingLoop'] as num).toDouble()
-          : 0.0,
-      decodingPredictions: json['decodingPredictions'] != null
-          ? (json['decodingPredictions'] as num).toDouble()
-          : 0.0,
-      decodingFiltering: json['decodingFiltering'] != null
-          ? (json['decodingFiltering'] as num).toDouble()
-          : 0.0,
-      decodingSampling: json['decodingSampling'] != null
-          ? (json['decodingSampling'] as num).toDouble()
-          : 0.0,
-      decodingFallback: json['decodingFallback'] != null
-          ? (json['decodingFallback'] as num).toDouble()
-          : 0.0,
-      decodingWindowing: json['decodingWindowing'] != null
-          ? (json['decodingWindowing'] as num).toDouble()
-          : 0.0,
-      decodingKvCaching: json['decodingKvCaching'] != null
-          ? (json['decodingKvCaching'] as num).toDouble()
-          : 0.0,
-      decodingWordTimestamps: json['decodingWordTimestamps'] != null
-          ? (json['decodingWordTimestamps'] as num).toDouble()
-          : 0.0,
-      decodingNonPrediction: json['decodingNonPrediction'] != null
-          ? (json['decodingNonPrediction'] as num).toDouble()
-          : 0.0,
-      totalAudioProcessingRuns: json['totalAudioProcessingRuns'] != null
-          ? (json['totalAudioProcessingRuns'] as num).toDouble()
-          : 0.0,
-      totalLogmelRuns: json['totalLogmelRuns'] != null
-          ? (json['totalLogmelRuns'] as num).toDouble()
-          : 0.0,
-      totalEncodingRuns: json['totalEncodingRuns'] != null
-          ? (json['totalEncodingRuns'] as num).toDouble()
-          : 0.0,
-      totalDecodingLoops: json['totalDecodingLoops'] != null
-          ? (json['totalDecodingLoops'] as num).toDouble()
-          : 0.0,
-      totalKVUpdateRuns: json['totalKVUpdateRuns'] != null
-          ? (json['totalKVUpdateRuns'] as num).toDouble()
-          : 0.0,
-      totalTimestampAlignmentRuns: json['totalTimestampAlignmentRuns'] != null
-          ? (json['totalTimestampAlignmentRuns'] as num).toDouble()
-          : 0.0,
-      totalDecodingFallbacks: json['totalDecodingFallbacks'] != null
-          ? (json['totalDecodingFallbacks'] as num).toDouble()
-          : 0.0,
-      totalDecodingWindows: json['totalDecodingWindows'] != null
-          ? (json['totalDecodingWindows'] as num).toDouble()
-          : 0.0,
-      fullPipeline: json['fullPipeline'] != null
-          ? (json['fullPipeline'] as num).toDouble()
-          : 0.0,
-    );
-  }
-
   /// Converts this [TranscriptionTimings] to a JSON map.
   Map<String, dynamic> toJson() {
     return {
@@ -432,27 +432,6 @@ class TranscriptionResult {
     this.seekTime,
   });
 
-  /// The full transcribed text.
-  final String text;
-
-  /// The segments of the transcription.
-  final List<TranscriptionSegment> segments;
-
-  /// The detected language code.
-  final String language;
-
-  /// Timing information for the transcription.
-  final TranscriptionTimings timings;
-
-  /// The seek time in the audio, if applicable.
-  final double? seekTime;
-
-  /// Returns all words from all segments.
-  List<WordTiming> get allWords => segments
-      .where((segment) => segment.words != null)
-      .expand((segment) => segment.words!)
-      .toList();
-
   /// Creates a [TranscriptionResult] from a JSON string.
   factory TranscriptionResult.fromJsonString(String jsonString) {
     final Map<String, dynamic> json = Map<String, dynamic>.from(
@@ -484,6 +463,27 @@ class TranscriptionResult {
           : null,
     );
   }
+
+  /// The full transcribed text.
+  final String text;
+
+  /// The segments of the transcription.
+  final List<TranscriptionSegment> segments;
+
+  /// The detected language code.
+  final String language;
+
+  /// Timing information for the transcription.
+  final TranscriptionTimings timings;
+
+  /// The seek time in the audio, if applicable.
+  final double? seekTime;
+
+  /// Returns all words from all segments.
+  List<WordTiming> get allWords => segments
+      .where((segment) => segment.words != null)
+      .expand((segment) => segment.words!)
+      .toList();
 
   /// Converts this [TranscriptionResult] to a JSON map.
   Map<String, dynamic> toJson() {
