@@ -72,7 +72,7 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
     if (filePath.isEmpty) {
       throw InvalidArgumentsError(
         message: 'File path cannot be empty',
-        errorCode: ErrorCode.invalidParameters,
+        code: ErrorCode.invalidParameters,
       );
     }
 

@@ -177,7 +177,7 @@ void main() {
 
           final mappedResult = result
               .map((path) => 'Model at: $path')
-              .mapError((error) => WhisperKitError(
+              .mapError((error) => UnknownError(
                     code: error.code,
                     message: 'Wrapped: ${error.message}',
                   ));
@@ -398,7 +398,7 @@ void main() {
         final startResult = await whisperKit.startRecordingWithResult();
         final mappedStart = startResult
           .map((msg) => 'Started: $msg')
-          .mapError((err) => WhisperKitError(
+          .mapError((err) => UnknownError(
             code: err.code,
             message: 'Recording error: ${err.message}',
           ));

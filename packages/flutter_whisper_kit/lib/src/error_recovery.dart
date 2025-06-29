@@ -329,7 +329,7 @@ class RecoveryExecutor {
         attempt++;
       } catch (e) {
         // Handle non-WhisperKitError exceptions
-        final error = WhisperKitError(
+        final error = TranscriptionFailedError(
           code: ErrorCode.transcriptionFailed,
           message: 'Unexpected error: $e',
         );
@@ -339,7 +339,7 @@ class RecoveryExecutor {
 
     // Should not reach here, but return last error if we do
     return Failure(lastError ??
-        WhisperKitError(
+        TranscriptionFailedError(
           code: ErrorCode.transcriptionFailed,
           message: 'Operation failed after retries',
         ));

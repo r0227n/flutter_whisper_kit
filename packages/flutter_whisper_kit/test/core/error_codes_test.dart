@@ -148,19 +148,10 @@ void main() {
       });
     });
 
-    group('createError', () {
-      test('should create error with default description', () {
-        final error = ErrorCode.createError(ErrorCode.modelNotFound);
-
-        expect(error, isA<WhisperKitError>());
-        expect(error.code, equals(ErrorCode.modelNotFound));
-        expect(error.message, equals('Model not found at specified path'));
-      });
-
       test('should create error with custom message', () {
         final customMessage = 'Custom error message';
         final error =
-            ErrorCode.createError(ErrorCode.transcriptionFailed, customMessage);
+            WhisperKitError.fromCode(ErrorCode.transcriptionFailed, customMessage);
 
         expect(error, isA<WhisperKitError>());
         expect(error.code, equals(ErrorCode.transcriptionFailed));
@@ -168,7 +159,7 @@ void main() {
       });
 
       test('should create error with unknown code', () {
-        final error = ErrorCode.createError(9999);
+        final error = WhisperKitError.fromCode(9999);
 
         expect(error, isA<WhisperKitError>());
         expect(error.code, equals(9999));

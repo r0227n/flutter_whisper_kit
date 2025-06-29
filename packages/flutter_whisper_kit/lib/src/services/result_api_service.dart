@@ -22,11 +22,6 @@ class ResultApiService {
         _recordingService = recordingService,
         _transcriptionService = transcriptionService;
 
-  /// Helper method to convert typed error to error code
-  int _getErrorCodeFromType(WhisperKitErrorType error) {
-    return error.errorCode; // Now preserve the original error code
-  }
-
   /// Loads a WhisperKit model using the Result pattern.
   ///
   /// This is a new API that returns a Result type instead of throwing exceptions,
@@ -66,7 +61,7 @@ class ResultApiService {
 
       if (modelPath == null) {
         return Failure(
-          WhisperKitError(
+          ModelLoadingFailedError(
             code: 1001,
             message: 'Model loading returned null',
           ),
@@ -76,18 +71,9 @@ class ResultApiService {
       return Success(modelPath);
     } on WhisperKitError catch (e) {
       return Failure(e);
-    } on WhisperKitErrorType catch (e) {
-      // Convert typed error to WhisperKitError for Result API
-      return Failure(
-        WhisperKitError(
-          code: _getErrorCodeFromType(e),
-          message: e.message,
-          details: e.details,
-        ),
-      );
     } catch (e) {
       return Failure(
-        WhisperKitError(
+        UnknownError(
           code: 1000,
           message: 'Unexpected error: $e',
         ),
@@ -131,7 +117,7 @@ class ResultApiService {
 
       if (modelPath == null) {
         return Failure(
-          WhisperKitError(
+          ModelLoadingFailedError(
             code: 1000,
             message: 'Download failed: model path is null',
           ),
@@ -141,17 +127,9 @@ class ResultApiService {
       return Success(modelPath);
     } on WhisperKitError catch (e) {
       return Failure(e);
-    } on WhisperKitErrorType catch (e) {
-      return Failure(
-        WhisperKitError(
-          code: _getErrorCodeFromType(e),
-          message: e.message,
-          details: e.details,
-        ),
-      );
     } catch (e) {
       return Failure(
-        WhisperKitError(
+        UnknownError(
           code: 1000,
           message: 'Download failed: $e',
         ),
@@ -187,17 +165,9 @@ class ResultApiService {
       return Success(models);
     } on WhisperKitError catch (e) {
       return Failure(e);
-    } on WhisperKitErrorType catch (e) {
-      return Failure(
-        WhisperKitError(
-          code: _getErrorCodeFromType(e),
-          message: e.message,
-          details: e.details,
-        ),
-      );
     } catch (e) {
       return Failure(
-        WhisperKitError(
+        UnknownError(
           code: 1001,
           message: 'Failed to fetch available models: $e',
         ),
@@ -225,7 +195,7 @@ class ResultApiService {
 
       if (result == null) {
         return Failure(
-          WhisperKitError(
+          RecordingFailedError(
             code: 2003,
             message: 'Failed to start recording: result is null',
           ),
@@ -235,17 +205,9 @@ class ResultApiService {
       return Success(result);
     } on WhisperKitError catch (e) {
       return Failure(e);
-    } on WhisperKitErrorType catch (e) {
-      return Failure(
-        WhisperKitError(
-          code: _getErrorCodeFromType(e),
-          message: e.message,
-          details: e.details,
-        ),
-      );
     } catch (e) {
       return Failure(
-        WhisperKitError(
+        RecordingFailedError(
           code: 2003,
           message: 'Failed to start recording: $e',
         ),
@@ -273,7 +235,7 @@ class ResultApiService {
 
       if (result == null) {
         return Failure(
-          WhisperKitError(
+          RecordingFailedError(
             code: 2004,
             message: 'Failed to stop recording: result is null',
           ),
@@ -283,17 +245,9 @@ class ResultApiService {
       return Success(result);
     } on WhisperKitError catch (e) {
       return Failure(e);
-    } on WhisperKitErrorType catch (e) {
-      return Failure(
-        WhisperKitError(
-          code: _getErrorCodeFromType(e),
-          message: e.message,
-          details: e.details,
-        ),
-      );
     } catch (e) {
       return Failure(
-        WhisperKitError(
+        RecordingFailedError(
           code: 2004,
           message: 'Failed to stop recording: $e',
         ),
@@ -328,18 +282,9 @@ class ResultApiService {
       return Success(result);
     } on WhisperKitError catch (e) {
       return Failure(e);
-    } on WhisperKitErrorType catch (e) {
-      // Convert typed error to WhisperKitError for Result API
-      return Failure(
-        WhisperKitError(
-          code: _getErrorCodeFromType(e),
-          message: e.message,
-          details: e.details,
-        ),
-      );
     } catch (e) {
       return Failure(
-        WhisperKitError(
+        TranscriptionFailedError(
           code: 2001,
           message: 'Transcription failed: $e',
         ),
@@ -361,18 +306,9 @@ class ResultApiService {
       return Success(result);
     } on WhisperKitError catch (e) {
       return Failure(e);
-    } on WhisperKitErrorType catch (e) {
-      // Convert typed error to WhisperKitError for Result API
-      return Failure(
-        WhisperKitError(
-          code: _getErrorCodeFromType(e),
-          message: e.message,
-          details: e.details,
-        ),
-      );
     } catch (e) {
       return Failure(
-        WhisperKitError(
+        TranscriptionFailedError(
           code: 2002,
           message: 'Language detection failed: $e',
         ),

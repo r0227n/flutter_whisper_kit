@@ -19,7 +19,7 @@ class ModelManagementService {
     try {
       return await platformCall();
     } on PlatformException catch (e) {
-      throw WhisperKitErrorType.fromPlatformException(e);
+      throw WhisperKitError.fromPlatformException(e);
     } catch (e) {
       rethrow;
     }

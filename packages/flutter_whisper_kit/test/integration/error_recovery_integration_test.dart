@@ -127,7 +127,7 @@ void main() {
         expect(customStrategy.onError, isNotNull);
 
         // Test the custom error handler
-        final networkError = WhisperKitError(
+        final networkError = UnknownError(
           code: ErrorCode.networkTimeout,
           message: 'Network timeout',
         );
@@ -270,7 +270,7 @@ void main() {
         for (final errorCode in recoverableErrors) {
           expect(ErrorCode.isRecoverable(errorCode), isTrue);
 
-          final error = ErrorCode.createError(errorCode);
+          final error = WhisperKitError.fromCode(errorCode);
           expect(error.code, equals(errorCode));
           expect(error.message, equals(ErrorCode.getDescription(errorCode)));
         }

@@ -243,7 +243,7 @@ void main() {
       expect(strategy.onError, isNotNull);
 
       // Test the handler
-      strategy.onError!(WhisperKitError(code: 1, message: 'test'));
+      strategy.onError!(UnknownError(code: 1, message: 'test'));
       expect(handlerCalled, isTrue);
     });
   });
@@ -314,7 +314,7 @@ void main() {
           () async {
             attempts++;
             if (attempts < 3) {
-              throw WhisperKitError(
+              throw RecordingFailedError(
                 code: ErrorCode.networkTimeout,
                 message: 'Network timeout',
               );
@@ -338,7 +338,7 @@ void main() {
         final result = await executor.executeWithRetry(
           () async {
             attempts++;
-            throw WhisperKitError(
+            throw ModelLoadingFailedError(
               code: ErrorCode.modelNotFound,
               message: 'Model not found',
             );
@@ -360,7 +360,7 @@ void main() {
         final result = await executor.executeWithRetry(
           () async {
             attempts++;
-            throw WhisperKitError(
+            throw RecordingFailedError(
               code: ErrorCode.networkTimeout,
               message: 'Network timeout',
             );

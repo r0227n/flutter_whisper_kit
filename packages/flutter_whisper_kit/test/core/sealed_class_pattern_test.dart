@@ -28,7 +28,7 @@ void main() {
     test('exhaustive pattern matching with switch expression', () {
       final successResult = Success<String, WhisperKitError>('Hello');
       final failureResult = Failure<String, WhisperKitError>(
-        WhisperKitError(code: 1001, message: 'Error'),
+        ModelLoadingFailedError(code: 1001, message: 'Error'),
       );
 
       // Switch expression with exhaustive pattern matching
@@ -128,7 +128,7 @@ void main() {
       );
 
       final emptyResult = Failure<String, WhisperKitError>(
-        WhisperKitError(code: 404, message: 'Not found'),
+        UnknownError(code: 404, message: 'Not found'),
       );
       expect(
         processResult(emptyResult, onEmpty: () => 'default'),
