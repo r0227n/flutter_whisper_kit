@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 import 'models.dart';
-import 'whisper_kit_error.dart';
 import 'platform_specifics/flutter_whisper_kit_platform_interface.dart';
+import 'whisper_kit_error.dart';
 
 /// The main entry point for the Flutter WhisperKit plugin.
 ///
@@ -170,6 +170,172 @@ class FlutterWhisperKit {
     );
   }
 
+  /// Starts audio recording using the Result pattern.
+  ///
+  /// This is a **Result-based API** that returns a [Result] type instead of 
+  /// throwing exceptions, providing better error handling and more explicit 
+  /// success/failure states for real-time audio capture.
+  ///
+  /// ## Parameters
+  /// 
+  /// - **[loop]** *(optional)*: Recording loop behavior
+  ///   - Default: `true`
+  ///   - When `true`: Recording automatically restarts after transcription
+  ///   - When `false`: Recording stops after each transcription completes
+  ///   - Must match the value used in [stopRecordingWithResult]
+  ///
+  /// ## Return Value
+  /// 
+  /// Returns a `Future<Result<String, WhisperKitError>>` containing either:
+  /// 
+  /// - **Success**: A success message indicating recording has started
+  /// - **Failure**: A [WhisperKitError] with specific error code and message
+  ///
+  /// ## Error Codes
+  /// 
+  /// - **2003**: Generic recording start failure or null result
+  /// - **Permission codes**: For microphone access denied
+  /// - **Audio session codes**: For audio hardware setup failures
+  ///
+  /// ## Prerequisites
+  /// 
+  /// Before calling this method, ensure:
+  /// 
+  /// 1. **Model is loaded**: Use [loadModelWithResult] first
+  /// 2. **Microphone permissions**: Request and verify audio permissions
+  /// 3. **Audio session**: Ensure audio session is properly configured
+  /// 4. **Hardware availability**: Verify microphone hardware is available
+  ///
+  /// ## Usage Examples
+  /// 
+  /// ### Basic Recording
+  /// ```dart
+  /// // Start continuous recording (loop mode)
+  /// final result = await whisperKit.startRecordingWithResult();
+  /// result.when(
+  ///   success: (message) {
+  ///     print('Recording started: $message');
+  ///     _updateUI(isRecording: true);
+  ///   },
+  ///   failure: (error) {
+  ///     print('Failed to start recording: ${error.message}');
+  ///     _showErrorDialog(error);
+  ///   },
+  /// );
+  /// ```
+  /// 
+  /// ### Single-Shot Recording
+  /// ```dart
+  /// // Start recording that stops after transcription
+  /// final result = await whisperKit.startRecordingWithResult(loop: false);
+  /// result.when(
+  ///   success: (message) {
+  ///     print('Single recording started: $message');
+  ///     _startTimer(); // Auto-stop after timeout
+  ///   },
+  ///   failure: (error) => _handleRecordingError(error),
+  /// );
+  /// ```
+  /// 
+  /// ### Complete Recording Workflow
+  /// ```dart
+  /// class AudioRecorder {
+  ///   bool _isRecording = false;
+  ///   
+  ///   Future<void> startRecording() async {
+  ///     if (_isRecording) return;
+  ///     
+  ///     // 1. Check permissions
+  ///     final hasPermission = await _checkMicrophonePermission();
+  ///     if (!hasPermission) {
+  ///       _showPermissionDialog();
+  ///       return;
+  ///     }
+  ///     
+  ///     // 2. Ensure model is loaded
+  ///     final modelResult = await whisperKit.loadModelWithResult('tiny');
+  ///     if (modelResult.isFailure) {
+  ///       _showError('Please load a model first');
+  ///       return;
+  ///     }
+  ///     
+  ///     // 3. Start recording
+  ///     final recordResult = await whisperKit.startRecordingWithResult();
+  ///     recordResult.when(
+  ///       success: (message) {
+  ///         _isRecording = true;
+  ///         _listenToTranscription();
+  ///         _updateUI();
+  ///       },
+  ///       failure: (error) => _handleError(error),
+  ///     );
+  ///   }
+  ///   
+  ///   void _listenToTranscription() {
+  ///     whisperKit.transcriptionStream.listen(
+  ///       (result) => _onTranscriptionReceived(result),
+  ///       onError: (error) => _onTranscriptionError(error),
+  ///     );
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// ## Best Practices
+  /// 
+  /// 1. **Check permissions first** before attempting to record
+  /// 2. **Load model before recording** to ensure transcription capability
+  /// 3. **Handle concurrent calls** - avoid multiple simultaneous recordings
+  /// 4. **Provide user feedback** during loading and error states
+  /// 5. **Clean up resources** by stopping recording when appropriate
+  /// 6. **Match loop parameter** between start and stop calls
+  /// 
+  /// ## Related Methods
+  /// 
+  /// - [stopRecordingWithResult]: Stop audio recording
+  /// - [transcriptionStream]: Listen to real-time transcription results
+  /// - [loadModelWithResult]: Load model before recording
+  /// 
+  /// ## See Also
+  /// 
+  /// - [WhisperKitError]: Error information structure
+  /// - [Result]: Result type documentation
+  /// - [TranscriptionResult]: Real-time transcription data
+  Future<Result<String, WhisperKitError>> startRecordingWithResult({
+    bool loop = true,
+  }) async {
+    try {
+      final result = await startRecording(loop: loop);
+
+      if (result == null) {
+        return Failure(
+          WhisperKitError(
+            code: 2003,
+            message: 'Failed to start recording: result is null',
+          ),
+        );
+      }
+
+      return Success(result);
+    } on WhisperKitError catch (e) {
+      return Failure(e);
+    } on WhisperKitErrorType catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: _getErrorCodeFromType(e),
+          message: e.message,
+          details: e.details,
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: 2003,
+          message: 'Failed to start recording: $e',
+        ),
+      );
+    }
+  }
+
   /// Stops recording audio and optionally triggers transcription.
   ///
   /// Stops the audio capture from the device's microphone and, depending on
@@ -186,6 +352,135 @@ class FlutterWhisperKit {
     return _handlePlatformCall(
       () => FlutterWhisperKitPlatform.instance.stopRecording(loop: loop),
     );
+  }
+
+  /// Stops audio recording using the Result pattern.
+  ///
+  /// This is a **Result-based API** that returns a [Result] type instead of 
+  /// throwing exceptions, providing better error handling and more explicit 
+  /// success/failure states for audio recording termination.
+  ///
+  /// ## Parameters
+  /// 
+  /// - **[loop]** *(optional)*: Recording loop behavior control
+  ///   - Default: `true`
+  ///   - When `true`: Recording will restart after transcription completes
+  ///   - When `false`: Recording stops completely and triggers final transcription
+  ///   - **Must match** the value used in [startRecordingWithResult]
+  ///
+  /// ## Return Value
+  /// 
+  /// Returns a `Future<Result<String, WhisperKitError>>` containing either:
+  /// 
+  /// - **Success**: A success message indicating recording has stopped
+  /// - **Failure**: A [WhisperKitError] with specific error code and message
+  ///
+  /// ## Error Codes
+  /// 
+  /// - **2004**: Generic recording stop failure or null result
+  /// - **Audio session codes**: For audio hardware cleanup failures
+  /// - **State codes**: For invalid recording state transitions
+  ///
+  /// ## Usage Examples
+  /// 
+  /// ### Stop Continuous Recording
+  /// ```dart
+  /// // Stop recording but keep transcription going
+  /// final result = await whisperKit.stopRecordingWithResult();
+  /// result.when(
+  ///   success: (message) {
+  ///     print('Recording paused: $message');
+  ///     // Recording will auto-restart after transcription
+  ///   },
+  ///   failure: (error) => _handleStopError(error),
+  /// );
+  /// ```
+  /// 
+  /// ### Final Stop (Complete Session End)
+  /// ```dart
+  /// // Stop recording completely
+  /// final result = await whisperKit.stopRecordingWithResult(loop: false);
+  /// result.when(
+  ///   success: (message) {
+  ///     print('Recording session ended: $message');
+  ///     _updateUI(isRecording: false);
+  ///     _cleanupResources();
+  ///   },
+  ///   failure: (error) => _handleFinalStopError(error),
+  /// );
+  /// ```
+  /// 
+  /// ### Voice Memo Implementation
+  /// ```dart
+  /// class VoiceMemo {
+  ///   bool _isRecording = false;
+  ///   final List<String> _transcripts = [];
+  ///   
+  ///   Future<void> stopMemo() async {
+  ///     if (!_isRecording) return;
+  ///     
+  ///     final stopResult = await whisperKit.stopRecordingWithResult(loop: false);
+  ///     stopResult.when(
+  ///       success: (message) {
+  ///         _isRecording = false;
+  ///         _saveMemo(_transcripts.join(' '));
+  ///       },
+  ///       failure: (error) => _handleStopError(error),
+  ///     );
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// ## Best Practices
+  /// 
+  /// 1. **Match loop parameters** between start and stop calls
+  /// 2. **Use `loop: false`** for final session termination
+  /// 3. **Clean up resources** after final stop
+  /// 4. **Handle both success and failure** cases appropriately
+  /// 
+  /// ## Related Methods
+  /// 
+  /// - [startRecordingWithResult]: Start audio recording
+  /// - [transcriptionStream]: Listen to transcription results
+  /// 
+  /// ## See Also
+  /// 
+  /// - [WhisperKitError]: Error information structure
+  /// - [Result]: Result type documentation
+  Future<Result<String, WhisperKitError>> stopRecordingWithResult({
+    bool loop = true,
+  }) async {
+    try {
+      final result = await stopRecording(loop: loop);
+
+      if (result == null) {
+        return Failure(
+          WhisperKitError(
+            code: 2004,
+            message: 'Failed to stop recording: result is null',
+          ),
+        );
+      }
+
+      return Success(result);
+    } on WhisperKitError catch (e) {
+      return Failure(e);
+    } on WhisperKitErrorType catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: _getErrorCodeFromType(e),
+          message: e.message,
+          details: e.details,
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: 2004,
+          message: 'Failed to stop recording: $e',
+        ),
+      );
+    }
   }
 
   /// Stream of real-time transcription results.
@@ -251,6 +546,61 @@ class FlutterWhisperKit {
         token: token,
       ),
     );
+  }
+
+  /// Fetches available WhisperKit models using the Result pattern.
+  ///
+  /// This is a new API that returns a Result type instead of throwing exceptions,
+  /// providing better error handling and more explicit success/failure states.
+  ///
+  /// Parameters:
+  /// - [modelRepo]: The repository to fetch models from (default: "argmaxinc/whisperkit-coreml").
+  /// - [matching]: Optional list of glob patterns to filter models by (default: ['*']).
+  /// - [token]: Optional access token for private repositories.
+  ///
+  /// Returns a [Result] containing either:
+  /// - Success: A list of available model names
+  /// - Failure: A [WhisperKitError] describing what went wrong
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await whisperKit.fetchAvailableModelsWithResult();
+  /// result.when(
+  ///   success: (models) => print('Available models: $models'),
+  ///   failure: (error) => print('Failed to fetch models: ${error.message}'),
+  /// );
+  /// ```
+  Future<Result<List<String>, WhisperKitError>> fetchAvailableModelsWithResult({
+    String modelRepo = 'argmaxinc/whisperkit-coreml',
+    List<String> matching = const ['*'],
+    String? token,
+  }) async {
+    try {
+      final models = await fetchAvailableModels(
+        modelRepo: modelRepo,
+        matching: matching,
+        token: token,
+      );
+
+      return Success(models);
+    } on WhisperKitError catch (e) {
+      return Failure(e);
+    } on WhisperKitErrorType catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: _getErrorCodeFromType(e),
+          message: e.message,
+          details: e.details,
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: 1001,
+          message: 'Failed to fetch available models: $e',
+        ),
+      );
+    }
   }
 
   /// Returns the name of the device.
@@ -458,6 +808,82 @@ class FlutterWhisperKit {
     } finally {
       // Ensure the progress subscription is cancelled to prevent memory leaks
       progressSubscription?.cancel();
+    }
+  }
+
+  /// Downloads a WhisperKit model using the Result pattern.
+  ///
+  /// This is a new API that returns a Result type instead of throwing exceptions,
+  /// providing better error handling and more explicit success/failure states.
+  ///
+  /// Parameters:
+  /// - [variant]: The model variant to download (required).
+  /// - [downloadBase]: The base URL for downloads.
+  /// - [useBackgroundSession]: Whether to use a background session for the download.
+  /// - [repo]: The repository to download from (default: 'argmaxinc/whisperkit-coreml').
+  /// - [token]: An access token for the repository.
+  /// - [onProgress]: A callback function that receives download progress updates.
+  ///
+  /// Returns a [Result] containing either:
+  /// - Success: The path to the downloaded model
+  /// - Failure: A [WhisperKitError] describing what went wrong
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await whisperKit.downloadWithResult(
+  ///   variant: 'tiny',
+  ///   onProgress: (progress) => print('Progress: ${progress.fractionCompleted}'),
+  /// );
+  /// result.when(
+  ///   success: (modelPath) => print('Model downloaded to: $modelPath'),
+  ///   failure: (error) => print('Download failed: ${error.message}'),
+  /// );
+  /// ```
+  Future<Result<String, WhisperKitError>> downloadWithResult({
+    required String variant,
+    String? downloadBase,
+    bool useBackgroundSession = false,
+    String repo = 'argmaxinc/whisperkit-coreml',
+    String? token,
+    Function(Progress progress)? onProgress,
+  }) async {
+    try {
+      final modelPath = await download(
+        variant: variant,
+        downloadBase: downloadBase,
+        useBackgroundSession: useBackgroundSession,
+        repo: repo,
+        token: token,
+        onProgress: onProgress,
+      );
+
+      if (modelPath == null) {
+        return Failure(
+          WhisperKitError(
+            code: 1000,
+            message: 'Download failed: model path is null',
+          ),
+        );
+      }
+
+      return Success(modelPath);
+    } on WhisperKitError catch (e) {
+      return Failure(e);
+    } on WhisperKitErrorType catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: _getErrorCodeFromType(e),
+          message: e.message,
+          details: e.details,
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        WhisperKitError(
+          code: 1000,
+          message: 'Download failed: $e',
+        ),
+      );
     }
   }
 
