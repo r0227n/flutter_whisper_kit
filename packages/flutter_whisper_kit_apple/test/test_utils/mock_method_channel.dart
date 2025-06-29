@@ -5,7 +5,6 @@ import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_m
 /// A mock implementation of [MethodChannelFlutterWhisperKit] for testing.
 class MockMethodChannelFlutterWhisperkit
     extends MethodChannelFlutterWhisperKit {
-
   /// Constructor
   MockMethodChannelFlutterWhisperkit() {
     // Add a test result to the stream after a short delay
@@ -20,6 +19,7 @@ class MockMethodChannelFlutterWhisperkit
       );
     });
   }
+
   /// Stream controller for test transcription results
   final StreamController<TranscriptionResult> _testStreamController =
       StreamController<TranscriptionResult>.broadcast();
