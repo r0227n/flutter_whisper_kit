@@ -8,11 +8,11 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperKitPlatform {
-
   MockFlutterWhisperkitPlatform()
       : _progressController = StreamController<Progress>.broadcast(),
         _transcriptionController =
             StreamController<TranscriptionResult>.broadcast();
+
   /// Exception to throw for testing error handling
   Exception? _throwError;
 

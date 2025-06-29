@@ -7,14 +7,12 @@ sealed class TranscriptionEvent {}
 
 /// Event carrying transcription result
 class TranscriptionResultEvent extends TranscriptionEvent {
-
   TranscriptionResultEvent(this.result);
   final TranscriptionResult result;
 }
 
 /// Event carrying progress information
 class ProgressEvent extends TranscriptionEvent {
-
   ProgressEvent(this.progress);
   final double progress;
 }
@@ -28,7 +26,6 @@ enum OverflowStrategy {
 
 /// Reactive programming support for transcription events
 class TranscriptionStream implements IDisposable {
-
   /// Creates a new TranscriptionStream
   TranscriptionStream()
       : _controller = StreamController<TranscriptionEvent>.broadcast();
@@ -73,7 +70,6 @@ abstract class IDisposable {
 
 /// Buffered transcription stream with backpressure support
 class BufferedTranscriptionStream implements IDisposable {
-
   /// Creates a buffered transcription stream
   BufferedTranscriptionStream({
     this.maxBufferSize = 100,

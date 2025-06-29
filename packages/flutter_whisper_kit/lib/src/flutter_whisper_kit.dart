@@ -18,7 +18,6 @@ import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 /// - [TranscriptionService]: File transcription and language detection
 /// - [ResultApiService]: Result-based API methods for better error handling
 class FlutterWhisperKit {
-
   FlutterWhisperKit() {
     _modelService = ModelManagementService();
     _recordingService = RecordingService();

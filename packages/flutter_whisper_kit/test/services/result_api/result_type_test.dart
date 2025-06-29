@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/src/result.dart';
 
 class TestException implements Exception {
-
   const TestException(this.message, [this.code]);
   final String message;
   final int? code;

@@ -10,7 +10,6 @@ import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 /// offering better error handling and more explicit success/failure states
 /// instead of throwing exceptions.
 class ResultApiService {
-
   ResultApiService({
     required ModelManagementService modelService,
     required RecordingService recordingService,

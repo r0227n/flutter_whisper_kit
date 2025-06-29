@@ -14,7 +14,6 @@ import 'package:flutter_whisper_kit/src/platform_specifics/whisper_kit_message.g
 /// the transcription and model loading processes by forwarding calls to the
 /// native WhisperKit implementation.
 class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
-
   /// Constructor that sets up the event channel listeners.
   ///
   /// Initializes the event channels for transcription results and model loading
@@ -79,6 +78,7 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       },
     );
   }
+
   /// The Pigeon-generated message interface for communicating with native code.
   final _whisperKitMessage = WhisperKitMessage();
 

@@ -48,7 +48,6 @@ enum LogLevel {
 
 /// Retry policy configuration
 class RetryPolicy {
-
   const RetryPolicy({
     this.maxAttempts = 3,
     this.initialDelay = const Duration(seconds: 1),
@@ -56,6 +55,7 @@ class RetryPolicy {
     this.backoffMultiplier = 2.0,
     this.jitterFactor = 0.1,
   });
+
   /// Maximum number of retry attempts
   final int maxAttempts;
 
@@ -102,7 +102,6 @@ class RetryPolicy {
 
 /// Fallback options when primary operation fails
 class FallbackOptions {
-
   const FallbackOptions({
     this.useOfflineModel = false,
     this.offlineModelVariant = 'tiny',
@@ -110,6 +109,7 @@ class FallbackOptions {
     this.skipWordTimestamps = false,
     this.reduceConcurrency = false,
   });
+
   /// Use offline model if available
   final bool useOfflineModel;
 
@@ -161,7 +161,6 @@ class FallbackOptions {
 
 /// Error recovery strategy configuration
 class ErrorRecoveryStrategy {
-
   const ErrorRecoveryStrategy._({
     required this.type,
     required this.retryPolicy,
@@ -202,6 +201,7 @@ class ErrorRecoveryStrategy {
       onError: onError,
     );
   }
+
   /// Type of recovery strategy
   final RecoveryType type;
 
@@ -217,7 +217,6 @@ class ErrorRecoveryStrategy {
 
 /// Main configuration for WhisperKit with error recovery
 class WhisperKitConfiguration {
-
   const WhisperKitConfiguration({
     required this.errorRecovery,
     required this.retryPolicy,
@@ -259,6 +258,7 @@ class WhisperKitConfiguration {
       logLevel: LogLevel.warning,
     );
   }
+
   /// Error recovery strategy
   final ErrorRecoveryStrategy errorRecovery;
 
@@ -277,7 +277,6 @@ class WhisperKitConfiguration {
 
 /// Executes operations with error recovery
 class RecoveryExecutor {
-
   RecoveryExecutor({
     required this.retryPolicy,
     this.fallbackOptions,
