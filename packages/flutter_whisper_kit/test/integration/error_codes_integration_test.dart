@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
 import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
-import 'test_utils/mock_platform.dart';
+import '../core/test_utils/mock_platform.dart';
 
 void main() {
   late MockFlutterWhisperKitPlatform mockPlatform;
