@@ -757,7 +757,7 @@ private class WhisperKitApiImpl: WhisperKitMessage {
       }
       
       whisperKit.loggingCallback { message in
-        print("WhisperKit log: \(message)")
+        print("WhisperKitLog: \(message)")
       }
       
       completion(.success(()))
