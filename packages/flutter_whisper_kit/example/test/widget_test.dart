@@ -14,7 +14,7 @@ void main() {
   testWidgets('App initializes correctly', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(buildTestApp());
-    
+
     // Wait for initial render
     await tester.pump();
 

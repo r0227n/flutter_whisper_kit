@@ -87,7 +87,7 @@ void main() {
       // since specific button texts might be scrolled down
       expect(find.byType(ElevatedButton), findsWidgets);
       expect(find.byType(DropdownButton<String>), findsWidgets);
-      
+
       // Basic interaction test - just verify the app responds to pumps
       await tester.pump();
       expect(find.byType(Scaffold), findsOneWidget);
