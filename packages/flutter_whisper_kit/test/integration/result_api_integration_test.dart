@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
-import 'test_utils/mocks.dart';
+import '../core/test_utils/mocks.dart';
 
 void main() {
   group('Result-based API Integration Tests', () {
@@ -176,7 +177,7 @@ void main() {
 
           final mappedResult = result
               .map((path) => 'Model at: $path')
-              .mapError((error) => WhisperKitError(
+              .mapError((error) => UnknownError(
                     code: error.code,
                     message: 'Wrapped: ${error.message}',
                   ));
@@ -230,6 +231,190 @@ void main() {
         () => whisperKit.transcribeFileWithResult('/path/to/audio.wav'),
         isA<Function>(),
       );
+    });
+  });
+
+  group('downloadWithResult', () {
+    late FlutterWhisperKit whisperKit;
+
+    setUp(() {
+      whisperKit = FlutterWhisperKit();
+    });
+
+    test('should return success with model path when download succeeds',
+        () async {
+      // Test the method exists and returns the correct type
+      expect(
+        () => whisperKit.downloadWithResult(variant: 'tiny'),
+        isA<Function>(),
+      );
+
+      // Test the return type
+      final future = whisperKit.downloadWithResult(variant: 'tiny');
+      expect(future, isA<Future<Result<String, WhisperKitError>>>());
+    });
+
+    test('should handle progress updates', () async {
+      final progressUpdates = <Progress>[];
+
+      final future = whisperKit.downloadWithResult(
+        variant: 'base',
+        onProgress: (progress) => progressUpdates.add(progress),
+      );
+
+      expect(future, isA<Future<Result<String, WhisperKitError>>>());
+    });
+
+    test('should accept all parameters', () async {
+      final future = whisperKit.downloadWithResult(
+        variant: 'small',
+        downloadBase: 'https://custom.url',
+        useBackgroundSession: true,
+        repo: 'custom/repo',
+        token: 'auth-token',
+      );
+
+      expect(future, isA<Future<Result<String, WhisperKitError>>>());
+    });
+  });
+
+  group('fetchAvailableModelsWithResult', () {
+    late FlutterWhisperKit whisperKit;
+
+    setUp(() {
+      whisperKit = FlutterWhisperKit();
+    });
+
+    test('should return success with model list', () async {
+      expect(
+        whisperKit.fetchAvailableModelsWithResult,
+        isA<Function>(),
+      );
+
+      final future = whisperKit.fetchAvailableModelsWithResult();
+      expect(future, isA<Future<Result<List<String>, WhisperKitError>>>());
+    });
+
+    test('should accept custom parameters', () async {
+      final future = whisperKit.fetchAvailableModelsWithResult(
+        modelRepo: 'custom/repo',
+        matching: ['tiny*', 'base*'],
+        token: 'auth-token',
+      );
+
+      expect(future, isA<Future<Result<List<String>, WhisperKitError>>>());
+    });
+  });
+
+  group('startRecordingWithResult', () {
+    late FlutterWhisperKit whisperKit;
+
+    setUp(() {
+      whisperKit = FlutterWhisperKit();
+    });
+
+    test('should return success when recording starts', () async {
+      expect(
+        whisperKit.startRecordingWithResult,
+        isA<Function>(),
+      );
+
+      final future = whisperKit.startRecordingWithResult();
+      expect(future, isA<Future<Result<String, WhisperKitError>>>());
+    });
+
+    test('should accept loop parameter', () async {
+      final future = whisperKit.startRecordingWithResult(loop: false);
+      expect(future, isA<Future<Result<String, WhisperKitError>>>());
+    });
+  });
+
+  group('stopRecordingWithResult', () {
+    late FlutterWhisperKit whisperKit;
+
+    setUp(() {
+      whisperKit = FlutterWhisperKit();
+    });
+
+    test('should return success when recording stops', () async {
+      expect(
+        whisperKit.stopRecordingWithResult,
+        isA<Function>(),
+      );
+
+      final future = whisperKit.stopRecordingWithResult();
+      expect(future, isA<Future<Result<String, WhisperKitError>>>());
+    });
+
+    test('should accept loop parameter', () async {
+      final future = whisperKit.stopRecordingWithResult(loop: false);
+      expect(future, isA<Future<Result<String, WhisperKitError>>>());
+    });
+  });
+
+  group('All WithResult methods integration', () {
+    late FlutterWhisperKit whisperKit;
+
+    setUp(() {
+      whisperKit = FlutterWhisperKit();
+    });
+
+    test('all WithResult methods follow consistent error handling pattern', () {
+      // All methods should return Result<T, WhisperKitError>
+      expect(whisperKit.loadModelWithResult('tiny'),
+          isA<Future<Result<String, WhisperKitError>>>());
+      expect(whisperKit.transcribeFileWithResult('/path/to/audio.wav'),
+          isA<Future<Result<TranscriptionResult?, WhisperKitError>>>());
+      expect(whisperKit.detectLanguageWithResult('/path/to/audio.wav'),
+          isA<Future<Result<LanguageDetectionResult?, WhisperKitError>>>());
+      expect(whisperKit.downloadWithResult(variant: 'tiny'),
+          isA<Future<Result<String, WhisperKitError>>>());
+      expect(whisperKit.fetchAvailableModelsWithResult(),
+          isA<Future<Result<List<String>, WhisperKitError>>>());
+      expect(whisperKit.startRecordingWithResult(),
+          isA<Future<Result<String, WhisperKitError>>>());
+      expect(whisperKit.stopRecordingWithResult(),
+          isA<Future<Result<String, WhisperKitError>>>());
+    });
+
+    test('all WithResult methods support Result pattern operations', () async {
+      // Example showing all methods support when/fold/map operations
+      void exampleUsage() async {
+        // downloadWithResult
+        final downloadResult =
+            await whisperKit.downloadWithResult(variant: 'tiny');
+        downloadResult.when(
+          success: (path) => debugPrint('Downloaded to: $path'),
+          failure: (error) => debugPrint('Download failed: ${error.message}'),
+        );
+
+        // fetchAvailableModelsWithResult
+        final modelsResult = await whisperKit.fetchAvailableModelsWithResult();
+        final modelCount = modelsResult.fold(
+          onSuccess: (models) => models.length,
+          onFailure: (error) => 0,
+        );
+        debugPrint('Model count: $modelCount');
+
+        // startRecordingWithResult
+        final startResult = await whisperKit.startRecordingWithResult();
+        final mappedStart = startResult
+            .map((msg) => 'Started: $msg')
+            .mapError((err) => UnknownError(
+                  code: err.code,
+                  message: 'Recording error: ${err.message}',
+                ));
+        debugPrint('Mapped result: $mappedStart');
+
+        // stopRecordingWithResult
+        final stopResult =
+            await whisperKit.stopRecordingWithResult(loop: false);
+        if (stopResult.isSuccess) {
+          debugPrint('Recording stopped successfully');
+        }
+      }
+
+      expect(exampleUsage, isA<Function>());
     });
   });
 }

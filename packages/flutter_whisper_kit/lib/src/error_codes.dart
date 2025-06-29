@@ -1,5 +1,3 @@
-import 'whisper_kit_error.dart';
-
 /// Categories of errors for better organization and handling
 enum ErrorCategory {
   /// Initialization errors (1000-1999)
@@ -158,12 +156,6 @@ abstract class ErrorCode {
       audioTooLong => 'Audio file too long',
       _ => 'Unknown error',
     };
-  }
-
-  /// Creates a WhisperKitError with the specified code and optional custom message
-  static WhisperKitError createError(int code, [String? customMessage]) {
-    final message = customMessage ?? getDescription(code);
-    return WhisperKitError(code: code, message: message);
   }
 
   /// Checks if an error code represents a recoverable error

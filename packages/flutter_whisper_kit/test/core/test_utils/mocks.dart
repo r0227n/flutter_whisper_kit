@@ -143,7 +143,7 @@ class MockFlutterWhisperkitPlatform
 
     if (filePath.isEmpty || filePath.contains('../')) {
       throw InvalidArgumentsError(
-          message: 'File path cannot be empty', errorCode: 5003);
+          message: 'File path cannot be empty', code: 5003);
     }
 
     // Mock JSON response for a successful transcription
@@ -239,8 +239,7 @@ class MockFlutterWhisperkitPlatform
     _checkThrowError();
     if (modelRepo.startsWith('http://127.0.0.1') ||
         modelRepo.startsWith('file://')) {
-      throw InvalidArgumentsError(
-          message: 'Invalid modelRepo', errorCode: 5002);
+      throw InvalidArgumentsError(message: 'Invalid modelRepo', code: 5002);
     }
     return Future.value([
       'tiny',

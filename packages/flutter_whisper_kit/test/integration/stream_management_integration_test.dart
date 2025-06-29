@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
-import 'test_utils/mocks.dart';
+import '../core/test_utils/mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -207,7 +207,7 @@ void main() {
       test('should cancel progress stream on error', () async {
         // Arrange
         mockPlatform.setThrowError(
-          ModelLoadingFailedError(message: 'Model not found', errorCode: 1001),
+          ModelLoadingFailedError(message: 'Model not found', code: 1001),
         );
 
         final progressUpdates = <Progress>[];
@@ -470,7 +470,7 @@ void main() {
                 Success<TranscriptionResult, WhisperKitError>(result))
             .handleError(
                 (error) => Failure<TranscriptionResult, WhisperKitError>(
-                      WhisperKitError(code: 2001, message: error.toString()),
+                      UnknownError(code: 2001, message: error.toString()),
                     ))
             .listen((result) => streamResults.add(result));
 

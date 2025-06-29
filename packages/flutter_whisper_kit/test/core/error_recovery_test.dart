@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/src/error_recovery.dart';
-import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/src/whisper_kit_error.dart';
 
 void main() {
   group('RetryPolicy', () {
@@ -228,7 +228,7 @@ void main() {
       expect(strategy.onError, isNull);
     });
 
-    test('custom strategy should include error handler', () {
+    test('custom strategy should include error handler', () async {
       bool handlerCalled = false;
 
       final strategy = ErrorRecoveryStrategy.custom(
@@ -243,7 +243,7 @@ void main() {
       expect(strategy.onError, isNotNull);
 
       // Test the handler
-      strategy.onError!(WhisperKitError(code: 1, message: 'test'));
+      await strategy.onError!(UnknownError(code: 1, message: 'test'));
       expect(handlerCalled, isTrue);
     });
   });
@@ -314,7 +314,7 @@ void main() {
           () async {
             attempts++;
             if (attempts < 3) {
-              throw WhisperKitError(
+              throw RecordingFailedError(
                 code: ErrorCode.networkTimeout,
                 message: 'Network timeout',
               );
@@ -338,7 +338,7 @@ void main() {
         final result = await executor.executeWithRetry(
           () async {
             attempts++;
-            throw WhisperKitError(
+            throw ModelLoadingFailedError(
               code: ErrorCode.modelNotFound,
               message: 'Model not found',
             );
@@ -360,7 +360,7 @@ void main() {
         final result = await executor.executeWithRetry(
           () async {
             attempts++;
-            throw WhisperKitError(
+            throw RecordingFailedError(
               code: ErrorCode.networkTimeout,
               message: 'Network timeout',
             );

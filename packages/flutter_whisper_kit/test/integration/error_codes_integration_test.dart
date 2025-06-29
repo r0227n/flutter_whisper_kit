@@ -1,7 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
 import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
-import 'test_utils/mock_platform.dart';
+
+import '../core/test_utils/mock_platform.dart';
 
 void main() {
   late MockFlutterWhisperKitPlatform mockPlatform;
@@ -90,11 +91,11 @@ void main() {
       try {
         await whisperKit.startRecording();
         fail('Should throw error');
-      } on WhisperKitErrorType catch (e) {
+      } on WhisperKitError catch (e) {
         // Then - now we catch the typed error and check its errorCode property
-        expect(e.errorCode, ErrorCode.microphonePermissionDenied);
-        expect(ErrorCategory.fromCode(e.errorCode), ErrorCategory.permission);
-        expect(ErrorCode.getSuggestedAction(e.errorCode),
+        expect(e.code, ErrorCode.microphonePermissionDenied);
+        expect(ErrorCategory.fromCode(e.code), ErrorCategory.permission);
+        expect(ErrorCode.getSuggestedAction(e.code),
             contains('Grant microphone permission'));
       }
     });
@@ -124,7 +125,7 @@ void main() {
     test('should create errors with custom messages while preserving codes',
         () {
       // Given
-      final customError = ErrorCode.createError(
+      final customError = WhisperKitError.fromCode(
         ErrorCode.transcriptionFailed,
         'Custom transcription error: timeout after 30 seconds',
       );

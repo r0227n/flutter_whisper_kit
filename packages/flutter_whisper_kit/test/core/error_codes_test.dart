@@ -148,32 +148,22 @@ void main() {
       });
     });
 
-    group('createError', () {
-      test('should create error with default description', () {
-        final error = ErrorCode.createError(ErrorCode.modelNotFound);
+    test('should create error with custom message', () {
+      final customMessage = 'Custom error message';
+      final error = WhisperKitError.fromCode(
+          ErrorCode.transcriptionFailed, customMessage);
 
-        expect(error, isA<WhisperKitError>());
-        expect(error.code, equals(ErrorCode.modelNotFound));
-        expect(error.message, equals('Model not found at specified path'));
-      });
+      expect(error, isA<WhisperKitError>());
+      expect(error.code, equals(ErrorCode.transcriptionFailed));
+      expect(error.message, equals(customMessage));
+    });
 
-      test('should create error with custom message', () {
-        final customMessage = 'Custom error message';
-        final error =
-            ErrorCode.createError(ErrorCode.transcriptionFailed, customMessage);
+    test('should create error with unknown code', () {
+      final error = WhisperKitError.fromCode(9999);
 
-        expect(error, isA<WhisperKitError>());
-        expect(error.code, equals(ErrorCode.transcriptionFailed));
-        expect(error.message, equals(customMessage));
-      });
-
-      test('should create error with unknown code', () {
-        final error = ErrorCode.createError(9999);
-
-        expect(error, isA<WhisperKitError>());
-        expect(error.code, equals(9999));
-        expect(error.message, equals('Unknown error'));
-      });
+      expect(error, isA<WhisperKitError>());
+      expect(error.code, equals(9999));
+      expect(error.message, equals('Unknown error'));
     });
   });
 }

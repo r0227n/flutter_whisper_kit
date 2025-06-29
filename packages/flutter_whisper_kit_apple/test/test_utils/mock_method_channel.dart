@@ -69,7 +69,7 @@ class MockMethodChannelFlutterWhisperkit
   }) async {
     if (filePath.isEmpty) {
       throw InvalidArgumentsError(
-          message: 'File path cannot be empty', errorCode: 5001);
+          message: 'File path cannot be empty', code: 5001);
     }
 
     // Return a mock transcription result

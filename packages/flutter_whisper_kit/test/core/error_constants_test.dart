@@ -72,12 +72,12 @@ void main() {
 
     test('error codes should map to correct error types', () {
       // Given & When
-      final modelError = ErrorCode.createError(
+      final modelError = WhisperKitError.fromCode(
         ErrorCode.modelNotFound,
         'Custom message',
       );
 
-      final transcriptionError = ErrorCode.createError(
+      final transcriptionError = WhisperKitError.fromCode(
         ErrorCode.transcriptionFailed,
         'Custom message',
       );
