@@ -148,23 +148,22 @@ void main() {
       });
     });
 
-      test('should create error with custom message', () {
-        final customMessage = 'Custom error message';
-        final error =
-            WhisperKitError.fromCode(ErrorCode.transcriptionFailed, customMessage);
+    test('should create error with custom message', () {
+      final customMessage = 'Custom error message';
+      final error = WhisperKitError.fromCode(
+          ErrorCode.transcriptionFailed, customMessage);
 
-        expect(error, isA<WhisperKitError>());
-        expect(error.code, equals(ErrorCode.transcriptionFailed));
-        expect(error.message, equals(customMessage));
-      });
+      expect(error, isA<WhisperKitError>());
+      expect(error.code, equals(ErrorCode.transcriptionFailed));
+      expect(error.message, equals(customMessage));
+    });
 
-      test('should create error with unknown code', () {
-        final error = WhisperKitError.fromCode(9999);
+    test('should create error with unknown code', () {
+      final error = WhisperKitError.fromCode(9999);
 
-        expect(error, isA<WhisperKitError>());
-        expect(error.code, equals(9999));
-        expect(error.message, equals('Unknown error'));
-      });
+      expect(error, isA<WhisperKitError>());
+      expect(error.code, equals(9999));
+      expect(error.message, equals('Unknown error'));
     });
   });
 }
