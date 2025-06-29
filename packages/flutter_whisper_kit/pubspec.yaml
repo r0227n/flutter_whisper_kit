@@ -27,8 +27,6 @@ topics:
   - 'speech-to-text'
 
 flutter:
-  uses-material-design: true
-  
   plugin:
     platforms:
       ios:

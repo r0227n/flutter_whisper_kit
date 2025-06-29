@@ -8,22 +8,19 @@ environment:
 resolution: workspace
 
 dependencies:
+  cupertino_icons: ^1.0.8
+  file_picker: ^10.1.2
   flutter:
     sdk: flutter
-
   flutter_whisper_kit:
     path: ../
 
-  cupertino_icons: ^1.0.8
-  file_picker: ^10.1.2
-
 dev_dependencies:
-  integration_test:
-    sdk: flutter
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
-
-  flutter_lints: ^5.0.0
+  integration_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true
