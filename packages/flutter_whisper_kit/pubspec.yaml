@@ -13,7 +13,9 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
+  flutter_whisper_kit_apple: 0.2.0
   plugin_platform_interface: ^2.0.2
+
 
 dev_dependencies:
   flutter_lints: ^5.0.0
