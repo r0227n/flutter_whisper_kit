@@ -150,7 +150,7 @@ class FallbackOptions {
       promptTokens: original.promptTokens,
       prefixTokens: original.prefixTokens,
       suppressBlank: original.suppressBlank,
-      suppressTokens: original.suppressTokens,
+      supressTokens: original.supressTokens,
       compressionRatioThreshold: original.compressionRatioThreshold,
       logProbThreshold: original.logProbThreshold,
       firstTokenLogProbThreshold: original.firstTokenLogProbThreshold,

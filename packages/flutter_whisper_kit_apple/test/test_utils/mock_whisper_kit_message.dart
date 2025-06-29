@@ -21,7 +21,7 @@ class MockWhisperKitMessage extends FlutterWhisperKitPlatform {
   }) async {
     if (filePath.isEmpty) {
       throw InvalidArgumentsError(
-          message: 'File path cannot be empty', errorCode: 5001);
+          message: 'File path cannot be empty', code: 5001);
     }
 
     return TranscriptionResult(
