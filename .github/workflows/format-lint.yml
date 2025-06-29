@@ -27,5 +27,5 @@ jobs:
         run: flutter analyze --no-fatal-infos
       
       - name: Run Tests (if available)
-        run: flutter test
+        run: flutter test .
         continue-on-error: true
