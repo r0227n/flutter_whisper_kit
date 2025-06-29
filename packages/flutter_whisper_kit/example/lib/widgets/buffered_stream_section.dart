@@ -14,20 +14,20 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
   // Stream instances
   TranscriptionStream? _transcriptionStream;
   BufferedTranscriptionStream? _bufferedStream;
-  
+
   // Subscriptions
   StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
   StreamSubscription<double>? _progressSubscription;
   StreamSubscription<TranscriptionEvent>? _bufferedSubscription;
-  
+
   // State variables
   final List<String> _streamLogs = [];
   bool _isStreamActive = false;
-  
+
   // Buffer configuration
   int _bufferSize = 5;
   OverflowStrategy _overflowStrategy = OverflowStrategy.drop;
-  
+
   // Statistics
   int _totalEvents = 0;
   int _droppedEvents = 0;
@@ -50,7 +50,8 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
 
   void _addLog(String message) {
     setState(() {
-      _streamLogs.insert(0, '[${DateTime.now().millisecondsSinceEpoch % 100000}] $message');
+      _streamLogs.insert(
+          0, '[${DateTime.now().millisecondsSinceEpoch % 100000}] $message');
       if (_streamLogs.length > 20) {
         _streamLogs.removeLast();
       }
@@ -59,7 +60,7 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
 
   void _startStreamTesting() {
     _disposeStreams();
-    
+
     setState(() {
       _isStreamActive = true;
       _streamLogs.clear();
@@ -76,12 +77,14 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
       overflowStrategy: _overflowStrategy,
     );
 
-    _addLog('Created streams with buffer size: $_bufferSize, strategy: $_overflowStrategy');
+    _addLog(
+        'Created streams with buffer size: $_bufferSize, strategy: $_overflowStrategy');
 
     // Subscribe to transcription stream results
     _transcriptionSubscription = _transcriptionStream!.results.listen(
       (result) {
-        _addLog('📄 Transcription result: "${result.text.length > 30 ? '${result.text.substring(0, 30)}...' : result.text}"');
+        _addLog(
+            '📄 Transcription result: "${result.text.length > 30 ? '${result.text.substring(0, 30)}...' : result.text}"');
         setState(() {
           _transcriptionEvents++;
         });
@@ -104,9 +107,11 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
     _bufferedSubscription = _bufferedStream!.events.listen(
       (event) {
         if (event is TranscriptionResultEvent) {
-          _addLog('🔄 Buffered transcription: "${event.result.text.length > 20 ? '${event.result.text.substring(0, 20)}...' : event.result.text}"');
+          _addLog(
+              '🔄 Buffered transcription: "${event.result.text.length > 20 ? '${event.result.text.substring(0, 20)}...' : event.result.text}"');
         } else if (event is ProgressEvent) {
-          _addLog('🔄 Buffered progress: ${(event.progress * 100).toStringAsFixed(1)}%');
+          _addLog(
+              '🔄 Buffered progress: ${(event.progress * 100).toStringAsFixed(1)}%');
         }
       },
       onError: (error) => _addLog('❌ Buffered stream error: $error'),
@@ -124,7 +129,9 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
   }
 
   void _simulateEvents() {
-    if (!_isStreamActive || _transcriptionStream == null || _bufferedStream == null) {
+    if (!_isStreamActive ||
+        _transcriptionStream == null ||
+        _bufferedStream == null) {
       _addLog('⚠️ Start stream testing first');
       return;
     }
@@ -137,26 +144,28 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
 
   void _simulateProgressEvents() {
     final progressValues = [0.1, 0.3, 0.5, 0.7, 0.9];
-    
+
     for (int i = 0; i < progressValues.length; i++) {
       Timer(Duration(milliseconds: i * 200), () {
         if (_isStreamActive) {
           final event = ProgressEvent(progressValues[i]);
           _transcriptionStream!.add(event);
           _bufferedStream!.add(event);
-          
+
           setState(() {
             _totalEvents++;
           });
-          
-          _addLog('🟢 Sent progress event: ${(progressValues[i] * 100).toStringAsFixed(1)}%');
-          
+
+          _addLog(
+              '🟢 Sent progress event: ${(progressValues[i] * 100).toStringAsFixed(1)}%');
+
           // Check buffer size for overflow detection
           if (_bufferedStream!.currentBufferSize >= _bufferSize) {
             setState(() {
               _droppedEvents++;
             });
-            _addLog('⚠️ Buffer overflow detected (size: ${_bufferedStream!.currentBufferSize})');
+            _addLog(
+                '⚠️ Buffer overflow detected (size: ${_bufferedStream!.currentBufferSize})');
           }
         }
       });
@@ -181,23 +190,24 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
             language: 'en',
             timings: const TranscriptionTimings(),
           );
-          
+
           final event = TranscriptionResultEvent(mockResult);
           _transcriptionStream!.add(event);
           _bufferedStream!.add(event);
-          
+
           setState(() {
             _totalEvents++;
           });
-          
+
           _addLog('🟡 Sent transcription event: "${transcriptionTexts[i]}"');
-          
+
           // Check buffer size for overflow detection
           if (_bufferedStream!.currentBufferSize >= _bufferSize) {
             setState(() {
               _droppedEvents++;
             });
-            _addLog('⚠️ Buffer overflow detected (size: ${_bufferedStream!.currentBufferSize})');
+            _addLog(
+                '⚠️ Buffer overflow detected (size: ${_bufferedStream!.currentBufferSize})');
           }
         }
       });
@@ -209,17 +219,17 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
     Timer(const Duration(milliseconds: 3000), () {
       if (_isStreamActive) {
         _addLog('🔥 Simulating buffer overflow...');
-        
+
         for (int i = 0; i < _bufferSize + 3; i++) {
           Timer(Duration(milliseconds: i * 50), () {
             if (_isStreamActive) {
               final event = ProgressEvent(0.1 + (i * 0.1));
               _bufferedStream!.add(event);
-              
+
               setState(() {
                 _totalEvents++;
               });
-              
+
               if (_bufferedStream!.currentBufferSize >= _bufferSize) {
                 setState(() {
                   _droppedEvents++;
@@ -235,7 +245,8 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
   void _clearBuffer() {
     if (_bufferedStream != null) {
       _bufferedStream!.clearBuffer();
-      _addLog('🧹 Buffer cleared (size now: ${_bufferedStream!.currentBufferSize})');
+      _addLog(
+          '🧹 Buffer cleared (size now: ${_bufferedStream!.currentBufferSize})');
     }
   }
 
@@ -249,7 +260,7 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        
+
         // Configuration controls
         Card(
           child: Padding(
@@ -257,7 +268,8 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Configuration', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Configuration',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 Row(
                   children: [
                     const Text('Buffer Size: '),
@@ -268,11 +280,13 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
                         max: 10,
                         divisions: 9,
                         label: _bufferSize.toString(),
-                        onChanged: _isStreamActive ? null : (value) {
-                          setState(() {
-                            _bufferSize = value.round();
-                          });
-                        },
+                        onChanged: _isStreamActive
+                            ? null
+                            : (value) {
+                                setState(() {
+                                  _bufferSize = value.round();
+                                });
+                              },
                       ),
                     ),
                     Text(_bufferSize.toString()),
@@ -285,13 +299,15 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
                       child: DropdownButton<OverflowStrategy>(
                         value: _overflowStrategy,
                         isExpanded: true,
-                        onChanged: _isStreamActive ? null : (OverflowStrategy? newValue) {
-                          if (newValue != null) {
-                            setState(() {
-                              _overflowStrategy = newValue;
-                            });
-                          }
-                        },
+                        onChanged: _isStreamActive
+                            ? null
+                            : (OverflowStrategy? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _overflowStrategy = newValue;
+                                  });
+                                }
+                              },
                         items: OverflowStrategy.values.map((strategy) {
                           return DropdownMenuItem<OverflowStrategy>(
                             value: strategy,
@@ -306,9 +322,9 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
             ),
           ),
         ),
-        
+
         const SizedBox(height: 8),
-        
+
         // Control buttons
         Wrap(
           spacing: 8.0,
@@ -331,9 +347,9 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Statistics
         Card(
           child: Padding(
@@ -341,22 +357,24 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Statistics', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Statistics',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 Text('Total Events Sent: $_totalEvents'),
                 Text('Transcription Events: $_transcriptionEvents'),
                 Text('Progress Events: $_progressEvents'),
                 Text('Dropped Events: $_droppedEvents'),
                 if (_bufferedStream != null)
-                  Text('Current Buffer Size: ${_bufferedStream!.currentBufferSize}'),
+                  Text(
+                      'Current Buffer Size: ${_bufferedStream!.currentBufferSize}'),
                 Text('Strategy: ${_overflowStrategy.name}'),
                 Text('Max Buffer Size: $_bufferSize'),
               ],
             ),
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Event log
         Card(
           child: Padding(
@@ -364,7 +382,8 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Event Log', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Event Log',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Container(
                   height: 300,
@@ -374,12 +393,14 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
                     borderRadius: BorderRadius.circular(4.0),
                   ),
                   child: _streamLogs.isEmpty
-                      ? const Text('No events yet. Start stream testing and simulate events.')
+                      ? const Text(
+                          'No events yet. Start stream testing and simulate events.')
                       : ListView.builder(
                           itemCount: _streamLogs.length,
                           itemBuilder: (context, index) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 1.0),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 1.0),
                               child: Text(
                                 _streamLogs[index],
                                 style: const TextStyle(

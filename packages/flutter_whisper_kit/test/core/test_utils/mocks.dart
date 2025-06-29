@@ -239,8 +239,7 @@ class MockFlutterWhisperkitPlatform
     _checkThrowError();
     if (modelRepo.startsWith('http://127.0.0.1') ||
         modelRepo.startsWith('file://')) {
-      throw InvalidArgumentsError(
-          message: 'Invalid modelRepo', code: 5002);
+      throw InvalidArgumentsError(message: 'Invalid modelRepo', code: 5002);
     }
     return Future.value([
       'tiny',

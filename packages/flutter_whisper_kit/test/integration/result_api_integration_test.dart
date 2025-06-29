@@ -241,7 +241,8 @@ void main() {
       whisperKit = FlutterWhisperKit();
     });
 
-    test('should return success with model path when download succeeds', () async {
+    test('should return success with model path when download succeeds',
+        () async {
       // Test the method exists and returns the correct type
       expect(
         () => whisperKit.downloadWithResult(variant: 'tiny'),
@@ -360,27 +361,28 @@ void main() {
 
     test('all WithResult methods follow consistent error handling pattern', () {
       // All methods should return Result<T, WhisperKitError>
-      expect(whisperKit.loadModelWithResult('tiny'), 
-        isA<Future<Result<String, WhisperKitError>>>());
-      expect(whisperKit.transcribeFileWithResult('/path/to/audio.wav'), 
-        isA<Future<Result<TranscriptionResult?, WhisperKitError>>>());
-      expect(whisperKit.detectLanguageWithResult('/path/to/audio.wav'), 
-        isA<Future<Result<LanguageDetectionResult?, WhisperKitError>>>());
-      expect(whisperKit.downloadWithResult(variant: 'tiny'), 
-        isA<Future<Result<String, WhisperKitError>>>());
-      expect(whisperKit.fetchAvailableModelsWithResult(), 
-        isA<Future<Result<List<String>, WhisperKitError>>>());
-      expect(whisperKit.startRecordingWithResult(), 
-        isA<Future<Result<String, WhisperKitError>>>());
-      expect(whisperKit.stopRecordingWithResult(), 
-        isA<Future<Result<String, WhisperKitError>>>());
+      expect(whisperKit.loadModelWithResult('tiny'),
+          isA<Future<Result<String, WhisperKitError>>>());
+      expect(whisperKit.transcribeFileWithResult('/path/to/audio.wav'),
+          isA<Future<Result<TranscriptionResult?, WhisperKitError>>>());
+      expect(whisperKit.detectLanguageWithResult('/path/to/audio.wav'),
+          isA<Future<Result<LanguageDetectionResult?, WhisperKitError>>>());
+      expect(whisperKit.downloadWithResult(variant: 'tiny'),
+          isA<Future<Result<String, WhisperKitError>>>());
+      expect(whisperKit.fetchAvailableModelsWithResult(),
+          isA<Future<Result<List<String>, WhisperKitError>>>());
+      expect(whisperKit.startRecordingWithResult(),
+          isA<Future<Result<String, WhisperKitError>>>());
+      expect(whisperKit.stopRecordingWithResult(),
+          isA<Future<Result<String, WhisperKitError>>>());
     });
 
     test('all WithResult methods support Result pattern operations', () async {
       // Example showing all methods support when/fold/map operations
       void exampleUsage() async {
         // downloadWithResult
-        final downloadResult = await whisperKit.downloadWithResult(variant: 'tiny');
+        final downloadResult =
+            await whisperKit.downloadWithResult(variant: 'tiny');
         downloadResult.when(
           success: (path) => debugPrint('Downloaded to: $path'),
           failure: (error) => debugPrint('Download failed: ${error.message}'),
@@ -397,15 +399,16 @@ void main() {
         // startRecordingWithResult
         final startResult = await whisperKit.startRecordingWithResult();
         final mappedStart = startResult
-          .map((msg) => 'Started: $msg')
-          .mapError((err) => UnknownError(
-            code: err.code,
-            message: 'Recording error: ${err.message}',
-          ));
+            .map((msg) => 'Started: $msg')
+            .mapError((err) => UnknownError(
+                  code: err.code,
+                  message: 'Recording error: ${err.message}',
+                ));
         debugPrint('Mapped result: $mappedStart');
 
         // stopRecordingWithResult
-        final stopResult = await whisperKit.stopRecordingWithResult(loop: false);
+        final stopResult =
+            await whisperKit.stopRecordingWithResult(loop: false);
         if (stopResult.isSuccess) {
           debugPrint('Recording stopped successfully');
         }

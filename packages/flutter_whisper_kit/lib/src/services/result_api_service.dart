@@ -177,8 +177,8 @@ class ResultApiService {
 
   /// Starts audio recording using the Result pattern.
   ///
-  /// This is a **Result-based API** that returns a [Result] type instead of 
-  /// throwing exceptions, providing better error handling and more explicit 
+  /// This is a **Result-based API** that returns a [Result] type instead of
+  /// throwing exceptions, providing better error handling and more explicit
   /// success/failure states for real-time audio capture.
   ///
   /// Parameters:
@@ -217,8 +217,8 @@ class ResultApiService {
 
   /// Stops audio recording using the Result pattern.
   ///
-  /// This is a **Result-based API** that returns a [Result] type instead of 
-  /// throwing exceptions, providing better error handling and more explicit 
+  /// This is a **Result-based API** that returns a [Result] type instead of
+  /// throwing exceptions, providing better error handling and more explicit
   /// success/failure states for audio recording termination.
   ///
   /// Parameters:

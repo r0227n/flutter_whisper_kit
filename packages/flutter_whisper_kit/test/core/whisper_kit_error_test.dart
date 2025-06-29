@@ -37,8 +37,7 @@ void main() {
           details: {'modelName': 'tiny'},
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error.code, equals(1234));
         expect(error.message, equals('Model loading failed'));
@@ -75,8 +74,7 @@ void main() {
           message: 'Different domain error',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<UnknownError>());
         expect(error.code, equals(1000));
@@ -94,8 +92,7 @@ void main() {
           details: details,
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error.details, equals(details));
       });
@@ -129,8 +126,7 @@ void main() {
           code: 'UNKNOWN_ERROR',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error.code, equals(1000));
         expect(error.message, equals('Unknown error'));
@@ -143,8 +139,7 @@ void main() {
           details: {'custom': 'data'},
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error.code, equals(1000));
         expect(error.message, equals('Custom error message'));
@@ -162,8 +157,7 @@ void main() {
           details: {'modelName': 'tiny'},
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<ModelLoadingFailedError>());
         expect(error.message, equals('Model loading failed'));
@@ -176,8 +170,7 @@ void main() {
           message: 'Failed to transcribe',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<TranscriptionFailedError>());
         expect(error.message, equals('Transcription failed'));
@@ -189,8 +182,7 @@ void main() {
           message: 'Failed to record',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<RecordingFailedError>());
         expect(error.message, equals('Recording failed'));
@@ -202,8 +194,7 @@ void main() {
           message: 'Microphone permission denied',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<PermissionDeniedError>());
         expect(error.message, equals('Permission denied'));
@@ -215,8 +206,7 @@ void main() {
           message: 'Invalid parameters',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<InvalidArgumentsError>());
         expect(error.message, equals('Invalid arguments'));
@@ -228,8 +218,7 @@ void main() {
           message: 'Something went wrong',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<UnknownError>());
         expect(error.message, equals('Unknown error'));
@@ -241,8 +230,7 @@ void main() {
           message: 'Different domain error',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<UnknownError>());
         expect(error.message, equals('Different domain error'));
@@ -254,8 +242,7 @@ void main() {
           message: 'Invalid argument provided',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<UnknownError>());
         expect(error.message, equals('Invalid argument provided'));
@@ -266,8 +253,7 @@ void main() {
           code: 'UNKNOWN_ERROR',
         );
 
-        final error =
-            WhisperKitError.fromPlatformException(platformException);
+        final error = WhisperKitError.fromPlatformException(platformException);
 
         expect(error, isA<UnknownError>());
         expect(error.message, equals('Unknown error'));
@@ -302,18 +288,16 @@ void main() {
               message: 'Failed to load model', code: 1001),
           const TranscriptionFailedError(
               message: 'Transcription failed', code: 2001),
-          const RecordingFailedError(
-              message: 'Recording failed', code: 3001),
-          const InvalidArgumentsError(
-              message: 'Invalid arguments', code: 5002),
-          const PermissionDeniedError(
-              message: 'Permission denied', code: 4001),
+          const RecordingFailedError(message: 'Recording failed', code: 3001),
+          const InvalidArgumentsError(message: 'Invalid arguments', code: 5002),
+          const PermissionDeniedError(message: 'Permission denied', code: 4001),
           const UnknownError(message: 'Unknown error', code: 1000),
         ];
 
         for (final error in errors) {
           final result = error.toString();
-          expect(result, equals('${error.runtimeType}(${error.code}): ${error.message}'));
+          expect(result,
+              equals('${error.runtimeType}(${error.code}): ${error.message}'));
         }
       });
     });
