@@ -9,3 +9,7 @@ node_modules/
 
 # FVM Version Cache
 .fvm/
+
+# melos
+melos_workspace.iml
+.idea
