@@ -2,10 +2,13 @@ name: flutter_whisper_kit_android
 description: Android platform implementation for flutter_whisper_kit
 version: 0.1.0
 homepage: https://github.com/r0227n/flutter_whisper_kit
+publish_to: none
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.0.0"
+  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.3.0"
+
+resolution: workspace
 
 dependencies:
   flutter:
