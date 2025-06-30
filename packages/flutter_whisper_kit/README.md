@@ -20,11 +20,11 @@ A Flutter plugin that provides on-device speech recognition capabilities using [
 
 ## Platform Support
 
-| Platform | Minimum Version | Status |
-|----------|----------------|--------|
-| iOS      | 16.0+          | ✅ Fully Supported |
-| macOS    | 13.0+          | ✅ Fully Supported |
-| Android  | -              | 🚧 Planned for Future Release |
+| Platform | Minimum Version | Status                        |
+| -------- | --------------- | ----------------------------- |
+| iOS      | 16.0+           | ✅ Fully Supported            |
+| macOS    | 13.0+           | ✅ Fully Supported            |
+| Android  | -               | 🚧 Planned for Future Release |
 
 ## Installation
 
@@ -217,12 +217,12 @@ final result = await whisperKit.transcribeFromFile(audioPath, options: options);
 if (result != null) {
   print('Text: ${result.text}');
   print('Language: ${result.language}');
-  
+
   // Segment information
   for (final segment in result.segments) {
     print('Segment ${segment.id}: ${segment.text}');
     print('  Start: ${segment.startTime}s, End: ${segment.endTime}s');
-    
+
     // Word timing information (if wordTimestamps: true)
     for (final word in segment.words) {
       print('  Word: ${word.word} (${word.start}s - ${word.end}s)');
@@ -235,15 +235,15 @@ if (result != null) {
 
 Choose the appropriate model size based on your use case:
 
-| Model | Size | Speed | Accuracy | Use Case |
-|-------|------|-------|----------|----------|
-| tiny | ~39MB | Very Fast | Low | Real-time processing, battery-conscious |
-| tiny-en | ~39MB | Very Fast | Low (English only) | English-only real-time processing |
-| base | ~145MB | Fast | Medium | Balanced performance |
-| small | ~466MB | Medium | High | When higher accuracy is needed |
-| medium | ~1.5GB | Slow | Higher | When even higher accuracy is needed |
-| large-v2 | ~2.9GB | Very Slow | Very High | When maximum accuracy is needed |
-| large-v3 | ~2.9GB | Very Slow | Highest | Latest and highest accuracy |
+| Model    | Size   | Speed     | Accuracy           | Use Case                                |
+| -------- | ------ | --------- | ------------------ | --------------------------------------- |
+| tiny     | ~39MB  | Very Fast | Low                | Real-time processing, battery-conscious |
+| tiny-en  | ~39MB  | Very Fast | Low (English only) | English-only real-time processing       |
+| base     | ~145MB | Fast      | Medium             | Balanced performance                    |
+| small    | ~466MB | Medium    | High               | When higher accuracy is needed          |
+| medium   | ~1.5GB | Slow      | Higher             | When even higher accuracy is needed     |
+| large-v2 | ~2.9GB | Very Slow | Very High          | When maximum accuracy is needed         |
+| large-v3 | ~2.9GB | Very Slow | Highest            | Latest and highest accuracy             |
 
 ## Example App
 

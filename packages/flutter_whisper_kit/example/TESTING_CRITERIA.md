@@ -5,6 +5,7 @@ This document outlines the testing criteria for the Flutter WhisperKit example a
 ## Public Functions Testing Criteria
 
 ### 1. Device Information
+
 - **Function**: `deviceName()`
 - **UI Component**: DeviceInformationSection widget
 - **Input**: "Get Device Name" button
@@ -16,16 +17,17 @@ This document outlines the testing criteria for the Flutter WhisperKit example a
   - Error message is displayed if the call fails
 
 ### 2. Model Discovery
-- **Functions**: 
+
+- **Functions**:
   - `fetchAvailableModels()`
   - `recommendedModels()`
   - `recommendedRemoteModels()`
 - **UI Component**: ModelDiscoverySection widget
-- **Inputs**: 
+- **Inputs**:
   - "Fetch Available Models" button
   - "Get Recommended Models" button
   - "Get Recommended Remote Models" button
-- **Outputs**: 
+- **Outputs**:
   - List of available models
   - ModelSupport object showing default, supported, and disabled models
   - ModelSupport object showing remote model recommendations
@@ -38,10 +40,11 @@ This document outlines the testing criteria for the Flutter WhisperKit example a
   - Error messages are displayed if calls fail
 
 ### 3. Language Detection
+
 - **Function**: `detectLanguage()`
 - **UI Component**: LanguageDetectionSection widget
 - **Input**: "Detect Language from File" button (opens file picker)
-- **Output**: 
+- **Output**:
   - Detected language
   - Language probabilities (top 5, sorted by probability)
 - **Success Criteria**:
@@ -53,15 +56,16 @@ This document outlines the testing criteria for the Flutter WhisperKit example a
   - Error message is displayed if the call fails
 
 ### 4. Model Configuration
-- **Functions**: 
+
+- **Functions**:
   - `formatModelFiles()`
   - `fetchModelSupportConfig()`
 - **UI Component**: ModelConfigurationSection widget
-- **Inputs**: 
+- **Inputs**:
   - Text field for model file names
   - "Format Model Files" button
   - "Fetch Model Support Config" button
-- **Outputs**: 
+- **Outputs**:
   - List of formatted model files
   - ModelSupportConfig object with repository info, known models, and device supports
 - **Success Criteria**:
@@ -73,10 +77,11 @@ This document outlines the testing criteria for the Flutter WhisperKit example a
   - Error messages are displayed if calls fail
 
 ### 5. File Transcription
+
 - **Function**: `transcribeFromFile()`
 - **UI Component**: FileTranscriptionSection widget
 - **Input**: "Transcribe from File" button (opens file picker)
-- **Output**: 
+- **Output**:
   - Transcription text
   - Detected language
   - Transcription segments with timestamps
@@ -91,13 +96,14 @@ This document outlines the testing criteria for the Flutter WhisperKit example a
   - Error message is displayed if the call fails
 
 ### 6. Real-time Transcription
-- **Functions**: 
+
+- **Functions**:
   - `startRecording()`
   - `stopRecording()`
   - `transcriptionStream`
 - **UI Component**: RealTimeTranscriptionSection widget
 - **Input**: "Start Recording"/"Stop Recording" toggle button
-- **Output**: 
+- **Output**:
   - Real-time transcription text
   - Transcription segments with timestamps
 - **Success Criteria**:
@@ -108,14 +114,15 @@ This document outlines the testing criteria for the Flutter WhisperKit example a
   - Error message is displayed if recording fails
 
 ### 7. Model Loading
-- **Functions**: 
+
+- **Functions**:
   - `loadModel()`
   - `modelProgressStream`
 - **UI Component**: ModelLoadingIndicator widget
-- **Inputs**: 
+- **Inputs**:
   - Model selection dropdown
   - "Load Model" button
-- **Output**: 
+- **Output**:
   - Loading progress indicator
   - Success/failure message
 - **Success Criteria**:

@@ -1,5 +1,5 @@
 extends:
-  - '@commitlint/config-conventional'
+  - "@commitlint/config-conventional"
 
 rules:
   type-enum:
@@ -19,4 +19,4 @@ rules:
   subject-case:
     - 2
     - never
-    - - upper-case
+    - upper-case

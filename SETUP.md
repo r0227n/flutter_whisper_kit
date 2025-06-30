@@ -26,6 +26,7 @@ npm install
 ```
 
 This command will:
+
 - Install all required dependencies from package.json
 - Set up husky Git hooks automatically via the prepare script
 
@@ -60,6 +61,7 @@ All commit messages must follow the Conventional Commits specification:
 ```
 
 Valid types are:
+
 - `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation changes
@@ -69,6 +71,7 @@ Valid types are:
 - `chore`: Changes to the build process or auxiliary tools
 
 Examples of valid commit messages:
+
 ```
 feat(auth): add user authentication flow
 fix(ui): resolve overflow in dashboard layout
@@ -111,6 +114,7 @@ If commitlint is not working:
 If you want to enforce commit message standards in your CI/CD pipeline:
 
 1. Add a step in your CI workflow to validate commit messages:
+
    ```yaml
    - name: Check commit message
      run: echo "${{ github.event.head_commit.message }}" | npx commitlint

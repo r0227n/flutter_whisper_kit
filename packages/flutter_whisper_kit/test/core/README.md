@@ -21,17 +21,20 @@ These tests were created following the **Red-Green-Refactor** cycle:
 ## Test Structure
 
 ### Core Functionality Tests (5 files)
+
 - `flutter_whisperkit_method_channel_test.dart` - Method channel implementation testing
 - `flutter_whisper_kit_test.dart` - Main API class comprehensive testing (20+ methods)
 - `transcription_test.dart` - File transcription functionality with various audio formats
 - `realtime_transcription_test.dart` - Real-time transcription and recording lifecycle
 - `model_progress_test.dart` - Model download progress tracking and stream handling
 
-### Data Model Tests (2 files) 
+### Data Model Tests (2 files)
+
 - `models_test.dart` - Core model serialization (DecodingOptions, TranscriptionResult, Progress)
 - `additional_models_test.dart` - Extended model testing (DeviceSupport, LanguageDetectionResult, ModelSupport, etc.)
 
 ### Error Handling & Recovery Tests (6 files)
+
 - `whisper_kit_error_test.dart` - Error hierarchy and PlatformException conversion
 - `error_handling_test.dart` - Comprehensive error scenarios and edge cases
 - `error_codes_test.dart` - Error code constants validation and categorization
@@ -40,6 +43,7 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - `error_recovery_integration_test.dart` - Full error recovery workflow testing
 
 ### API Design Pattern Tests (5 files)
+
 - `result_type_test.dart` - Result<Success, Failure> pattern implementation
 - `result_api_integration_test.dart` - Result pattern integration with main API
 - `decoding_options_builder_test.dart` - Builder pattern for DecodingOptions
@@ -47,10 +51,12 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - `sealed_class_pattern_test.dart` - Sealed class pattern validation
 
 ### Integration Tests (2 files)
+
 - `stream_management_integration_test.dart` - Stream lifecycle and backpressure handling
 - `error_constants_test.dart` - Error constant consistency across the system
 
 ### Test Infrastructure (4 files)
+
 - `test_utils/mock_method_channel.dart` - Method channel mocking utilities
 - `test_utils/mocks.dart` - Enhanced mock platform with error simulation
 - `test_utils/mock_platform.dart` - Platform-specific mock implementations
@@ -60,10 +66,13 @@ These tests were created following the **Red-Green-Refactor** cycle:
 ## Detailed Test File Descriptions
 
 ### Core API Testing
+
 #### `flutter_whisper_kit_test.dart` (Main API Class)
+
 **Purpose**: Comprehensive testing of the FlutterWhisperKit main API class
 **Coverage**: 20+ public methods, error handling, stream management
 **Key Test Groups**:
+
 - Model Management: `loadModel()`, `setupModels()`, `download()`, `prewarmModels()`, `unloadModels()`, `clearState()`
 - Audio Processing: `transcribeFromFile()`, `startRecording()`, `stopRecording()`, `detectLanguage()`
 - Model Discovery: `fetchAvailableModels()`, `deviceName()`, `recommendedModels()`, `formatModelFiles()`
@@ -71,6 +80,7 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - Stream Access: `transcriptionStream`, `modelProgressStream`
 
 **Test Scenarios**:
+
 - ✅ Successful operation flows
 - ❌ Error handling and exception propagation
 - 🔄 Stream subscription management
@@ -78,9 +88,11 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - 🧪 Mock platform integration
 
 #### `transcription_test.dart` (File Transcription)
+
 **Purpose**: Testing audio file transcription capabilities
 **Coverage**: File-based transcription with various options and error scenarios
 **Key Test Groups**:
+
 - Basic transcription with default options
 - Custom DecodingOptions configuration
 - Language detection and auto-detection
@@ -88,9 +100,11 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - Error handling for invalid files and formats
 
 #### `realtime_transcription_test.dart` (Real-time Processing)
+
 **Purpose**: Testing real-time audio recording and transcription
 **Coverage**: Recording lifecycle, stream processing, real-time results
 **Key Test Groups**:
+
 - Recording start/stop operations
 - Real-time transcription stream handling
 - Custom decoding options for real-time
@@ -98,10 +112,13 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - Recording state management
 
 ### Data Model Testing
+
 #### `models_test.dart` (Core Models)
+
 **Purpose**: Testing core data model serialization and validation
 **Coverage**: JSON serialization, default values, type safety
 **Models Tested**:
+
 - `DecodingOptions`: 26+ parameters with validation
 - `TranscriptionResult`: Full result structure with segments
 - `Progress`: Progress tracking with completion states
@@ -109,9 +126,11 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - `WordTiming`: Word-level timing data
 
 #### `additional_models_test.dart` (Extended Models)
+
 **Purpose**: Testing extended model classes for device and language support
 **Coverage**: Device compatibility, language detection, model support
 **Models Tested**:
+
 - `DeviceSupport`: Hardware compatibility information
 - `LanguageDetectionResult`: Language probabilities and detection
 - `ModelSupport`: Model recommendation and compatibility
@@ -119,10 +138,13 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - `TranscriptionTimings`: Performance metrics and timing data
 
 ### Error Handling Testing
+
 #### `error_codes_test.dart` (Error Code System)
+
 **Purpose**: Testing error code constants and categorization
 **Coverage**: Error code ranges, descriptions, recoverability
 **Test Categories**:
+
 - **1000-1999**: Initialization errors (model loading, setup)
 - **2000-2999**: Runtime errors (transcription, processing)
 - **3000-3999**: Network errors (download, connectivity)
@@ -130,38 +152,48 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - **5000-5999**: Validation errors (invalid parameters)
 
 #### `error_recovery_test.dart` (Recovery Strategies)
+
 **Purpose**: Testing error recovery mechanisms and retry policies
 **Coverage**: Automatic recovery, retry policies, fallback options
 **Key Components**:
+
 - `RetryPolicy`: Exponential backoff with jitter
 - `FallbackOptions`: Quality degradation strategies
 - `ErrorRecoveryStrategy`: Automatic, manual, and custom recovery
 - `RecoveryExecutor`: Operation retry with recovery logic
 
 ### API Design Pattern Testing
+
 #### `result_type_test.dart` (Result Pattern)
+
 **Purpose**: Testing the Result<Success, Failure> pattern implementation
 **Coverage**: Type-safe error handling, pattern matching, transformations
 **Features Tested**:
+
 - Sealed class hierarchy (`Success<T>`, `Failure<E>`)
 - Pattern matching with `when()` method
 - Functional transformations (`map()`, `mapError()`, `fold()`)
 - Utility methods (`getOrNull()`, `getOrThrow()`, `getOrElse()`)
 
 #### `decoding_options_builder_test.dart` (Builder Pattern)
+
 **Purpose**: Testing the DecodingOptionsBuilder fluent API
 **Coverage**: Builder pattern implementation, method chaining, presets
 **Features Tested**:
+
 - Fluent API with method chaining
 - Preset configurations (fast, accurate, realtime)
 - Parameter validation and defaults
 - Builder state management
 
 ### Integration Testing
+
 #### `stream_management_integration_test.dart` (Stream Handling)
+
 **Purpose**: Testing stream lifecycle management and backpressure handling
 **Coverage**: Stream subscriptions, error handling, resource cleanup
 **Scenarios Tested**:
+
 - Concurrent stream subscriptions
 - Backpressure handling for slow consumers
 - Stream lifecycle (pause, resume, cancel)
@@ -169,9 +201,11 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - Resource cleanup and memory management
 
 #### `builder_pattern_integration_test.dart` (Builder Integration)
+
 **Purpose**: Testing builder pattern integration with main API
 **Coverage**: Builder usage in real scenarios, integration with error recovery
 **Integration Points**:
+
 - Builder usage in transcription workflows
 - Integration with error recovery fallback options
 - Preset configuration effectiveness
@@ -180,6 +214,7 @@ These tests were created following the **Red-Green-Refactor** cycle:
 ## Test Quality Metrics
 
 ### Coverage Statistics
+
 - **API Methods**: 21/21 public methods (100%)
 - **Error Scenarios**: 50+ error conditions
 - **Model Classes**: 12/12 model classes (100%)
@@ -187,12 +222,14 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - **Edge Cases**: 200+ boundary conditions
 
 ### Performance Benchmarks
+
 - **Individual Test Speed**: <10ms average
 - **Full Suite Runtime**: <30 seconds
 - **Memory Usage**: <50MB peak during testing
 - **Mock Response Time**: <1ms per operation
 
 ### Test Maintenance Metrics
+
 - **Test-to-Code Ratio**: 2.1:1 (comprehensive coverage)
 - **Mock Complexity**: Realistic platform behavior simulation
 - **Test Readability**: Descriptive naming and clear structure
@@ -201,12 +238,14 @@ These tests were created following the **Red-Green-Refactor** cycle:
 ## Enhanced Test Coverage
 
 ### **NEW: Complete API Coverage**
+
 - **FlutterWhisperKit Main Class**: All 20+ public methods tested
-- **Error Handling**: All 6 error types with boundary testing  
+- **Error Handling**: All 6 error types with boundary testing
 - **Stream Management**: Progress and transcription streams with subscription cleanup
 - **Platform Integration**: Comprehensive mock platform with error simulation
 
 ### **NEW: Model Classes Coverage**
+
 - **DeviceSupport**: Hardware compatibility testing
 - **LanguageDetectionResult**: Language detection with probabilities
 - **ModelSupport**: Model recommendation logic
@@ -216,6 +255,7 @@ These tests were created following the **Red-Green-Refactor** cycle:
 - **TranscriptionTimings**: Performance timing metrics
 
 ### **NEW: Error Scenarios Coverage**
+
 - **Model Loading Errors** (1000-1999): Not found, download failures, insufficient storage
 - **Transcription Errors** (2000-2999): Invalid files, timeouts, language detection failures
 - **Recording Errors** (3000-3999): Microphone issues, interruptions, audio session problems
@@ -226,12 +266,14 @@ These tests were created following the **Red-Green-Refactor** cycle:
 ## Running Tests
 
 ### All Tests
+
 ```bash
 cd packages/flutter_whisper_kit
 flutter test
 ```
 
 ### Specific Test Categories
+
 ```bash
 # Core functionality
 flutter test test/flutter_whisper_kit_test.dart
@@ -251,6 +293,7 @@ flutter test test/test_runner.dart
 ```
 
 ### Test with Coverage
+
 ```bash
 flutter test --coverage
 genhtml coverage/lcov.info -o coverage/html
@@ -287,27 +330,27 @@ This comprehensive test suite ensures the Flutter WhisperKit plugin is robust, r
 
 ```yaml
 review_request:
-  code: 'packages/flutter_whisper_kit/test/ && packages/flutter_whisper_kit_apple/test/'
+  code: "packages/flutter_whisper_kit/test/ && packages/flutter_whisper_kit_apple/test/"
 
   evaluation_criteria:
     security:
-      priority: 'HIGH'
+      priority: "HIGH"
       items:
-        - 'TODO: ファイルパスのサニタイズに関するテストを追加する (CWE-22: Improper Limitation of a Pathname to a Restricted Directory)'
-        - 'TODO: カスタムリポジトリURLの検証に関するテストを追加する (CWE-918: Server-Side Request Forgery)'
+        - "TODO: ファイルパスのサニタイズに関するテストを追加する (CWE-22: Improper Limitation of a Pathname to a Restricted Directory)"
+        - "TODO: カスタムリポジトリURLの検証に関するテストを追加する (CWE-918: Server-Side Request Forgery)"
 
     architecture:
-      priority: 'MEDIUM'
+      priority: "MEDIUM"
       items:
-        - 'TODO: `loadModel` と `download` のプログレスコールバックのテストを修正・有効化する'
-        - 'TODO: `transcriptionStream` と `modelProgressStream` のエラーハンドリングと連続データ処理に関するテストを拡充する'
-        - 'TODO: `FlutterWhisperKit` の各メソッドについて、異常系（無効な引数、存在しないファイル等）のテストケースを網羅的に追加する'
-        - 'TODO: `flutter_whisper_kit_apple` の `transcribeFromFile` の多言語テストを、モックが各言語を正しく返すように修正する'
-        - 'TODO: `DecodingOptions` の各パラメータの組み合わせや境界値に関するテストを追加する'
+        - "TODO: `loadModel` と `download` のプログレスコールバックのテストを修正・有効化する"
+        - "TODO: `transcriptionStream` と `modelProgressStream` のエラーハンドリングと連続データ処理に関するテストを拡充する"
+        - "TODO: `FlutterWhisperKit` の各メソッドについて、異常系（無効な引数、存在しないファイル等）のテストケースを網羅的に追加する"
+        - "TODO: `flutter_whisper_kit_apple` の `transcribeFromFile` の多言語テストを、モックが各言語を正しく返すように修正する"
+        - "TODO: `DecodingOptions` の各パラメータの組み合わせや境界値に関するテストを追加する"
 
     performance:
-      priority: 'LOW'
+      priority: "LOW"
       items:
-        - 'TODO: 長時間録音時のリアルタイム文字起こしの安定性に関するテストを追加する'
-        - 'TODO: 大量のモデルファイルを扱う場合の `formatModelFiles` のパフォーマンステストを追加する'
+        - "TODO: 長時間録音時のリアルタイム文字起こしの安定性に関するテストを追加する"
+        - "TODO: 大量のモデルファイルを扱う場合の `formatModelFiles` のパフォーマンステストを追加する"
 ```

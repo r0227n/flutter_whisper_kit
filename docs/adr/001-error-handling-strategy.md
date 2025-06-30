@@ -1,9 +1,11 @@
 # ADR-001: Error Handling Strategy
 
 ## Status
+
 Accepted
 
 ## Date
+
 2024-12-29
 
 ## Context
@@ -80,7 +82,7 @@ class Failure<S, E> extends Result<S, E> {
 ```dart
 class RecoveryExecutor {
   final RetryPolicy retryPolicy;
-  
+
   Future<Result<T, WhisperKitError>> executeWithRetry<T>(
     Future<T> Function() operation,
   ) async {
@@ -96,11 +98,11 @@ abstract class ErrorCodes {
   // Initialization errors (1000-1999)
   static const int modelNotFound = 1001;
   static const int invalidConfiguration = 1002;
-  
+
   // Runtime errors (2000-2999)
   static const int transcriptionFailed = 2001;
   static const int recordingFailed = 2003;
-  
+
   // Network errors (3000-3999)
   static const int downloadFailed = 3001;
   static const int networkTimeout = 3002;

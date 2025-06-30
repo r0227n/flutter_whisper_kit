@@ -1,14 +1,14 @@
-name: 'Setup Flutter'
-description: 'Sets up Flutter with the version specified in .mise.toml'
+name: "Setup Flutter"
+description: "Sets up Flutter with the version specified in .mise.toml"
 
 inputs:
   flutter-version-override:
-    description: 'Optional Flutter version to override the one in .mise.toml'
+    description: "Optional Flutter version to override the one in .mise.toml"
     required: false
-    default: ''
+    default: ""
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     # Extract Flutter version from .mise.toml
     - name: Get Flutter version from .mise.toml

@@ -1,14 +1,14 @@
-name: 'Setup Bun'
-description: 'Sets up Bun with the version specified in .mise.toml'
+name: "Setup Bun"
+description: "Sets up Bun with the version specified in .mise.toml"
 
 inputs:
   bun-version-override:
-    description: 'Optional Bun version to override the one in .mise.toml'
+    description: "Optional Bun version to override the one in .mise.toml"
     required: false
-    default: ''
+    default: ""
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     # Extract Bun version from .mise.toml
     - name: Get Bun version from .mise.toml

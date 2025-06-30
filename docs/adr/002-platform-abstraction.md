@@ -1,9 +1,11 @@
 # ADR-002: Platform Abstraction
 
 ## Status
+
 Accepted
 
 ## Date
+
 2024-12-29
 
 ## Context
@@ -29,7 +31,7 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
   Future<TranscriptionResult?> transcribeFromFile(String path, {/* parameters */});
   Future<String?> startRecording({/* parameters */});
   Future<String?> stopRecording({/* parameters */});
-  
+
   /// Platform capability queries
   bool get supportsBackgroundDownloads;
   bool get supportsRealtimeTranscription;
@@ -40,28 +42,30 @@ abstract class FlutterWhisperKitPlatform extends PlatformInterface {
 ### 2. Platform-Specific Implementations
 
 #### Apple Platform Implementation
+
 ```dart
 class FlutterWhisperKitApple extends FlutterWhisperKitPlatform {
   @override
   bool get supportsBackgroundDownloads => true;
-  
+
   @override
   bool get supportsRealtimeTranscription => true;
-  
+
   @override
   List<String> get supportedAudioFormats => ['wav', 'mp3', 'm4a', 'caf'];
 }
 ```
 
 #### Future Android Platform Implementation
+
 ```dart
 class FlutterWhisperKitAndroid extends FlutterWhisperKitPlatform {
   @override
   bool get supportsBackgroundDownloads => false; // Limited by Android constraints
-  
+
   @override
   bool get supportsRealtimeTranscription => true;
-  
+
   @override
   List<String> get supportedAudioFormats => ['wav', 'mp3', 'aac'];
 }
@@ -74,7 +78,7 @@ class FlutterWhisperKit {
   static FlutterWhisperKitPlatform get _platform {
     return FlutterWhisperKitPlatform.instance;
   }
-  
+
   // Platform detection happens automatically through plugin registration
 }
 ```
@@ -121,7 +125,7 @@ class WhisperKitFeatures {
   static bool canUseBackgroundDownloads() {
     return FlutterWhisperKitPlatform.instance.supportsBackgroundDownloads;
   }
-  
+
   static Future<void> downloadWithOptimalStrategy(String variant) async {
     if (canUseBackgroundDownloads()) {
       await whisperKit.download(variant: variant, useBackgroundSession: true);
@@ -139,7 +143,7 @@ class WhisperKitFeatures {
 ```dart
 abstract class FlutterWhisperKitPlatform {
   static const MethodChannel _channel = MethodChannel('flutter_whisper_kit');
-  
+
   /// Template method for platform calls with consistent error handling
   Future<T> _handlePlatformCall<T>(Future<T> Function() call) async {
     try {
@@ -159,6 +163,7 @@ abstract class FlutterWhisperKitPlatform {
 ### Platform-Specific Optimizations
 
 #### iOS/macOS Optimizations
+
 ```swift
 // Swift implementation with platform-specific features
 class WhisperKitApplePlugin: NSObject, FlutterPlugin {
@@ -167,7 +172,7 @@ class WhisperKitApplePlugin: NSObject, FlutterPlugin {
         let audioSession = AVAudioSession.sharedInstance()
         try? audioSession.setCategory(.record, mode: .measurement)
     }
-    
+
     // Leverage macOS-specific hardware acceleration
     private func configureMetalPerformanceShaders() {
         // macOS-specific GPU acceleration
@@ -183,7 +188,7 @@ class WhisperKitError {
     // Map platform-specific error codes to unified error codes
     final platformCode = e.code;
     final unifiedCode = _mapPlatformErrorCode(platformCode);
-    
+
     return WhisperKitError(
       code: unifiedCode,
       message: e.message ?? 'Platform error',
@@ -191,7 +196,7 @@ class WhisperKitError {
       platformCode: platformCode,
     );
   }
-  
+
   static int _mapPlatformErrorCode(String platformCode) {
     // iOS/macOS error code mappings
     if (platformCode.startsWith('AVAudioSession')) {
