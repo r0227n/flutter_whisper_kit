@@ -28,12 +28,14 @@ Each ADR follows a consistent format:
 ## Current ADRs
 
 ### [ADR-001: Error Handling Strategy](001-error-handling-strategy.md)
+
 **Status**: Accepted  
 **Date**: 2024-12-29
 
 Establishes the Result Pattern approach for error handling, providing better type safety and explicit error handling compared to traditional exception-throwing methods.
 
 **Key Decisions**:
+
 - Implement Result&lt;Success, Failure&gt; pattern
 - Dual API approach (traditional + Result-based)
 - Standardized error codes by category
@@ -42,12 +44,14 @@ Establishes the Result Pattern approach for error handling, providing better typ
 **Impact**: Improved reliability and developer experience for error handling.
 
 ### [ADR-002: Platform Abstraction](002-platform-abstraction.md)
+
 **Status**: Accepted  
 **Date**: 2024-12-29
 
 Defines the platform abstraction layer for supporting multiple Apple platforms (iOS/macOS) with a unified API while enabling platform-specific optimizations.
 
 **Key Decisions**:
+
 - Platform Interface Pattern implementation
 - Federated plugin architecture
 - Platform capability system
@@ -56,12 +60,14 @@ Defines the platform abstraction layer for supporting multiple Apple platforms (
 **Impact**: Enables multi-platform support with optimized platform-specific implementations.
 
 ### [ADR-003: Testing Approach](003-testing-approach.md)
+
 **Status**: Accepted  
 **Date**: 2024-12-29
 
 Establishes comprehensive testing strategy with standardized utilities, multi-layer testing pyramid, and Test-Driven Development (TDD) practices.
 
 **Key Decisions**:
+
 - 70% unit tests, 20% integration tests, 10% E2E tests
 - Standardized mock utilities and test data factories
 - TDD workflow implementation
@@ -70,12 +76,14 @@ Establishes comprehensive testing strategy with standardized utilities, multi-la
 **Impact**: High confidence in code quality and easier maintenance through comprehensive testing.
 
 ### [ADR-004: Stream Management](004-stream-management.md)
+
 **Status**: Accepted  
 **Date**: 2024-12-29
 
 Implements reactive stream architecture for real-time audio processing with buffering, backpressure handling, and proper resource management.
 
 **Key Decisions**:
+
 - Reactive stream architecture
 - Multiple buffering strategies
 - Event-driven architecture
@@ -116,27 +124,35 @@ Create an ADR when making decisions that:
 # ADR-XXX: [Decision Title]
 
 ## Status
+
 [Proposed | Accepted | Deprecated | Superseded by ADR-XXX]
 
 ## Date
+
 YYYY-MM-DD
 
 ## Context
+
 [Describe the problem and its context]
 
 ## Decision
+
 [Describe the decision and implementation]
 
 ## Rationale
+
 [Explain why this decision was made]
 
 ## Consequences
+
 [List positive and negative consequences]
 
 ## Related ADRs
+
 [Links to related decisions]
 
 ## References
+
 [External references and documentation]
 ```
 
@@ -159,10 +175,12 @@ When contributing to this project:
 ## Tools and Resources
 
 ### ADR Tools
+
 - [adr-tools](https://github.com/npryce/adr-tools): Command-line tools for working with ADRs
 - [adr-viewer](https://github.com/mrwilson/adr-viewer): Web-based ADR viewer
 
 ### Further Reading
+
 - [Documenting Architecture Decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions) by Michael Nygard
 - [ADR Best Practices](https://github.com/joelparkerhenderson/architecture-decision-record)
 - [When to Write an ADR](https://engineering.atspotify.com/2020/04/14/when-should-i-write-an-architecture-decision-record/)

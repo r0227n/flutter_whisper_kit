@@ -4,12 +4,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Documentation Structure and Relationship
 
-### CLAUDE.md - README.md Integration System
-
-- **CLAUDE.md** (this file): Contains workflows and configurations for Claude Code to understand prompts and project structure
-- **README.md**: Provides human-readable documentation that mirrors and explains the content in CLAUDE.md
-- **1:1 Relationship**: CLAUDE.md and README.md maintain a one-to-one correspondence where each section in CLAUDE.md has an equivalent explanation in README.md. This constraint applies to the entire project structure - any CLAUDE.md file must have a corresponding README.md file in the same directory.
-
 ### Language Configuration
 
 - **Default Language**: Japanese
@@ -24,17 +18,6 @@ The README.md file includes Mermaid diagrams to visualize:
 - Development workflow processes
 - Component relationships
 - System integration patterns
-
-```mermaid
-graph TD
-    A[CLAUDE.md] --> B[Claude Code Processing]
-    C[README.md] --> D[Human Understanding]
-    A -.->|1:1 Relationship| C
-    B --> E[Automated Development]
-    D --> F[Manual Review]
-    E --> G[Quality Assurance]
-    F --> G
-```
 
 ## Claude 4 Best Practices Implementation
 
@@ -333,7 +316,6 @@ flutter_whisper_kit/
 ├── commitlint.config.js                    # Commit message linting
 ├── CLAUDE.md                               # Claude Code configuration
 ├── README.md                               # Project README
-├── SETUP.md                                # Development setup guide
 ├── CONTRIBUTING.md                         # Contribution guidelines
 └── LICENSE                                 # MIT License file
 ```
