@@ -5,7 +5,7 @@
 
 A Flutter plugin that provides on-device speech recognition capabilities using [WhisperKit](https://github.com/argmaxinc/WhisperKit). Achieve high-quality speech-to-text transcription while maintaining privacy.
 
-[日本語 README](./docs/README_ja.md)
+[日本語 README](./doc/README_ja.md)
 
 ## Features
 
