@@ -7,9 +7,6 @@ environment:
 dev_dependencies:
   melos: ^7.0.0-dev.9
 
-dev_dependencies:
-  melos: ^7.0.0-dev.9
-
 workspace:
   - packages/flutter_whisper_kit
   - packages/flutter_whisper_kit/example
