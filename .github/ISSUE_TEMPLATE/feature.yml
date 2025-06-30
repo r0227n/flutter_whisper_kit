@@ -1,7 +1,7 @@
 name: Feature Request
 description: Request a new feature implementation using Claude Code and AI Review-First design
-title: '[FEATURE] '
-labels: ['enhancement', 'claude-code']
+title: "[FEATURE] "
+labels: ["enhancement", "claude-code"]
 assignees: []
 
 body:
@@ -18,7 +18,7 @@ body:
     attributes:
       label: Feature Title
       description: Clear and concise feature name
-      placeholder: 'User authentication with OAuth2.0'
+      placeholder: "User authentication with OAuth2.0"
     validations:
       required: true
 

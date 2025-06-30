@@ -1,7 +1,7 @@
 name: Bug Fix
 description: Report a bug for fixing using Claude Code and AI Review-First design
-title: '[BUG] '
-labels: ['bug', 'claude-code']
+title: "[BUG] "
+labels: ["bug", "claude-code"]
 assignees: []
 
 body:
@@ -18,7 +18,7 @@ body:
     attributes:
       label: Bug Title
       description: Clear and concise description of the bug
-      placeholder: 'Login form validation fails with special characters'
+      placeholder: "Login form validation fails with special characters"
     validations:
       required: true
 
