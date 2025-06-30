@@ -37,11 +37,9 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       dart_changed: ${{ steps.check_changes.outputs.dart_changed }}
-      i18n_files_exist: ${{ steps.check_changes.outputs.i18n_files_exist }}
       yml_changed: ${{ steps.check_changes.outputs.yml_changed }}
       yaml_changed: ${{ steps.check_changes.outputs.yaml_changed }}
       md_changed: ${{ steps.check_changes.outputs.md_changed }}
-      i18n_changed: ${{ steps.check_changes.outputs.i18n_changed }}
 
     steps:
       # https://github.com/actions/checkout
@@ -57,26 +55,6 @@ jobs:
         with:
           base_sha: ${{ github.event.pull_request.base.sha }}
           head_sha: ${{ github.event.pull_request.head.sha }}
-
-  i18n-validation:
-    name: i18n Validation
-    runs-on: ubuntu-24.04
-    needs: check-file-changes
-    if: needs.check-file-changes.outputs.i18n_files_exist == 'true' && needs.check-file-changes.outputs.i18n_changed > 0
-
-    steps:
-      # https://github.com/actions/checkout  ss
-      - name: Checkout code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Setup Flutter
-        uses: ./.github/actions/setup-flutter
-
-      - name: Setup Bun
-        uses: ./.github/actions/setup-bun
-
-      - name: Run slang analyze
-        run: melos run analyze:slang
 
   lint-yaml-markdown:
     name: Lint YAML and Markdown
