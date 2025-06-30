@@ -1,0 +1,54 @@
+name: 'Setup Flutter'
+description: 'Sets up Flutter with the version specified in .mise.toml'
+
+inputs:
+  flutter-version-override:
+    description: 'Optional Flutter version to override the one in .mise.toml'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    # Extract Flutter version from .mise.toml
+    - name: Get Flutter version from .mise.toml
+      id: flutter-version
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.flutter-version-override }}" ]; then
+          FLUTTER_VERSION="${{ inputs.flutter-version-override }}"
+        else
+          FLUTTER_VERSION=$(grep "^flutter = " .mise.toml | sed 's/flutter = "\(.*\)"/\1/')
+          if [ -z "$FLUTTER_VERSION" ]; then
+            echo "Error: Failed to extract Flutter version from .mise.toml"
+            echo "Make sure .mise.toml contains a line like 'flutter 3.32.5'"
+            exit 1
+          fi
+        fi
+        echo "version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+
+    # https://github.com/subosito/flutter-action
+    - name: Setup flutter
+      uses: subosito/flutter-action@1c5eb12d812966ca84680edc38353a0851c8fd56 # v2.14.0
+      with:
+        flutter-version: ${{ steps.flutter-version.outputs.version }}
+        cache: true
+
+    # Parse melos version from pubspec.yaml
+    - name: Get melos version
+      id: melos-version
+      shell: bash
+      run: |
+        MELOS_VERSION=$(grep "melos:" pubspec.yaml | head -1 | awk '{print $2}' | sed 's/\^//')
+        if [ -z "$MELOS_VERSION" ]; then
+          echo "Error: Failed to extract melos version from pubspec.yaml"
+          echo "Make sure pubspec.yaml contains a line like 'melos: ^6.4.0'"
+          exit 1
+        fi
+        echo "version=$MELOS_VERSION" >> $GITHUB_OUTPUT
+
+    # Setup melos
+    - name: Setup melos
+      uses: bluefireteam/melos-action@c7dcb921b23cc520cace360b95d02b37bf09cdaa # v3.0.0
+      with:
+        melos-version: ${{ steps.melos-version.outputs.version }}

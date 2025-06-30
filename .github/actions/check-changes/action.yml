@@ -1,0 +1,49 @@
+name: "Check File Changes"
+description: "Check for specific file type changes in PR"
+author: "r0227n"
+
+inputs:
+  base_sha:
+    description: "Base commit SHA for comparison"
+    required: true
+  head_sha:
+    description: "Head commit SHA for comparison"
+    required: true
+
+outputs:
+  dart_changed:
+    description: "Number of .dart files changed"
+    value: ${{ steps.check_changes.outputs.dart_changed }}
+  yml_changed:
+    description: "Number of .yml files changed"
+    value: ${{ steps.check_changes.outputs.yml_changed }}
+  yaml_changed:
+    description: "Number of .yaml files changed"
+    value: ${{ steps.check_changes.outputs.yaml_changed }}
+  md_changed:
+    description: "Number of .md files changed"
+    value: ${{ steps.check_changes.outputs.md_changed }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check for file changes
+      id: check_changes
+      shell: bash
+      run: |
+        # Get changed files in PR
+        CHANGED_FILES=$(git diff --name-only ${{ inputs.base_sha }}..${{ inputs.head_sha }})
+
+        # Check for specific file types
+        echo "dart_changed=$(echo "$CHANGED_FILES" | grep -E '\.dart$' | wc -l | xargs)" >> $GITHUB_OUTPUT
+        echo "yml_changed=$(echo "$CHANGED_FILES" | grep -E '\.yml$' | wc -l | xargs)" >> $GITHUB_OUTPUT
+        echo "yaml_changed=$(echo "$CHANGED_FILES" | grep -E '\.yaml$' | wc -l | xargs)" >> $GITHUB_OUTPUT
+        echo "md_changed=$(echo "$CHANGED_FILES" | grep -E '\.md$' | wc -l | xargs)" >> $GITHUB_OUTPUT
+
+        # Debug output
+        echo "Changed files:"
+        echo "$CHANGED_FILES"
+        echo "Dart files changed: $(echo "$CHANGED_FILES" | grep -E '\.dart$' | wc -l | xargs)"
+        echo "YML files changed: $(echo "$CHANGED_FILES" | grep -E '\.yml$' | wc -l | xargs)"
+        echo "YAML files changed: $(echo "$CHANGED_FILES" | grep -E '\.yaml$' | wc -l | xargs)"
+        echo "MD files changed: $(echo "$CHANGED_FILES" | grep -E '\.md$' | wc -l | xargs)"

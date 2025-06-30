@@ -1,0 +1,34 @@
+name: 'Setup Bun'
+description: 'Sets up Bun with the version specified in .mise.toml'
+
+inputs:
+  bun-version-override:
+    description: 'Optional Bun version to override the one in .mise.toml'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    # Extract Bun version from .mise.toml
+    - name: Get Bun version from .mise.toml
+      id: bun-version
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.bun-version-override }}" ]; then
+          BUN_VERSION="${{ inputs.bun-version-override }}"
+        else
+          BUN_VERSION=$(grep "^bun = " .mise.toml | sed 's/bun = "\(.*\)"/\1/')
+          if [ -z "$BUN_VERSION" ]; then
+            echo "Error: Failed to extract Bun version from .mise.toml"
+            echo "Make sure .mise.toml contains a line like 'bun 1.2.17'"
+            exit 1
+          fi
+        fi
+        echo "version=$BUN_VERSION" >> $GITHUB_OUTPUT
+
+    # https://github.com/oven-sh/setup-bun/releases/tag/v2.0.2
+    - name: Setup bun
+      uses: oven-sh/setup-bun@735343b667d3e6f658f44d0eca948eb6282f2b76
+      with:
+        bun-version: ${{ steps.bun-version.outputs.version }}
