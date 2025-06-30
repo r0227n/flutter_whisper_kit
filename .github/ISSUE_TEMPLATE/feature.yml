@@ -1,0 +1,249 @@
+name: Feature Request
+description: Request a new feature implementation using Claude Code and AI Review-First design
+title: '[FEATURE] '
+labels: ['enhancement', 'claude-code']
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request Template
+
+        This template follows Claude 4 best practices and AI Review-First design principles.
+        Please provide clear, specific instructions to enable effective Claude Code automation.
+
+  - type: input
+    id: feature-title
+    attributes:
+      label: Feature Title
+      description: Clear and concise feature name
+      placeholder: 'User authentication with OAuth2.0'
+    validations:
+      required: true
+
+  - type: textarea
+    id: context-and-motivation
+    attributes:
+      label: Context and Motivation
+      description: |
+        **Why is this feature needed?** Provide business context and user value.
+        This helps Claude understand the purpose and make better architectural decisions.
+      placeholder: |
+        Business need: Users need secure login without managing passwords
+        User value: Streamlined authentication experience
+        Context: Current basic auth is insufficient for enterprise customers
+    validations:
+      required: true
+
+  - type: textarea
+    id: detailed-requirements
+    attributes:
+      label: Detailed Requirements
+      description: |
+        **Specific and measurable requirements** (following Claude 4 best practices: be explicit, not vague)
+      placeholder: |
+        Functional Requirements:
+        - OAuth2.0 integration with Google, GitHub, and Microsoft
+        - JWT token management with 24-hour expiration
+        - Automatic token refresh
+        - Secure logout with token invalidation
+
+        Non-Functional Requirements:
+        - Response time: < 500ms for authentication
+        - Support for 1000+ concurrent users
+        - WCAG 2.1 AA compliance
+        - Mobile responsive design
+      value: |
+        ### Functional Requirements:
+        - [ ] 
+
+        ### Non-Functional Requirements:
+        - [ ] 
+
+        ### Security Requirements:
+        - [ ]
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical-constraints
+    attributes:
+      label: Technical Constraints and Guidelines
+      description: Architecture decisions, technology choices, and implementation constraints
+      placeholder: |
+        - Use existing Riverpod state management
+        - Follow Flutter/Dart conventions in the codebase
+        - Integrate with current go_router navigation
+        - Maintain compatibility with existing theme system
+        - Use slang for internationalization
+      value: |
+        ### Technology Stack:
+        - [ ] Follow project's Flutter + Riverpod architecture
+        - [ ] Use existing go_router for navigation
+        - [ ] Integrate with slang i18n system
+        - [ ] Follow SOLID principles
+
+        ### Code Standards:
+        - [ ] Include comprehensive unit tests
+        - [ ] Add widget tests for UI components
+        - [ ] Follow existing code conventions
+        - [ ] Include proper error handling
+    validations:
+      required: true
+
+  - type: textarea
+    id: ai-review-criteria
+    attributes:
+      label: AI Review-First Quality Criteria
+      description: |
+        Define specific criteria for the AI review cycles (3-4 iterations recommended)
+      value: |
+        ### Review Categories (Priority Order):
+
+        **High Priority - Security:**
+        - [ ] No security vulnerabilities (SQL injection, XSS, etc.)
+        - [ ] Proper input validation and sanitization
+        - [ ] Secure token storage and transmission
+        - [ ] Authentication bypass prevention
+
+        **Medium Priority - SOLID Principles:**
+        - [ ] Single Responsibility Principle compliance
+        - [ ] Open/Closed Principle adherence
+        - [ ] Dependency injection properly implemented
+        - [ ] Interface segregation followed
+
+        **Low Priority - Performance:**
+        - [ ] Efficient state management
+        - [ ] Minimal re-renders and rebuilds
+        - [ ] Proper memory management
+        - [ ] Optimized network requests
+
+        ### Review Constraints:
+        - Each review summary: ≤ 400 characters
+        - 3-4 review cycles maximum
+        - Human final validation required
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: |
+        **Specific, testable criteria** that define when this feature is complete
+      placeholder: |
+        - [ ] User can successfully authenticate with Google OAuth
+        - [ ] JWT tokens are properly managed and refreshed
+        - [ ] Authentication state persists across app restarts
+        - [ ] All security tests pass
+        - [ ] Performance benchmarks are met (< 500ms)
+        - [ ] Accessibility audit passes (WCAG 2.1 AA)
+        - [ ] Works on iOS and Android
+        - [ ] All unit and widget tests pass
+        - [ ] Code review approval received
+      value: |
+        ### Core Functionality:
+        - [ ] 
+
+        ### Quality Gates:
+        - [ ] All automated tests pass (unit, widget, integration)
+        - [ ] Static analysis (dart analyze) passes
+        - [ ] Code formatting (dart format) applied
+        - [ ] AI review cycles completed (3-4 iterations)
+        - [ ] Security review passed
+        - [ ] Performance benchmarks met
+        - [ ] Accessibility requirements satisfied
+
+        ### Documentation:
+        - [ ] API documentation updated
+        - [ ] User guide updated (if applicable)
+        - [ ] Code comments for complex logic
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing-strategy
+    attributes:
+      label: Testing Strategy
+      description: Define comprehensive testing approach (avoid over-focusing on tests per Claude 4 guidelines)
+      value: |
+        ### Test Types Required:
+        - [ ] Unit tests for business logic
+        - [ ] Widget tests for UI components
+        - [ ] Integration tests for critical flows
+        - [ ] Security tests for authentication
+
+        ### Test Coverage Goals:
+        - [ ] Business logic: 90%+
+        - [ ] UI components: 80%+
+        - [ ] Critical paths: 100%
+
+        ### Manual Testing:
+        - [ ] Cross-platform compatibility (iOS/Android)
+        - [ ] Accessibility testing with screen readers
+        - [ ] Performance testing under load
+    validations:
+      required: false
+
+  - type: textarea
+    id: claude-code-instructions
+    attributes:
+      label: Claude Code Implementation Instructions
+      description: |
+        **Specific instructions for Claude Code automation** (following CLAUDE.md guidelines)
+      value: |
+        ### Implementation Approach:
+        - [ ] Use AI Review-First design: small draft → critical review → regenerate → release
+        - [ ] Follow 3-4 review cycles focusing on security → SOLID → performance
+        - [ ] Create minimal walking skeleton first
+        - [ ] Include comprehensive error handling
+        - [ ] Follow project's Riverpod + go_router patterns
+
+        ### Automation Settings:
+        - [ ] Enable background tasks: `ENABLE_BACKGROUND_TASKS=true`
+        - [ ] Use git worktree for isolated development
+        - [ ] Create PR in Japanese upon completion
+        - [ ] Monitor GitHub Actions for completion confirmation
+
+        ### Quality Assurance:
+        - [ ] Run `melos run analyze` before commit
+        - [ ] Run `melos run test` before commit
+        - [ ] Run `melos run format` before commit
+        - [ ] Verify all CI checks pass
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Any additional information, mockups, references, or examples that would help with implementation
+      placeholder: |
+        - Link to design mockups
+        - Reference implementations
+        - Related issues or PRs
+        - External API documentation
+        - User research insights
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Ensure all required information is provided for effective Claude Code automation
+      options:
+        - label: I have provided clear, specific requirements (not vague instructions)
+          required: true
+        - label: I have defined measurable acceptance criteria
+          required: true
+        - label: I have specified AI review quality criteria
+          required: true
+        - label: I have included technical constraints and guidelines
+          required: true
+        - label: I have considered security, performance, and accessibility requirements
+          required: true
+        - label: This feature aligns with the project's architecture and technology choices
+          required: true

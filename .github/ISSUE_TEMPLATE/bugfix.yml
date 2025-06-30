@@ -1,0 +1,392 @@
+name: Bug Fix
+description: Report a bug for fixing using Claude Code and AI Review-First design
+title: '[BUG] '
+labels: ['bug', 'claude-code']
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Fix Template
+
+        This template follows Claude 4 best practices and AI Review-First design principles.
+        Please provide clear, specific information to enable effective Claude Code automation.
+
+  - type: input
+    id: bug-title
+    attributes:
+      label: Bug Title
+      description: Clear and concise description of the bug
+      placeholder: 'Login form validation fails with special characters'
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Bug Description
+      description: |
+        **What is the current problematic behavior?** Be specific and detailed.
+      placeholder: |
+        When users enter passwords containing special characters (!, @, #, $), 
+        the login form validation incorrectly rejects them as invalid, 
+        preventing successful authentication even with correct credentials.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: |
+        **Exact steps to consistently reproduce this bug**
+      placeholder: |
+        1. Navigate to login page
+        2. Enter valid email: test@example.com
+        3. Enter password with special characters: MyP@ssw0rd!
+        4. Click "Login" button
+        5. Observe validation error: "Invalid password format"
+      value: |
+        1. 
+        2. 
+        3. 
+        4. 
+        5.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: |
+        **What should happen instead?** Describe the correct behavior.
+      placeholder: |
+        The login form should accept passwords with special characters 
+        and proceed with authentication when credentials are valid.
+        Special characters should be properly handled in validation logic.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: |
+        **What currently happens?** Include error messages, unexpected outputs, etc.
+      placeholder: |
+        - Validation error appears: "Invalid password format"
+        - User cannot proceed with login
+        - Console shows: "RegExp validation failed for special characters"
+        - No authentication attempt is made
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment-info
+    attributes:
+      label: Environment Information
+      description: Platform, device, Flutter version, and other relevant environment details
+      value: |
+        ### Platform:
+        - [ ] iOS (version: )
+        - [ ] Android (version: )
+        - [ ] Web (browser: )
+
+        ### Device Information:
+        - Device model: 
+        - Screen size: 
+        - Orientation: 
+
+        ### Flutter/App Information:
+        - Flutter version: (check with `flutter --version`)
+        - App version: 
+        - Build mode: [ ] Debug [ ] Release [ ] Profile
+
+        ### Additional Context:
+        - Network conditions: 
+        - Data state:
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact-assessment
+    attributes:
+      label: Impact Assessment
+      description: |
+        **How severe is this bug?** Who is affected and how frequently?
+      value: |
+        ### Severity Level:
+        - [ ] Critical (blocks core functionality)
+        - [ ] High (affects main user flows)
+        - [ ] Medium (affects secondary features)
+        - [ ] Low (minor inconvenience)
+
+        ### User Impact:
+        - Affected users: 
+        - Frequency: 
+        - Workaround available: [ ] Yes [ ] No
+
+        ### Business Impact:
+        - User experience degradation: 
+        - Potential user loss: 
+        - Security implications:
+    validations:
+      required: true
+
+  - type: textarea
+    id: root-cause-analysis
+    attributes:
+      label: Root Cause Analysis (if known)
+      description: |
+        **Technical analysis of the problem** (if you have insights)
+      placeholder: |
+        Suspected file: lib/features/auth/validators/password_validator.dart
+        Suspected cause: RegExp pattern doesn't include special characters
+        Code location: line 23, password validation function
+        Related components: AuthController, LoginForm widget
+      value: |
+        ### Suspected Components:
+        - File: 
+        - Function/Class: 
+        - Line number: 
+
+        ### Error Analysis:
+        - Error type: 
+        - Stack trace: 
+        - Related logs: 
+
+        ### Dependency Issues:
+        - Package versions: 
+        - Configuration conflicts:
+    validations:
+      required: false
+
+  - type: textarea
+    id: ai-review-criteria
+    attributes:
+      label: AI Review-First Fix Criteria
+      description: |
+        Define specific criteria for the AI review cycles when implementing the fix
+      value: |
+        ### Review Categories (Priority Order):
+
+        **High Priority - Security:**
+        - [ ] Fix doesn't introduce security vulnerabilities
+        - [ ] Input validation remains secure
+        - [ ] No injection attack vectors created
+        - [ ] Proper sanitization maintained
+
+        **Medium Priority - SOLID Principles:**
+        - [ ] Fix follows Single Responsibility Principle
+        - [ ] No violation of existing architectural patterns
+        - [ ] Maintains loose coupling
+        - [ ] Preserves testability
+
+        **Low Priority - Performance:**
+        - [ ] Fix doesn't degrade performance
+        - [ ] No memory leaks introduced
+        - [ ] Efficient validation logic
+        - [ ] Minimal overhead added
+
+        ### Review Constraints:
+        - Each review summary: ≤ 400 characters
+        - 3-4 review cycles maximum
+        - Focus on robust, maintainable solution
+        - Human final validation required
+    validations:
+      required: true
+
+  - type: textarea
+    id: fix-requirements
+    attributes:
+      label: Fix Requirements
+      description: |
+        **Specific requirements for the bug fix** (following Claude 4 best practices)
+      value: |
+        ### Functional Requirements:
+        - [ ] Fix the specific issue without breaking existing functionality
+        - [ ] Maintain backward compatibility
+        - [ ] Preserve current user experience for valid cases
+
+        ### Technical Requirements:
+        - [ ] Follow project's coding standards and patterns
+        - [ ] Use existing validation framework
+        - [ ] Maintain integration with current auth system
+        - [ ] Preserve error handling mechanisms
+
+        ### Testing Requirements:
+        - [ ] Add regression tests for the specific bug
+        - [ ] Ensure existing tests continue to pass
+        - [ ] Add edge case coverage
+        - [ ] Include both positive and negative test cases
+
+        ### Documentation Requirements:
+        - [ ] Update relevant code comments
+        - [ ] Add validation rule documentation if applicable
+        - [ ] Update user-facing documentation if needed
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: |
+        **Specific, testable criteria** that define when this bug is fixed
+      value: |
+        ### Core Fix Validation:
+        - [ ] Original reproduction steps no longer cause the error
+        - [ ] Special characters in passwords are properly accepted
+        - [ ] Valid login attempts succeed as expected
+        - [ ] Invalid login attempts are still properly rejected
+
+        ### Regression Prevention:
+        - [ ] All existing authentication tests pass
+        - [ ] No new authentication issues introduced
+        - [ ] Performance impact is negligible (< 5ms overhead)
+        - [ ] Memory usage remains stable
+
+        ### Quality Gates:
+        - [ ] Unit tests cover the fix and edge cases
+        - [ ] Widget tests verify UI behavior
+        - [ ] Integration tests confirm end-to-end flow
+        - [ ] Static analysis (dart analyze) passes
+        - [ ] Code formatting (dart format) applied
+        - [ ] AI review cycles completed (3-4 iterations)
+        - [ ] Security review passed for auth-related changes
+
+        ### Cross-Platform Validation:
+        - [ ] Fix works on iOS
+        - [ ] Fix works on Android  
+        - [ ] Fix works on Web (if applicable)
+        - [ ] Consistent behavior across platforms
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing-strategy
+    attributes:
+      label: Testing Strategy
+      description: Comprehensive testing approach for the bug fix
+      value: |
+        ### Test Cases Required:
+        - [ ] Original bug reproduction test (should fail before fix, pass after)
+        - [ ] Edge cases with various special character combinations
+        - [ ] Boundary condition tests (empty, max length, etc.)
+        - [ ] Regression tests for related functionality
+
+        ### Test Coverage:
+        - [ ] Unit tests for validation logic: 100%
+        - [ ] Widget tests for form interaction: 90%+
+        - [ ] Integration tests for auth flow: Critical paths
+
+        ### Manual Testing:
+        - [ ] Cross-platform verification
+        - [ ] Accessibility testing (screen readers, keyboard navigation)
+        - [ ] Performance testing under various conditions
+        - [ ] User experience validation
+
+        ### Test Data:
+        ```
+        Valid test cases:
+        - MyP@ssw0rd!
+        - complex#P@ssw0rd$
+        - user.name+tag@domain.com
+
+        Invalid test cases:
+        - (empty)
+        - "password" (too simple)
+        - 123 (too short)
+        ```
+    validations:
+      required: false
+
+  - type: textarea
+    id: claude-code-instructions
+    attributes:
+      label: Claude Code Fix Instructions
+      description: |
+        **Specific instructions for Claude Code automation** (following CLAUDE.md guidelines)
+      value: |
+        ### Implementation Approach:
+        - [ ] Use AI Review-First design: analyze → minimal fix → critical review → iterate → release
+        - [ ] Focus on surgical fix: change minimum necessary code
+        - [ ] Preserve existing architecture and patterns
+        - [ ] Follow project's Flutter + Riverpod conventions
+
+        ### Analysis Phase:
+        - [ ] Examine current validation logic thoroughly
+        - [ ] Identify exact cause of the bug
+        - [ ] Review related code and dependencies
+        - [ ] Check for similar issues in codebase
+
+        ### Fix Implementation:
+        - [ ] Implement minimal, targeted fix
+        - [ ] Add comprehensive test coverage
+        - [ ] Include proper error handling
+        - [ ] Maintain code readability and maintainability
+
+        ### Automation Settings:
+        - [ ] Enable background tasks: `ENABLE_BACKGROUND_TASKS=true`
+        - [ ] Use git worktree for isolated development
+        - [ ] Create PR in Japanese upon completion
+        - [ ] Monitor GitHub Actions for completion confirmation
+
+        ### Quality Assurance:
+        - [ ] Run `melos run analyze` before commit
+        - [ ] Run `melos run test` before commit
+        - [ ] Run `melos run format` before commit
+        - [ ] Verify all CI checks pass
+        - [ ] Confirm fix resolves original issue
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: |
+        Screenshots, logs, code snippets, or any other relevant information
+      placeholder: |
+        ### Screenshots:
+        - Before: [attach screenshot of error]
+        - Expected: [attach screenshot of expected behavior]
+
+        ### Error Logs:
+        ```
+        [paste relevant console logs, stack traces, etc.]
+        ```
+
+        ### Code Snippets:
+        ```dart
+        // Current problematic code (if known)
+        ```
+
+        ### Related Issues:
+        - Similar bugs: #123, #456
+        - Related features: #789
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Ensure all required information is provided for effective Claude Code automation
+      options:
+        - label: I have provided clear reproduction steps
+          required: true
+        - label: I have described expected vs actual behavior
+          required: true
+        - label: I have specified AI review criteria for the fix
+          required: true
+        - label: I have defined measurable acceptance criteria
+          required: true
+        - label: I have assessed the impact and severity
+          required: true
+        - label: I have included environment information
+          required: true
+        - label: I have verified this is actually a bug (not intended behavior)
+          required: true

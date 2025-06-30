@@ -1,26 +1,48 @@
-<!-- for GitHub Copilot review rule -->
-<!--
-レビューする際には、以下のprefix(接頭辞)をつけてください
-[must]
-[imo] (in my opinion)
-[nits](nitpick)
-[ask]
-[fyi]
--->
-<!-- for GitHub Copilot review  rule-->
+## 📝 Overview
 
-<!-- I want to review in Japanese. -->
+<!-- Please briefly describe what you implemented in this PR -->
 
-## Related Issue
+## 🔄 Changes
 
-<!-- Please specify the Issue that this PR will close -->
+<!-- Please list the changes you made in bullet points -->
 
-Close #xxx
+-
+-
+-
 
-## Description
+## 🔗 Related Issues
 
-<!-- このPRで行った変更内容を詳細に記載してください -->
+- Closes #<!-- Add issue number if applicable -->
 
-## Checklist
+## ✅ Basic Checks
 
-- [ ] xxx
+### Functionality
+
+- [ ] Feature works as expected
+- [ ] No errors occur
+- [ ] No impact on existing features
+
+### Code Quality
+
+- [ ] No errors with `melos run analyze`
+- [ ] Executed `melos run format`
+- [ ] Tests added/updated (if necessary)
+
+## 📱 Test Results
+
+<!-- Please describe what you actually tested -->
+
+- [ ] Tested on iOS
+- [ ] Tested on Android
+
+## 🖼️ Screenshots (if UI changes)
+
+<!-- Please attach before/after screenshots if there are UI changes -->
+
+## 💬 Notes for Reviewers
+
+<!-- Please add any points or concerns you want reviewers to focus on -->
+
+---
+
+**🚀 Ready for review!**
