@@ -11,9 +11,10 @@ workspace:
   - packages/flutter_whisper_kit
   - packages/flutter_whisper_kit/example
   - packages/flutter_whisper_kit_apple
+  - packages/flutter_whisper_kit_android
 
 melos:
-  name: flutter_template_project
+  name: flutter_whisper_kit
 
   packages:
     - app/
