@@ -5,7 +5,8 @@ import 'package:pigeon/pigeon.dart';
     dartOut: 'lib/src/platform_specifics/whisper_kit_message.g.dart',
     swiftOut:
         '../flutter_whisper_kit_apple/darwin/flutter_whisper_kit_apple/Sources/flutter_whisper_kit_apple/WhisperKitMessage.g.swift',
-    kotlinOut: '../flutter_whisper_kit_android/android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/WhisperKitMessage.g.kt',
+    kotlinOut:
+        '../flutter_whisper_kit_android/android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/WhisperKitMessage.g.kt',
     kotlinOptions: KotlinOptions(
       package: 'com.r0227n.flutter_whisper_kit_android',
     ),
