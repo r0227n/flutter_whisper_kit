@@ -3,9 +3,9 @@ name: Check Release
 on:
   pull_request:
     branches:
-      - 'main'
+      - "main"
   workflow_dispatch:
-      
+
 jobs:
   diff-files:
     name: Get Changed Files
@@ -41,7 +41,7 @@ jobs:
     uses: ./.github/workflows/wc-sdk-compatibility.yml
     permissions:
       pull-requests: write
-      
+
   pana-evaluation-flutter:
     name: Run Pana Evaluation for Flutter Whisper Kit
     needs: diff-files
@@ -51,7 +51,7 @@ jobs:
       package_dir: packages/flutter_whisper_kit
     permissions:
       pull-requests: write
-      
+
   pana-evaluation-apple:
     name: Run Pana Evaluation for Flutter Whisper Kit Apple
     needs: diff-files
@@ -61,4 +61,3 @@ jobs:
       package_dir: packages/flutter_whisper_kit_apple
     permissions:
       pull-requests: write
-

@@ -2,7 +2,6 @@
 
 ## 🧠 [DeepWiki]
 
-
 A monorepo for Flutter WhisperKit packages that enable on-device speech recognition in Flutter applications using WhisperKit.
 
 ## Overview
@@ -52,8 +51,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [WhisperKit] - The underlying speech recognition framework
 - [Flutter] - The UI toolkit for building natively compiled applications
 
-
 <!-- URLs -->
+
 [WhisperKit]: https://github.com/argmaxinc/WhisperKit
 [DeepWiki]: https://deepwiki.com/r0227n/flutter_whisper_kit
 [flutter_whisper_kit]: packages/flutter_whisper_kit/README.md

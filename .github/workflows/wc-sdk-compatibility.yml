@@ -6,7 +6,7 @@ on:
 env:
   FLUTTER_WHISPER_KIT_DIR: packages/flutter_whisper_kit
   FLUTTER_WHISPER_KIT_APPLE_DIR: packages/flutter_whisper_kit_apple
-  MIN_FLUTTER_SDK_VERSION: '3.27.0' # DartSDK is 3.6.0
+  MIN_FLUTTER_SDK_VERSION: "3.27.0" # DartSDK is 3.6.0
 
 jobs:
   test-minimum-bound:
@@ -16,8 +16,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup FVM with Flutter
-        uses: ./.github/actions/setup-fvm
+      - name: Setup Flutter with Flutter
+        uses: ./.github/actions/setup-flutter
         with:
           flutter-version-override: ${{ env.MIN_FLUTTER_SDK_VERSION }}
 
@@ -42,10 +42,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup FVM with Flutter
-        uses: ./.github/actions/setup-fvm
+      - name: Setup Flutter with Flutter
+        uses: ./.github/actions/setup-flutter
         with:
-          flutter-version-override: 'stable'
+          flutter-version-override: "stable"
 
       - name: Get Flutter stable version
         id: flutter_version
@@ -71,8 +71,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup FVM with Flutter
-        uses: ./.github/actions/setup-fvm
+      - name: Setup Flutter with Flutter
+        uses: ./.github/actions/setup-flutter
         with:
           flutter-version-override: ${{ env.MIN_FLUTTER_SDK_VERSION }}
 
@@ -97,10 +97,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup FVM with Flutter
-        uses: ./.github/actions/setup-fvm
+      - name: Setup Flutter with Flutter
+        uses: ./.github/actions/setup-flutter
         with:
-          flutter-version-override: 'stable'
+          flutter-version-override: "stable"
 
       - name: Get Flutter stable version
         id: flutter_version
@@ -121,7 +121,13 @@ jobs:
 
   post-results:
     name: Post Test Results
-    needs: [test-minimum-bound, test-stable-bound, test-apple-minimum-bound, test-apple-stable-bound]
+    needs:
+      [
+        test-minimum-bound,
+        test-stable-bound,
+        test-apple-minimum-bound,
+        test-apple-stable-bound,
+      ]
     if: always()
     runs-on: ubuntu-latest
     permissions:
@@ -129,7 +135,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Create results summary
         id: create_summary
         run: |
