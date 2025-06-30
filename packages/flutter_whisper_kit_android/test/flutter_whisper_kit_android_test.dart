@@ -4,29 +4,35 @@ import 'package:test/test.dart';
 /// F.I.R.S.T. Principles Test for flutter_whisper_kit_android Package Structure
 ///
 /// F - Fast: < 0.1 seconds execution
-/// I - Independent: No dependencies between tests  
+/// I - Independent: No dependencies between tests
 /// R - Repeatable: Consistent results across environments
 /// S - Self-validating: Clear pass/fail outcomes
 /// T - Timely: Written before implementation (Red phase)
 void main() {
   group('FlutterWhisperKitAndroidPlugin', () {
     test('should have plugin class file in correct location', () {
-      final pluginFile = File('android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+      final pluginFile = File(
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
       expect(pluginFile.existsSync(), isTrue,
-          reason: 'FlutterWhisperKitAndroidPlugin.kt should exist in correct directory');
+          reason:
+              'FlutterWhisperKitAndroidPlugin.kt should exist in correct directory');
     });
 
     test('should have proper package declaration', () {
-      final pluginFile = File('android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+      final pluginFile = File(
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
-        expect(content.contains('package com.r0227n.flutter_whisper_kit_android'), isTrue,
+        expect(
+            content.contains('package com.r0227n.flutter_whisper_kit_android'),
+            isTrue,
             reason: 'Plugin should have correct package declaration');
       }
     });
 
     test('should implement FlutterPlugin interface', () {
-      final pluginFile = File('android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+      final pluginFile = File(
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('FlutterPlugin'), isTrue,
@@ -37,7 +43,8 @@ void main() {
     });
 
     test('should have required lifecycle methods', () {
-      final pluginFile = File('android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+      final pluginFile = File(
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('onAttachedToEngine'), isTrue,
@@ -50,7 +57,8 @@ void main() {
     });
 
     test('should use correct channel name', () {
-      final pluginFile = File('android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+      final pluginFile = File(
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('flutter_whisper_kit_android'), isTrue,
@@ -59,7 +67,8 @@ void main() {
     });
 
     test('should have proper class name', () {
-      final pluginFile = File('android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+      final pluginFile = File(
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('class FlutterWhisperKitAndroidPlugin'), isTrue,
