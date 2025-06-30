@@ -1,21 +1,29 @@
 {
   "name": "flutter_whisper_kit",
   "version": "1.0.0",
-  "description": "[DeepWiki](https://deepwiki.com/r0227n/flutter_whisper_kit)",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "description": "A Flutter plugin for running WhisperKit speech-to-text models on-device, powered by whisper.cpp. Supports iOS, macOS.",
+  "private": true,
+  "packageManager": "bun@1.2.17",
   "scripts": {
-    "test": "echo \"No tests specified\"",
-    "prepare": "husky"
+    "commitlint": "bunx commitlint --edit",
+    "lint": "bunx prettier --check '**/*.{yml,yaml,md}'",
+    "format": "bunx prettier --write '**/*.{yml,yaml,md}'",
+    "postinstall": "echo 'Dependencies installed with bun'",
+    "clean": "bun run clean:node_modules",
+    "clean:node_modules": "rm -rf node_modules && bun install",
+    "dev:lint": "bun run lint",
+    "dev:format": "bun run format",
+    "dev:setup": "bun install && bun run format",
+    "ci:check": "bun run lint && echo 'All quality checks passed'",
+    "ci:verify": "bun --version && bunx prettier --version"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "prettier": "3.6.1"
+  },
+  "engines": {
+    "bun": ">=1.2.0"
   }
 }
