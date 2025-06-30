@@ -13,12 +13,13 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
-  flutter_whisper_kit: 0.2.0
 
 dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
+  flutter_whisper_kit:
+    path: ../flutter_whisper_kit
   
 flutter:
   plugin:
