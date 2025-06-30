@@ -1,6 +1,6 @@
 name: flutter_whisper_kit
 description: "A Flutter plugin for on-device speech recognition and transcription using WhisperKit."
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/r0227n/flutter_whisper_kit/tree/main/packages/flutter_whisper_kit
 issue_tracker: https://github.com/r0227n/flutter_whisper_kit/issues
 
@@ -13,12 +13,14 @@ resolution: workspace
 dependencies:
   flutter:
     sdk: flutter
+  flutter_whisper_kit_apple: ^0.2.0
   plugin_platform_interface: ^2.0.2
 
+
 dev_dependencies:
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
   pigeon: ^25.3.2
 
 topics:
@@ -27,8 +29,6 @@ topics:
   - 'speech-to-text'
 
 flutter:
-  uses-material-design: true
-  
   plugin:
     platforms:
       ios:

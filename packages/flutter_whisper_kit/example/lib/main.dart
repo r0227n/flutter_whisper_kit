@@ -1,13 +1,15 @@
 import 'dart:async';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_whisper_kit/flutter_whisper_kit.dart';
-import 'package:file_picker/file_picker.dart';
-
 // Import widget files
-import 'widgets/device_information_section.dart';
-import 'widgets/model_discovery_section.dart';
-import 'widgets/language_detection_section.dart';
-import 'widgets/model_configuration_section.dart';
+import 'package:flutter_whisper_kit_example/widgets/device_information_section.dart';
+import 'package:flutter_whisper_kit_example/widgets/file_transcription_section.dart';
+import 'package:flutter_whisper_kit_example/widgets/language_detection_section.dart';
+import 'package:flutter_whisper_kit_example/widgets/model_configuration_section.dart';
+import 'package:flutter_whisper_kit_example/widgets/model_discovery_section.dart';
+import 'package:flutter_whisper_kit_example/widgets/real_time_transcription_section.dart';
 
 void main() {
   runApp(const MyApp());
@@ -70,19 +72,88 @@ class _MyAppState extends State<MyApp> {
   ModelSupportConfig? _modelSupportConfig;
   bool _isLoadingModelSupportConfig = false;
 
+  // NEW: State variables for additional model management functions
+  bool _isSettingUpModels = false;
+  String _setupModelsResult = '';
+  bool _isDownloadingModel = false;
+  String _downloadResult = '';
+  bool _isPrewarmingModels = false;
+  String _prewarmResult = '';
+  bool _isUnloadingModels = false;
+  String _unloadResult = '';
+  bool _isClearingState = false;
+  String _clearStateResult = '';
+  bool _isSettingLogging = false;
+  String _loggingResult = '';
+
+  // NEW: State variables for Result-based API testing
+  String _resultApiTest = '';
+  bool _isTestingResultApi = false;
+
+  // NEW: State variables for streams monitoring
+  List<String> _streamEvents = [];
+  int _progressEventCount = 0;
+  int _transcriptionEventCount = 0;
+
   final _flutterWhisperkitPlugin = FlutterWhisperKit();
   StreamSubscription<TranscriptionResult>? _transcriptionSubscription;
+  StreamSubscription<Progress>? _progressSubscription;
 
   @override
   void initState() {
     super.initState();
     _asyncLoadModel = _loadModel();
+    _setupStreamMonitoring();
   }
 
   @override
   void dispose() {
     _transcriptionSubscription?.cancel();
+    _progressSubscription?.cancel();
     super.dispose();
+  }
+
+  // NEW: Setup stream monitoring for detailed testing
+  void _setupStreamMonitoring() {
+    _progressSubscription = _flutterWhisperkitPlugin.modelProgressStream.listen(
+      (progress) {
+        setState(() {
+          _progressEventCount++;
+          _streamEvents.insert(0,
+              'Progress: ${(progress.fractionCompleted * 100).toStringAsFixed(1)}% (Event #$_progressEventCount)');
+          if (_streamEvents.length > 10) {
+            _streamEvents = _streamEvents.take(10).toList();
+          }
+        });
+      },
+      onError: (error) {
+        setState(() {
+          _streamEvents.insert(0, 'Progress Error: $error');
+        });
+      },
+    );
+
+    _transcriptionSubscription =
+        _flutterWhisperkitPlugin.transcriptionStream.listen(
+      (result) {
+        setState(() {
+          _transcriptionEventCount++;
+          final truncatedText = result.text.length > 30
+              ? '${result.text.substring(0, 30)}...'
+              : result.text;
+          _streamEvents.insert(0,
+              'Transcription: "$truncatedText" (Event #$_transcriptionEventCount)');
+          if (_streamEvents.length > 10) {
+            _streamEvents = _streamEvents.take(10).toList();
+          }
+        });
+      },
+      onError: (error) {
+        setState(() {
+          _streamEvents.insert(0, 'Transcription Error: $error');
+        });
+      },
+    );
   }
 
   Future<String> _loadModel() async {
@@ -410,12 +481,267 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  // NEW: Additional Model Management Functions
+  Future<void> _setupModels() async {
+    setState(() {
+      _isSettingUpModels = true;
+      _setupModelsResult = 'Setting up models...';
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.setupModels(
+        model: _selectedModel,
+        download: true,
+        modelRepo: 'argmaxinc/whisperkit-coreml',
+      );
+      setState(() {
+        _setupModelsResult = 'Setup successful: $result';
+      });
+    } catch (e) {
+      setState(() {
+        _setupModelsResult = 'Setup failed: $e';
+      });
+    } finally {
+      setState(() {
+        _isSettingUpModels = false;
+      });
+    }
+  }
+
+  Future<void> _downloadModel() async {
+    setState(() {
+      _isDownloadingModel = true;
+      _downloadResult = 'Downloading model...';
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.download(
+        variant: _selectedModel,
+        repo: 'argmaxinc/whisperkit-coreml',
+        onProgress: (progress) {
+          setState(() {
+            _downloadResult =
+                'Downloading: ${(progress.fractionCompleted * 100).toStringAsFixed(1)}%';
+          });
+        },
+      );
+      setState(() {
+        _downloadResult = 'Download successful: $result';
+      });
+    } catch (e) {
+      setState(() {
+        _downloadResult = 'Download failed: $e';
+      });
+    } finally {
+      setState(() {
+        _isDownloadingModel = false;
+      });
+    }
+  }
+
+  Future<void> _prewarmModels() async {
+    setState(() {
+      _isPrewarmingModels = true;
+      _prewarmResult = 'Prewarming models...';
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.prewarmModels();
+      setState(() {
+        _prewarmResult = 'Prewarm successful: $result';
+      });
+    } catch (e) {
+      setState(() {
+        _prewarmResult = 'Prewarm failed: $e';
+      });
+    } finally {
+      setState(() {
+        _isPrewarmingModels = false;
+      });
+    }
+  }
+
+  Future<void> _unloadModels() async {
+    setState(() {
+      _isUnloadingModels = true;
+      _unloadResult = 'Unloading models...';
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.unloadModels();
+      setState(() {
+        _unloadResult = 'Unload successful: $result';
+        _isModelLoaded = false; // Update model loaded state
+      });
+    } catch (e) {
+      setState(() {
+        _unloadResult = 'Unload failed: $e';
+      });
+    } finally {
+      setState(() {
+        _isUnloadingModels = false;
+      });
+    }
+  }
+
+  Future<void> _clearState() async {
+    setState(() {
+      _isClearingState = true;
+      _clearStateResult = 'Clearing state...';
+    });
+
+    try {
+      final result = await _flutterWhisperkitPlugin.clearState();
+      setState(() {
+        _clearStateResult = 'Clear state successful: $result';
+        // Reset transcription state
+        _transcriptionResult = [];
+        _transcriptionText = '';
+      });
+    } catch (e) {
+      setState(() {
+        _clearStateResult = 'Clear state failed: $e';
+      });
+    } finally {
+      setState(() {
+        _isClearingState = false;
+      });
+    }
+  }
+
+  Future<void> _setLoggingCallback() async {
+    setState(() {
+      _isSettingLogging = true;
+      _loggingResult = 'Setting logging callback...';
+    });
+
+    try {
+      await _flutterWhisperkitPlugin.loggingCallback(level: 'debug');
+      setState(() {
+        _loggingResult = 'Logging callback set successfully';
+      });
+    } catch (e) {
+      setState(() {
+        _loggingResult = 'Set logging failed: $e';
+      });
+    } finally {
+      setState(() {
+        _isSettingLogging = false;
+      });
+    }
+  }
+
+  // NEW: Result-based API Testing
+  Future<void> _testResultApi() async {
+    setState(() {
+      _isTestingResultApi = true;
+      _resultApiTest = 'Testing Result-based APIs...\n\n';
+    });
+
+    // Test loadModelWithResult
+    setState(() {
+      _resultApiTest += '1. Testing loadModelWithResult...\n';
+    });
+
+    final loadResult = await _flutterWhisperkitPlugin.loadModelWithResult(
+      _selectedModel,
+      modelRepo: 'argmaxinc/whisperkit-coreml',
+    );
+
+    loadResult.when(
+      success: (modelPath) {
+        setState(() {
+          _resultApiTest += '✅ loadModelWithResult SUCCESS: $modelPath\n\n';
+        });
+      },
+      failure: (error) {
+        setState(() {
+          _resultApiTest +=
+              '❌ loadModelWithResult FAILED: ${error.message}\n\n';
+        });
+      },
+    );
+
+    // Test detectLanguageWithResult
+    setState(() {
+      _resultApiTest += '2. Testing detectLanguageWithResult...\n';
+    });
+
+    try {
+      final filePath = await FilePicker.platform.pickFiles().then(
+            (file) => file?.files.firstOrNull?.path,
+          );
+
+      if (filePath != null) {
+        final detectResult =
+            await _flutterWhisperkitPlugin.detectLanguageWithResult(filePath);
+        detectResult.when(
+          success: (result) {
+            setState(() {
+              _resultApiTest +=
+                  '✅ detectLanguageWithResult SUCCESS: ${result?.language}\n\n';
+            });
+          },
+          failure: (error) {
+            setState(() {
+              _resultApiTest +=
+                  '❌ detectLanguageWithResult FAILED: ${error.message}\n\n';
+            });
+          },
+        );
+      } else {
+        setState(() {
+          _resultApiTest +=
+              '⚠️ detectLanguageWithResult SKIPPED: No file selected\n\n';
+        });
+      }
+
+      // Test transcribeFileWithResult
+      setState(() {
+        _resultApiTest += '3. Testing transcribeFileWithResult...\n';
+      });
+
+      if (filePath != null) {
+        final transcribeResult =
+            await _flutterWhisperkitPlugin.transcribeFileWithResult(filePath);
+        transcribeResult.when(
+          success: (result) {
+            setState(() {
+              _resultApiTest +=
+                  '✅ transcribeFileWithResult SUCCESS: "${result?.text.substring(0, 50)}..."\n\n';
+            });
+          },
+          failure: (error) {
+            setState(() {
+              _resultApiTest +=
+                  '❌ transcribeFileWithResult FAILED: ${error.message}\n\n';
+            });
+          },
+        );
+      } else {
+        setState(() {
+          _resultApiTest +=
+              '⚠️ transcribeFileWithResult SKIPPED: No file selected\n\n';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _resultApiTest += '❌ Result API test error: $e\n\n';
+      });
+    }
+
+    setState(() {
+      _resultApiTest += 'Result-based API testing completed!';
+      _isTestingResultApi = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Flutter WhisperKit Example'),
+          title: const Text('Flutter WhisperKit API Test'),
           actions: [
             IconButton(
               onPressed: () {
@@ -424,6 +750,9 @@ class _MyAppState extends State<MyApp> {
                   _transcriptionText = '';
                   _fileTranscriptionResult = null;
                   _fileTranscriptionText = '';
+                  _streamEvents = [];
+                  _progressEventCount = 0;
+                  _transcriptionEventCount = 0;
                 });
               },
               icon: const Icon(Icons.delete),
@@ -466,6 +795,48 @@ class _MyAppState extends State<MyApp> {
             ModelLoadingIndicator(
               asyncLoadModel: _asyncLoadModel,
               modelProgressStream: _flutterWhisperkitPlugin.modelProgressStream,
+            ),
+
+            const SizedBox(height: 16),
+
+            // NEW: Additional Model Management Section
+            AdditionalModelManagementSection(
+              isSettingUpModels: _isSettingUpModels,
+              setupModelsResult: _setupModelsResult,
+              isDownloadingModel: _isDownloadingModel,
+              downloadResult: _downloadResult,
+              isPrewarmingModels: _isPrewarmingModels,
+              prewarmResult: _prewarmResult,
+              isUnloadingModels: _isUnloadingModels,
+              unloadResult: _unloadResult,
+              isClearingState: _isClearingState,
+              clearStateResult: _clearStateResult,
+              isSettingLogging: _isSettingLogging,
+              loggingResult: _loggingResult,
+              onSetupModelsPressed: _setupModels,
+              onDownloadModelPressed: _downloadModel,
+              onPrewarmModelsPressed: _prewarmModels,
+              onUnloadModelsPressed: _unloadModels,
+              onClearStatePressed: _clearState,
+              onSetLoggingPressed: _setLoggingCallback,
+            ),
+
+            const SizedBox(height: 16),
+
+            // NEW: Result-based API Testing Section
+            ResultApiTestingSection(
+              isTestingResultApi: _isTestingResultApi,
+              resultApiTest: _resultApiTest,
+              onTestResultApiPressed: _testResultApi,
+            ),
+
+            const SizedBox(height: 16),
+
+            // NEW: Stream Monitoring Section
+            StreamMonitoringSection(
+              streamEvents: _streamEvents,
+              progressEventCount: _progressEventCount,
+              transcriptionEventCount: _transcriptionEventCount,
             ),
 
             const SizedBox(height: 16),
@@ -549,6 +920,219 @@ class _MyAppState extends State<MyApp> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// NEW: Widget for additional model management functions
+class AdditionalModelManagementSection extends StatelessWidget {
+  const AdditionalModelManagementSection({
+    super.key,
+    required this.isSettingUpModels,
+    required this.setupModelsResult,
+    required this.isDownloadingModel,
+    required this.downloadResult,
+    required this.isPrewarmingModels,
+    required this.prewarmResult,
+    required this.isUnloadingModels,
+    required this.unloadResult,
+    required this.isClearingState,
+    required this.clearStateResult,
+    required this.isSettingLogging,
+    required this.loggingResult,
+    required this.onSetupModelsPressed,
+    required this.onDownloadModelPressed,
+    required this.onPrewarmModelsPressed,
+    required this.onUnloadModelsPressed,
+    required this.onClearStatePressed,
+    required this.onSetLoggingPressed,
+  });
+
+  final bool isSettingUpModels;
+  final String setupModelsResult;
+  final bool isDownloadingModel;
+  final String downloadResult;
+  final bool isPrewarmingModels;
+  final String prewarmResult;
+  final bool isUnloadingModels;
+  final String unloadResult;
+  final bool isClearingState;
+  final String clearStateResult;
+  final bool isSettingLogging;
+  final String loggingResult;
+  final VoidCallback onSetupModelsPressed;
+  final VoidCallback onDownloadModelPressed;
+  final VoidCallback onPrewarmModelsPressed;
+  final VoidCallback onUnloadModelsPressed;
+  final VoidCallback onClearStatePressed;
+  final VoidCallback onSetLoggingPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Additional Model Management',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Wrap(
+          spacing: 8.0,
+          children: [
+            ElevatedButton(
+              onPressed: isSettingUpModels ? null : onSetupModelsPressed,
+              child: Text(isSettingUpModels ? 'Setting Up...' : 'Setup Models'),
+            ),
+            ElevatedButton(
+              onPressed: isDownloadingModel ? null : onDownloadModelPressed,
+              child: Text(
+                  isDownloadingModel ? 'Downloading...' : 'Download Model'),
+            ),
+            ElevatedButton(
+              onPressed: isPrewarmingModels ? null : onPrewarmModelsPressed,
+              child:
+                  Text(isPrewarmingModels ? 'Prewarming...' : 'Prewarm Models'),
+            ),
+            ElevatedButton(
+              onPressed: isUnloadingModels ? null : onUnloadModelsPressed,
+              child: Text(isUnloadingModels ? 'Unloading...' : 'Unload Models'),
+            ),
+            ElevatedButton(
+              onPressed: isClearingState ? null : onClearStatePressed,
+              child: Text(isClearingState ? 'Clearing...' : 'Clear State'),
+            ),
+            ElevatedButton(
+              onPressed: isSettingLogging ? null : onSetLoggingPressed,
+              child: Text(isSettingLogging ? 'Setting...' : 'Set Logging'),
+            ),
+          ],
+        ),
+        Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (setupModelsResult.isNotEmpty)
+                Text('Setup: $setupModelsResult'),
+              if (downloadResult.isNotEmpty) Text('Download: $downloadResult'),
+              if (prewarmResult.isNotEmpty) Text('Prewarm: $prewarmResult'),
+              if (unloadResult.isNotEmpty) Text('Unload: $unloadResult'),
+              if (clearStateResult.isNotEmpty) Text('Clear: $clearStateResult'),
+              if (loggingResult.isNotEmpty) Text('Logging: $loggingResult'),
+              if (setupModelsResult.isEmpty &&
+                  downloadResult.isEmpty &&
+                  prewarmResult.isEmpty &&
+                  unloadResult.isEmpty &&
+                  clearStateResult.isEmpty &&
+                  loggingResult.isEmpty)
+                const Text(
+                    'Press buttons above to test additional model management functions'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// NEW: Widget for Result-based API testing
+class ResultApiTestingSection extends StatelessWidget {
+  const ResultApiTestingSection({
+    super.key,
+    required this.isTestingResultApi,
+    required this.resultApiTest,
+    required this.onTestResultApiPressed,
+  });
+
+  final bool isTestingResultApi;
+  final String resultApiTest;
+  final VoidCallback onTestResultApiPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Result-based API Testing',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        ElevatedButton(
+          onPressed: isTestingResultApi ? null : onTestResultApiPressed,
+          child: Text(isTestingResultApi ? 'Testing...' : 'Test Result APIs'),
+        ),
+        Container(
+          height: 200,
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: SingleChildScrollView(
+            child: Text(
+              resultApiTest.isEmpty
+                  ? 'Press the button to test Result-based APIs (loadModelWithResult, transcribeFileWithResult, detectLanguageWithResult)'
+                  : resultApiTest,
+              style: const TextStyle(fontSize: 14, fontFamily: 'monospace'),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// NEW: Widget for stream monitoring
+class StreamMonitoringSection extends StatelessWidget {
+  const StreamMonitoringSection({
+    super.key,
+    required this.streamEvents,
+    required this.progressEventCount,
+    required this.transcriptionEventCount,
+  });
+
+  final List<String> streamEvents;
+  final int progressEventCount;
+  final int transcriptionEventCount;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Stream Monitoring',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          'Progress Events: $progressEventCount | Transcription Events: $transcriptionEventCount',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Container(
+          height: 150,
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: streamEvents.isEmpty
+              ? const Text('Stream events will appear here...')
+              : ListView.builder(
+                  itemCount: streamEvents.length,
+                  itemBuilder: (context, index) {
+                    return Text(
+                      streamEvents[index],
+                      style: const TextStyle(
+                          fontSize: 12, fontFamily: 'monospace'),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 }
@@ -726,160 +1310,6 @@ class ModelLoadingIndicator extends StatelessWidget {
           },
         );
       },
-    );
-  }
-}
-
-/// Widget for file transcription section
-class FileTranscriptionSection extends StatelessWidget {
-  const FileTranscriptionSection({
-    super.key,
-    required this.isModelLoaded,
-    required this.isTranscribingFile,
-    required this.fileTranscriptionText,
-    required this.fileTranscriptionResult,
-    required this.onTranscribePressed,
-  });
-
-  final bool isModelLoaded;
-  final bool isTranscribingFile;
-  final String fileTranscriptionText;
-  final TranscriptionResult? fileTranscriptionResult;
-  final VoidCallback onTranscribePressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text(
-          'File Transcription',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        ElevatedButton(
-          onPressed: isModelLoaded ? onTranscribePressed : null,
-          child: Text(
-            isTranscribingFile ? 'Transcribing...' : 'Transcribe from File',
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                fileTranscriptionText.isEmpty
-                    ? 'Press the button to transcribe a file'
-                    : fileTranscriptionText,
-                style: const TextStyle(fontSize: 16),
-              ),
-              if (fileTranscriptionResult != null) ...[
-                const Text(
-                  'Detected Language:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(fileTranscriptionResult?.language ?? 'Unknown'),
-                const Text(
-                  'Segments:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                ...(fileTranscriptionResult?.segments ?? []).map(
-                  (segment) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4.0),
-                    child: Text(
-                      '[${segment.start.toStringAsFixed(2)}s - ${segment.end.toStringAsFixed(2)}s]: ${segment.text}',
-                    ),
-                  ),
-                ),
-                const Text(
-                  'Performance:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Real-time factor: ${fileTranscriptionResult?.timings.realTimeFactor.toStringAsFixed(2)}x',
-                ),
-                Text(
-                  'Processing time: ${fileTranscriptionResult?.timings.fullPipeline.toStringAsFixed(2)}s',
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Widget for real-time transcription section
-class RealTimeTranscriptionSection extends StatelessWidget {
-  const RealTimeTranscriptionSection({
-    super.key,
-    required this.isModelLoaded,
-    required this.isRecording,
-    required this.transcriptionText,
-    required this.segments,
-    required this.onRecordPressed,
-  });
-
-  final bool isModelLoaded;
-  final bool isRecording;
-  final List<TranscriptionSegment> segments;
-  final String transcriptionText;
-  final VoidCallback onRecordPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: 16.0,
-      children: [
-        const Text(
-          'Real-time Transcription',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        Container(
-          height: 200,
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: segments.isNotEmpty
-              ? ListView.builder(
-                  itemCount: segments.length,
-                  itemBuilder: (context, index) {
-                    return Text(
-                      '[${segments[index].start.toStringAsFixed(2)}s - ${segments[index].end.toStringAsFixed(2)}s]: ${segments[index].text}',
-                    );
-                  },
-                )
-              : const Text('No segments'),
-        ),
-        Container(
-          height: 200,
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: SingleChildScrollView(
-            child: Text(
-              transcriptionText.isEmpty
-                  ? 'Press the button to start recording'
-                  : transcriptionText,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: isModelLoaded ? onRecordPressed : null,
-          child: Text(isRecording ? 'Stop Recording' : 'Start Recording'),
-        ),
-      ],
     );
   }
 }

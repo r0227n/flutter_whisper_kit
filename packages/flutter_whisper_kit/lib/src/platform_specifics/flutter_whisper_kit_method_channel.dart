@@ -3,10 +3,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-
-import 'whisper_kit_message.g.dart';
-import 'flutter_whisper_kit_platform_interface.dart';
-import '../models.dart';
+import 'package:flutter_whisper_kit/src/models.dart';
+import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_platform_interface.dart';
+import 'package:flutter_whisper_kit/src/platform_specifics/whisper_kit_message.g.dart';
 
 /// An implementation of [FlutterWhisperKitPlatform] that uses method channels.
 ///
@@ -15,41 +14,6 @@ import '../models.dart';
 /// the transcription and model loading processes by forwarding calls to the
 /// native WhisperKit implementation.
 class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
-  /// The Pigeon-generated message interface for communicating with native code.
-  final _whisperKitMessage = WhisperKitMessage();
-
-  /// The event channel for streaming transcription results from native code.
-  ///
-  /// This channel receives real-time transcription updates during recording
-  /// and forwards them to the [transcriptionStream].
-  @visibleForTesting
-  final EventChannel transcriptionStreamChannel = const EventChannel(
-    'flutter_whisper_kit/transcription_stream',
-  );
-
-  /// The event channel for streaming model loading progress from native code.
-  ///
-  /// This channel receives progress updates during model download and loading
-  /// and forwards them to the [modelProgressStream].
-  @visibleForTesting
-  final EventChannel modelProgressStreamChannel = const EventChannel(
-    'flutter_whisper_kit/model_progress_stream',
-  );
-
-  /// Stream controller for transcription results.
-  ///
-  /// This controller manages the stream of transcription results that are
-  /// received from the native code through the [transcriptionStreamChannel].
-  final StreamController<TranscriptionResult> _transcriptionStreamController =
-      StreamController<TranscriptionResult>.broadcast();
-
-  /// Stream controller for model loading progress.
-  ///
-  /// This controller manages the stream of progress updates that are
-  /// received from the native code through the [modelProgressStreamChannel].
-  final StreamController<Progress> _modelProgressStreamController =
-      StreamController<Progress>.broadcast();
-
   /// Constructor that sets up the event channel listeners.
   ///
   /// Initializes the event channels for transcription results and model loading
@@ -114,6 +78,41 @@ class MethodChannelFlutterWhisperKit extends FlutterWhisperKitPlatform {
       },
     );
   }
+
+  /// The Pigeon-generated message interface for communicating with native code.
+  final _whisperKitMessage = WhisperKitMessage();
+
+  /// The event channel for streaming transcription results from native code.
+  ///
+  /// This channel receives real-time transcription updates during recording
+  /// and forwards them to the [transcriptionStream].
+  @visibleForTesting
+  final EventChannel transcriptionStreamChannel = const EventChannel(
+    'flutter_whisper_kit/transcription_stream',
+  );
+
+  /// The event channel for streaming model loading progress from native code.
+  ///
+  /// This channel receives progress updates during model download and loading
+  /// and forwards them to the [modelProgressStream].
+  @visibleForTesting
+  final EventChannel modelProgressStreamChannel = const EventChannel(
+    'flutter_whisper_kit/model_progress_stream',
+  );
+
+  /// Stream controller for transcription results.
+  ///
+  /// This controller manages the stream of transcription results that are
+  /// received from the native code through the [transcriptionStreamChannel].
+  final StreamController<TranscriptionResult> _transcriptionStreamController =
+      StreamController<TranscriptionResult>.broadcast();
+
+  /// Stream controller for model loading progress.
+  ///
+  /// This controller manages the stream of progress updates that are
+  /// received from the native code through the [modelProgressStreamChannel].
+  final StreamController<Progress> _modelProgressStreamController =
+      StreamController<Progress>.broadcast();
 
   /// Loads a WhisperKit model.
   ///

@@ -1,3 +1,14 @@
+## 0.2.0
+
+* **Model Download Progress Tracking**: 
+  * Added `ModelProgressStreamHandler` to stream model download progress in real-time
+  * Provides detailed progress information (completion rate, completed/total units) through `progressCallback`
+  * Supports progress display on Flutter side
+* **Enhanced Testing Capabilities**:
+  * Added `MockFlutterWhisperkitPlatform` and `MockMethodChannelFlutterWhisperkit` for testing
+  * Improved unit test reliability through method channel mocking functionality
+  * Expanded test coverage for streaming features
+
 ## 0.1.0
 
 * Expanded native API and improved platform integration:

@@ -15,16 +15,18 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(buildTestApp());
 
-    // Verify that app title is displayed
-    expect(find.text('Flutter WhisperKit Example'), findsOneWidget);
+    // Wait for initial render
+    await tester.pump();
 
-    // Verify that buttons are present instead of looking for dropdowns
+    // Verify that app title is displayed
+    expect(find.text('Flutter WhisperKit API Test'), findsOneWidget);
+
+    // Verify that buttons are present
     expect(find.byType(ElevatedButton), findsWidgets);
 
-    // Verify that file transcription section is present
-    expect(find.text('File Transcription'), findsOneWidget);
-
-    // Verify that real-time transcription section is present
-    expect(find.text('Real-time Transcription'), findsOneWidget);
+    // Basic structure verification
+    expect(find.byType(Scaffold), findsOneWidget);
+    expect(find.text('Select Model: '), findsOneWidget);
+    expect(find.text('Load Model'), findsOneWidget);
   });
 }

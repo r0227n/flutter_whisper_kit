@@ -5,14 +5,6 @@ import 'package:flutter_whisper_kit/src/platform_specifics/flutter_whisper_kit_m
 /// A mock implementation of [MethodChannelFlutterWhisperKit] for testing.
 class MockMethodChannelFlutterWhisperkit
     extends MethodChannelFlutterWhisperKit {
-  /// Stream controller for test transcription results
-  final StreamController<TranscriptionResult> _testStreamController =
-      StreamController<TranscriptionResult>.broadcast();
-
-  /// Stream controller for model progress updates
-  final StreamController<Progress> _modelProgressStreamController =
-      StreamController<Progress>.broadcast();
-
   /// Constructor
   MockMethodChannelFlutterWhisperkit() {
     // Add a test result to the stream after a short delay
@@ -27,6 +19,14 @@ class MockMethodChannelFlutterWhisperkit
       );
     });
   }
+
+  /// Stream controller for test transcription results
+  final StreamController<TranscriptionResult> _testStreamController =
+      StreamController<TranscriptionResult>.broadcast();
+
+  /// Stream controller for model progress updates
+  final StreamController<Progress> _modelProgressStreamController =
+      StreamController<Progress>.broadcast();
 
   /// Override the transcription stream to return our test stream
   @override
@@ -68,7 +68,8 @@ class MockMethodChannelFlutterWhisperkit
     DecodingOptions options = const DecodingOptions(),
   }) async {
     if (filePath.isEmpty) {
-      throw InvalidArgumentsError(message: 'File path cannot be empty');
+      throw InvalidArgumentsError(
+          message: 'File path cannot be empty', code: 5001);
     }
 
     // Return a mock transcription result

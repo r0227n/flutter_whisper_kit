@@ -1,9 +1,18 @@
 // Export the model classes
-export 'models/decoding_options.dart';
-export 'models/model_support.dart';
-export 'models/language_detection_result.dart';
-export 'models/transcription_result.dart';
-export 'models/word_timing.dart';
-export 'models/progress.dart';
-export 'models/model_support_config.dart';
-export 'models/device_support.dart';
+
+// Export error codes for standardized error handling
+export 'error_codes.dart';
+// Common models
+export 'models/common/progress.dart';
+// Decoding models
+export 'models/decoding/decoding_options.dart';
+// Device and support models
+export 'models/device/device_support.dart';
+export 'models/device/model_support.dart';
+export 'models/device/model_support_config.dart';
+// Transcription models
+export 'models/transcription/language_detection_result.dart';
+export 'models/transcription/transcription_result.dart';
+export 'models/transcription/word_timing.dart';
+// Export the Result type for improved error handling
+export 'result.dart';

@@ -1,4 +1,18 @@
 include: package:flutter_lints/flutter.yaml
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+linter:
+  rules:
+    # Import rules - enforce absolute paths and proper ordering
+    directives_ordering: true
+    avoid_relative_lib_imports: true
+    prefer_relative_imports: false
+
+    # Additional import rules
+    always_use_package_imports: true
+
+    # Constructor ordering
+    sort_constructors_first: true
+    sort_unnamed_constructors_first: true
+
+    # Import and dependency formatting
+    sort_pub_dependencies: true
