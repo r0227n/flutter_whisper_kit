@@ -24,9 +24,7 @@ void main() {
           'android/src/main/kotlin/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
-        expect(
-            content.contains('package flutter_whisper_kit_android'),
-            isTrue,
+        expect(content.contains('package flutter_whisper_kit_android'), isTrue,
             reason: 'Plugin should have correct package declaration');
       }
     });

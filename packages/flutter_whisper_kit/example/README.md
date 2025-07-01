@@ -23,6 +23,7 @@ The Flutter Whisper Kit plugin requires the following minimum Android configurat
 
 1. **Minimum SDK Version**: API 26 (Android 8.0)
    - Update `android/app/build.gradle.kts`:
+
    ```kotlin
    defaultConfig {
        minSdk = 26

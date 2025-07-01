@@ -59,8 +59,7 @@ void main() {
 
       final androidConfig =
           pubspec['flutter']['plugin']['platforms']['android'];
-      expect(androidConfig['package'],
-          equals('flutter_whisper_kit_android'));
+      expect(androidConfig['package'], equals('flutter_whisper_kit_android'));
       expect(androidConfig['pluginClass'],
           equals('FlutterWhisperKitAndroidPlugin'));
     });
