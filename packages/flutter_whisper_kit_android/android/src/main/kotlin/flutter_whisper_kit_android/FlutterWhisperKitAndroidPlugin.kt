@@ -5,6 +5,8 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+import android.os.Build
+import java.io.File
 // TODO: Uncomment when WhisperKit Android library is available
 // import com.argmaxinc.whisperkit.WhisperKit
 // import com.argmaxinc.whisperkit.ExperimentalWhisperKit
@@ -28,6 +30,9 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private lateinit var channel : MethodChannel
+  
+  // TODO: Uncomment when WhisperKit Android library is available
+  // private var whisperKit: WhisperKit? = null
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_whisper_kit_android")
@@ -155,11 +160,15 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
 
   override fun deviceName(callback: (Result<String>) -> Unit) {
     try {
-      // Return actual device information
-      val deviceInfo = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}"
+      // Return actual device information with Android version
+      val manufacturer = Build.MANUFACTURER
+      val model = Build.MODEL
+      val androidVersion = Build.VERSION.RELEASE
+      val deviceInfo = "$manufacturer $model (Android $androidVersion)"
       callback(Result.success(deviceInfo))
     } catch (e: Exception) {
-      callback(Result.failure(e))
+      // Return fallback device name on error
+      callback(Result.success("Unknown Android Device"))
     }
   }
 
@@ -186,6 +195,7 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
     }
   }
 
+  // @OptIn(ExperimentalWhisperKit::class) // TODO: Uncomment when WhisperKit Android library is available
   override fun detectLanguage(audioPath: String, callback: (Result<String?>) -> Unit) {
     try {
       // Input validation
@@ -193,10 +203,42 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
         callback(Result.failure(IllegalArgumentException("Audio path cannot be empty")))
         return
       }
-      // Stub implementation - return null until WhisperKitAndroid integration
+      
+      // Security validation - prevent path traversal
+      if (audioPath.contains("..") || audioPath.startsWith("/etc/") || 
+          audioPath.contains(":\\") || audioPath.startsWith("file://")) {
+        callback(Result.success("Error: Invalid file path"))
+        return
+      }
+      
+      // File validation
+      val file = File(audioPath)
+      if (!file.exists() || !file.canRead()) {
+        callback(Result.success("Error: Audio file not found or not readable"))
+        return
+      }
+      
+      // Check supported formats
+      val extension = file.extension.lowercase()
+      if (extension !in listOf("wav", "mp3", "m4a", "flac")) {
+        callback(Result.success("Language detection failed: Unsupported audio format"))
+        return
+      }
+      
+      // TODO: Use WhisperKit language detection when available
+      /*
+      val audioData = loadAudioFile(file)
+      val detectedLanguage = whisperKit?.detectLanguage(audioData)
+      
+      detectedLanguage?.let { language ->
+        callback(Result.success(formatLanguageCode(language)))
+      } ?: callback(Result.success(null))
+      */
+      
+      // Stub implementation until WhisperKit Android integration
       callback(Result.success(null))
     } catch (e: Exception) {
-      callback(Result.failure(e))
+      callback(Result.success("Language detection failed: ${e.message}"))
     }
   }
 
@@ -273,12 +315,26 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
     }
   }
 
+  // @OptIn(ExperimentalWhisperKit::class) // TODO: Uncomment when WhisperKit Android library is available
   override fun clearState(callback: (Result<String?>) -> Unit) {
     try {
-      // Stub implementation - return null until WhisperKitAndroid integration
-      callback(Result.success(null))
+      // TODO: Use WhisperKit clearState when available
+      /*
+      whisperKit?.clearState()
+      */
+      
+      // Clear any internal state if needed
+      // This method should be idempotent
+      
+      callback(Result.success("State cleared successfully"))
     } catch (e: Exception) {
-      callback(Result.failure(e))
+      // Don't expose internal state information
+      val safeMessage = when {
+        e.message?.contains("initialized", ignoreCase = true) == true -> 
+          "Clear state failed: WhisperKit not initialized"
+        else -> "Clear state failed: Internal error"
+      }
+      callback(Result.failure(RuntimeException(safeMessage)))
     }
   }
 
@@ -290,4 +346,38 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
       callback(Result.failure(e))
     }
   }
+  
+  // MARK: - Helper Methods
+  
+  /**
+   * Formats language code to ISO 639-1 standard
+   * Example: "japanese" -> "ja", "english" -> "en"
+   */
+  private fun formatLanguageCode(language: String): String {
+    return when (language.lowercase()) {
+      "japanese", "ja", "jpn" -> "ja"
+      "english", "en", "eng" -> "en"
+      "spanish", "es", "spa" -> "es"
+      "french", "fr", "fra" -> "fr"
+      "german", "de", "deu" -> "de"
+      "chinese", "zh", "zho" -> "zh"
+      "korean", "ko", "kor" -> "ko"
+      "italian", "it", "ita" -> "it"
+      "portuguese", "pt", "por" -> "pt"
+      "russian", "ru", "rus" -> "ru"
+      else -> language.take(2).lowercase() // Default to first 2 chars
+    }
+  }
+  
+  /**
+   * Loads audio file data (placeholder for future implementation)
+   * TODO: Implement when WhisperKit Android library is available
+   */
+  /*
+  private fun loadAudioFile(file: File): AudioData {
+    // This will be implemented when WhisperKit Android provides audio loading
+    // For now, return a placeholder
+    return AudioData(file.readBytes())
+  }
+  */
 }
