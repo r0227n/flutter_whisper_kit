@@ -10,3 +10,4 @@ node_modules/
 # melos
 melos_workspace.iml
 .idea
+build/
