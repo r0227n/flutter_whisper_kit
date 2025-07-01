@@ -6,6 +6,8 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import com.argmaxinc.whisperkit.WhisperKit
+import com.argmaxinc.whisperkit.ExperimentalWhisperKit
 
 /**
  * FlutterWhisperKitAndroidPlugin
@@ -54,19 +56,50 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
   }
 
   // MARK: - WhisperKitMessage Interface Implementation
-  // Following TDD Green phase: minimal stub implementations
+  // Following TDD Green phase: WhisperKit.Builder implementation
   
+  @OptIn(ExperimentalWhisperKit::class)
   override fun loadModel(variant: String?, modelRepo: String?, redownload: Boolean, callback: (Result<String?>) -> Unit) {
     try {
-      // Input validation
+      // Input validation - prevent directory traversal attacks
       if (variant.isNullOrBlank()) {
         callback(Result.failure(IllegalArgumentException("Model variant cannot be null or empty")))
         return
       }
-      // Stub implementation - return null until WhisperKitAndroid integration
-      callback(Result.success(null))
+      
+      // Validate model variant doesn't contain dangerous path elements
+      if (variant.contains("..") || variant.contains("/") || variant.contains("\\")) {
+        callback(Result.failure(IllegalArgumentException("Invalid model variant: path traversal not allowed")))
+        return
+      }
+      
+      // WhisperKit.Builder pattern implementation
+      val builder = WhisperKit.Builder()
+        .setModel(variant)
+        .setModelRepo(modelRepo ?: "")
+        
+      if (redownload) {
+        builder.setForceRedownload(true)
+      }
+      
+      val whisperKit = builder.build()
+      whisperKit.loadModel()
+      
+      callback(Result.success("Model loaded successfully"))
+    } catch (e: OutOfMemoryError) {
+      System.gc() // Memory management for large models
+      callback(Result.failure(RuntimeException("Model loading failed: insufficient memory")))
     } catch (e: Exception) {
-      callback(Result.failure(e))
+      val errorMsg = when {
+        e.message?.contains("network", ignoreCase = true) == true -> 
+          "Model loading failed: network error"
+        e.message?.contains("variant", ignoreCase = true) == true -> 
+          "Model loading failed: invalid model variant"
+        else -> "Model loading failed: ${e.message?.substringBefore("at ")}"
+      }
+      callback(Result.failure(RuntimeException(errorMsg)))
+    } finally {
+      // Resource cleanup handled by WhisperKit internally
     }
   }
 
