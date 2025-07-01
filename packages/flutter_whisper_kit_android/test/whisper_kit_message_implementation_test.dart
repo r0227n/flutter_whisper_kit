@@ -1,23 +1,25 @@
 import 'dart:io';
-import 'package:test/test.dart';
+
+import 'package:flutter_test/flutter_test.dart';
 
 /// F.I.R.S.T. Principles Test for WhisperKitMessage Interface Implementation
 ///
 /// F - Fast: < 0.1 seconds execution
-/// I - Independent: No dependencies between tests  
+/// I - Independent: No dependencies between tests
 /// R - Repeatable: Consistent results across environments
 /// S - Self-validating: Clear pass/fail outcomes
 /// T - Timely: Written before implementation (Red phase)
 void main() {
   group('WhisperKitMessage Interface Implementation', () {
-    test('should implement WhisperKitMessage interface in FlutterWhisperKitAndroidPlugin', () {
+    test(
+        'should implement WhisperKitMessage interface in FlutterWhisperKitAndroidPlugin',
+        () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       expect(pluginFile.existsSync(), isTrue,
           reason: 'FlutterWhisperKitAndroidPlugin.kt should exist');
-      
+
       final content = pluginFile.readAsStringSync();
       expect(content.contains('WhisperKitMessage'), isTrue,
           reason: 'Plugin should implement WhisperKitMessage interface');
@@ -25,9 +27,8 @@ void main() {
 
     test('should implement loadModel method with correct signature', () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('override fun loadModel'), isTrue,
@@ -43,9 +44,8 @@ void main() {
 
     test('should implement transcribeFromFile method', () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('override fun transcribeFromFile'), isTrue,
@@ -59,9 +59,8 @@ void main() {
 
     test('should implement recording control methods', () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('override fun startRecording'), isTrue,
@@ -73,9 +72,8 @@ void main() {
 
     test('should implement model management methods', () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('override fun fetchAvailableModels'), isTrue,
@@ -89,9 +87,8 @@ void main() {
 
     test('should implement utility methods', () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('override fun deviceName'), isTrue,
@@ -105,9 +102,8 @@ void main() {
 
     test('should have proper error handling structure', () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('try') || content.contains('catch'), isTrue,
@@ -117,9 +113,8 @@ void main() {
 
     test('should maintain existing FlutterPlugin functionality', () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('FlutterPlugin'), isTrue,
@@ -135,9 +130,8 @@ void main() {
   group('Kotlin Code Quality', () {
     test('should follow Kotlin naming conventions', () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('fun '), isTrue,
@@ -150,9 +144,8 @@ void main() {
 
     test('should have proper null safety handling', () {
       final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt'
-      );
-      
+          'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+
       if (pluginFile.existsSync()) {
         final content = pluginFile.readAsStringSync();
         expect(content.contains('?'), isTrue,
