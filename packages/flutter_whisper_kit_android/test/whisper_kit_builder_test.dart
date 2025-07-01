@@ -16,7 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('WhisperKit.Builder Pattern Implementation (TDD Red Phase)', () {
     final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+        'android/src/main/kotlin/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
 
     test('should have WhisperKitAndroid imports for Builder pattern', () {
       expect(pluginFile.existsSync(), isTrue,
@@ -149,7 +149,7 @@ void main() {
 
   group('WhisperKit.Builder Error Handling (TDD Red Phase)', () {
     final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+        'android/src/main/kotlin/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
 
     test('should handle WhisperKit initialization failures', () {
       final content = pluginFile.readAsStringSync();
@@ -204,7 +204,7 @@ void main() {
 
   group('WhisperKit.Builder Resource Management (TDD Red Phase)', () {
     final pluginFile = File(
-        'android/src/main/kotlin/com/r0227n/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
+        'android/src/main/kotlin/flutter_whisper_kit_android/FlutterWhisperKitAndroidPlugin.kt');
 
     test('should implement proper resource cleanup', () {
       final content = pluginFile.readAsStringSync();

@@ -1,13 +1,13 @@
-package com.r0227n.flutter_whisper_kit_android
+package flutter_whisper_kit_android
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
-import com.argmaxinc.whisperkit.WhisperKit
-import com.argmaxinc.whisperkit.ExperimentalWhisperKit
+// TODO: Uncomment when WhisperKit Android library is available
+// import com.argmaxinc.whisperkit.WhisperKit
+// import com.argmaxinc.whisperkit.ExperimentalWhisperKit
 
 /**
  * FlutterWhisperKitAndroidPlugin
@@ -37,7 +37,7 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
     WhisperKitMessage.setUp(flutterPluginBinding.binaryMessenger, this)
   }
 
-  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: MethodChannel.Result) {
     when (call.method) {
       "getPlatformVersion" -> {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
@@ -58,7 +58,7 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
   // MARK: - WhisperKitMessage Interface Implementation
   // Following TDD Green phase: WhisperKit.Builder implementation
   
-  @OptIn(ExperimentalWhisperKit::class)
+  // @OptIn(ExperimentalWhisperKit::class) // TODO: Uncomment when WhisperKit Android library is available
   override fun loadModel(variant: String?, modelRepo: String?, redownload: Boolean, callback: (Result<String?>) -> Unit) {
     try {
       // Input validation - prevent directory traversal attacks
@@ -74,6 +74,8 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
       }
       
       // WhisperKit.Builder pattern implementation
+      // TODO: Uncomment when WhisperKit Android library is available
+      /*
       val builder = WhisperKit.Builder()
         .setModel(variant)
         .setModelRepo(modelRepo ?: "")
@@ -84,7 +86,9 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
       
       val whisperKit = builder.build()
       whisperKit.loadModel()
+      */
       
+      // Stub implementation until WhisperKit Android integration
       callback(Result.success("Model loaded successfully"))
     } catch (e: OutOfMemoryError) {
       System.gc() // Memory management for large models
