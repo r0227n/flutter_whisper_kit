@@ -28,7 +28,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: flutter_whisper_kit_android
+        package: com.r0227n.flutter_whisper_kit_android
         pluginClass: FlutterWhisperKitAndroidPlugin
 
 topics:

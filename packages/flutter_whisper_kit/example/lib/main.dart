@@ -164,8 +164,6 @@ class _MyAppState extends State<MyApp> {
         modelRepo: 'argmaxinc/whisperkit-coreml',
       );
 
-      print('Model loaded: $result');
-
       setState(() {
         _isModelLoaded = true;
       });

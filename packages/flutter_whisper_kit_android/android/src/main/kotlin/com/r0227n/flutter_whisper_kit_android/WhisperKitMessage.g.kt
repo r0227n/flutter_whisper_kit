@@ -2,7 +2,7 @@
 // See also: https://pub.dev/packages/pigeon
 @file:Suppress("UNCHECKED_CAST", "ArrayInDataClass")
 
-package flutter_whisper_kit_android
+package com.r0227n.flutter_whisper_kit_android
 
 import android.util.Log
 import io.flutter.plugin.common.BasicMessageChannel

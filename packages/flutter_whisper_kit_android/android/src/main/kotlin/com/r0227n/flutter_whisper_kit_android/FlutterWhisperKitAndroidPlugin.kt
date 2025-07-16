@@ -1,13 +1,11 @@
-package flutter_whisper_kit_android
+package com.r0227n.flutter_whisper_kit_android
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-// TODO: Uncomment when WhisperKit Android library is available
-// import com.argmaxinc.whisperkit.WhisperKit
-// import com.argmaxinc.whisperkit.ExperimentalWhisperKit
+import io.flutter.plugin.common.MethodChannel.Result
 
 /**
  * FlutterWhisperKitAndroidPlugin
@@ -37,7 +35,7 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
     WhisperKitMessage.setUp(flutterPluginBinding.binaryMessenger, this)
   }
 
-  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: MethodChannel.Result) {
+  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     when (call.method) {
       "getPlatformVersion" -> {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
@@ -56,54 +54,19 @@ class FlutterWhisperKitAndroidPlugin: FlutterPlugin, MethodCallHandler, WhisperK
   }
 
   // MARK: - WhisperKitMessage Interface Implementation
-  // Following TDD Green phase: WhisperKit.Builder implementation
+  // Following TDD Green phase: minimal stub implementations
   
-  // @OptIn(ExperimentalWhisperKit::class) // TODO: Uncomment when WhisperKit Android library is available
   override fun loadModel(variant: String?, modelRepo: String?, redownload: Boolean, callback: (Result<String?>) -> Unit) {
     try {
-      // Input validation - prevent directory traversal attacks
+      // Input validation
       if (variant.isNullOrBlank()) {
         callback(Result.failure(IllegalArgumentException("Model variant cannot be null or empty")))
         return
       }
-      
-      // Validate model variant doesn't contain dangerous path elements
-      if (variant.contains("..") || variant.contains("/") || variant.contains("\\")) {
-        callback(Result.failure(IllegalArgumentException("Invalid model variant: path traversal not allowed")))
-        return
-      }
-      
-      // WhisperKit.Builder pattern implementation
-      // TODO: Uncomment when WhisperKit Android library is available
-      /*
-      val builder = WhisperKit.Builder()
-        .setModel(variant)
-        .setModelRepo(modelRepo ?: "")
-        
-      if (redownload) {
-        builder.setForceRedownload(true)
-      }
-      
-      val whisperKit = builder.build()
-      whisperKit.loadModel()
-      */
-      
-      // Stub implementation until WhisperKit Android integration
-      callback(Result.success("Model loaded successfully"))
-    } catch (e: OutOfMemoryError) {
-      System.gc() // Memory management for large models
-      callback(Result.failure(RuntimeException("Model loading failed: insufficient memory")))
+      // Stub implementation - return null until WhisperKitAndroid integration
+      callback(Result.success(null))
     } catch (e: Exception) {
-      val errorMsg = when {
-        e.message?.contains("network", ignoreCase = true) == true -> 
-          "Model loading failed: network error"
-        e.message?.contains("variant", ignoreCase = true) == true -> 
-          "Model loading failed: invalid model variant"
-        else -> "Model loading failed: ${e.message?.substringBefore("at ")}"
-      }
-      callback(Result.failure(RuntimeException(errorMsg)))
-    } finally {
-      // Resource cleanup handled by WhisperKit internally
+      callback(Result.failure(e))
     }
   }
 
