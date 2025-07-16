@@ -190,7 +190,7 @@ Constraints:
 - Verify F.I.R.S.T. compliance: test independence, speed, repeatability
 - Run TDD quality metrics: cycle time (Red: 5min, Green: 10min, Refactor: 15min)
 - Generate test coverage report and ensure quality thresholds met
-- Create Pull Request with Issue Template-compliant description (base branch: develop)
+- Create Pull Request with Issue Template-compliant description
 - Monitor GitHub Actions: `.github/workflows/check-pr.yml`
 - Update GitHub Issue with TDD metrics and completion status
 - Send completion notification with TDD quality metrics summary
@@ -257,9 +257,7 @@ else
 fi
 
 # Create PR with Issue Template compliance validation
-# IMPORTANT: PR base branch should be 'develop'
 gh pr create \
-  --base develop \
   --title "$(gh issue view #123 --json title | jq -r '.title') [#123]" \
   --body "$(cat <<EOF
 ## Issue Template Compliance
