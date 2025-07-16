@@ -1,6 +1,5 @@
 import 'dart:io';
-
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 /// F.I.R.S.T. Principles Test for flutter_whisper_kit_android Package Structure
 ///
