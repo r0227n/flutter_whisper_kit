@@ -49,8 +49,8 @@ fi
 
 **重要**: このローカル`.claude/CLAUDE.md`設定は、プロジェクトルートレベルのCLAUDE.mdファイルを**オーバーライド**し、**無視**します。
 
-- ルートCLAUDE.mdパス: `CLAUDE.md` （無視される）
-- ローカルCLAUDE.mdパス: `.claude-workspaces/TASK-84/.claude/CLAUDE.md` （アクティブ）
+- ルートCLAUDE.mdパス: `/Users/r0227n/dev/flutter_template_project/CLAUDE.md` （無視される）
+- ローカルCLAUDE.mdパス: `/Users/r0227n/dev/flutter_template_project/.claude-workspaces/TASK-84/.claude/CLAUDE.md` （アクティブ）
 
 ## コマンド固有ルール
 
