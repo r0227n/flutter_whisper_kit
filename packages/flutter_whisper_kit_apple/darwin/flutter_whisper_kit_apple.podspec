@@ -11,7 +11,7 @@ iOS and macOS implementation of the flutter_whisper_kit plugin, providing on-dev
                        DESC
   s.homepage         = 'https://github.com/r0227n/flutter_whisper_kit/tree/main/flutter_whisper_kit_apple'
   s.license          = { :file => '../LICENSE' }
-  s.author           = 'Ryo24'
+  s.author           = { 'Ryo24' }
 
   s.source           = { :path => '.' }
   s.source_files = 'flutter_whisper_kit_apple/Sources/flutter_whisper_kit_apple/**/*'
