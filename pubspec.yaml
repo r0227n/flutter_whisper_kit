@@ -11,7 +11,6 @@ workspace:
   - packages/flutter_whisper_kit
   - packages/flutter_whisper_kit/example
   - packages/flutter_whisper_kit_apple
-  - packages/flutter_whisper_kit_android
 
 melos:
   name: flutter_whisper_kit
@@ -44,7 +43,7 @@ melos:
     # Run tests for all packages
     test:
       description: Run tests for all packages
-      run: melos exec --fail-fast --concurrency=1 --ignore="flutter_whisper_kit_example" -- "flutter test"
+      run: melos exec --fail-fast --concurrency=1 -- "flutter test"
 
     # Check if formatting is correct (for CI)
     ci:format:
