@@ -5,7 +5,7 @@ repository: https://github.com/r0227n/flutter_whisper_kit/tree/main/packages/flu
 issue_tracker: https://github.com/r0227n/flutter_whisper_kit/issues
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
+  sdk: ">=3.8.0 <4.0.0"
   flutter: ">=3.3.0"
 
 resolution: workspace

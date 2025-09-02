@@ -52,5 +52,3 @@ runs:
       uses: bluefireteam/melos-action@c7dcb921b23cc520cace360b95d02b37bf09cdaa # v3.0.0
       with:
         melos-version: ${{ steps.melos-version.outputs.version }}
-        enforce-lockfile: true # NOTE: DartSDKが古いため
-        dart-version: "3.8.0"

@@ -2,10 +2,10 @@ name: workspace
 publish_to: none
 
 environment:
-  sdk: "^3.6.0"
+  sdk: "^3.8.0"
 
 dev_dependencies:
-  melos: ^7.0.0-dev.9
+  melos: ^7.0.0
 
 workspace:
   - packages/flutter_whisper_kit
