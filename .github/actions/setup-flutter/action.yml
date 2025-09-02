@@ -53,3 +53,4 @@ runs:
       with:
         melos-version: ${{ steps.melos-version.outputs.version }}
         enforce-lockfile: true # NOTE: DartSDKが古いため
+        dart-version: "3.8.0"
