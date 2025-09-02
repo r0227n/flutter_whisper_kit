@@ -1,3 +1,11 @@
+## 0.2.1
+
+- **CocoaPods Compatibility Fix**:
+  - Fixed invalid author syntax in `flutter_whisper_kit_apple.podspec`
+  - Changed author field from hash syntax `{ 'Ryo24' }` to valid string `'Ryo24'`
+  - Resolves CocoaPods validation error that prevented pod installation
+  - Ensures compatibility with CocoaPods specification requirements
+
 ## 0.2.0
 
 - **Model Download Progress Tracking**:
