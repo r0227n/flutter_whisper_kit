@@ -5,7 +5,7 @@ repository: https://github.com/r0227n/flutter_whisper_kit/tree/main/packages/flu
 issue_tracker: https://github.com/r0227n/flutter_whisper_kit/issues
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
   flutter: ">=3.3.0"
 
 resolution: workspace
@@ -15,7 +15,7 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
   flutter_whisper_kit:
