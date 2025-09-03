@@ -30,17 +30,19 @@ void main() {
         // Act & Assert
         expect(
           () => whisperKit.loadModel('invalid-model'),
-          throwsA(allOf(
-            isA<ModelLoadingFailedError>(),
-            predicate<ModelLoadingFailedError>(
-              (error) => error.message == 'Model not found',
+          throwsA(
+            allOf(
+              isA<ModelLoadingFailedError>(),
+              predicate<ModelLoadingFailedError>(
+                (error) => error.message == 'Model not found',
+              ),
+              predicate<ModelLoadingFailedError>(
+                (error) =>
+                    error.details != null &&
+                    error.details['variant'] == 'invalid-model',
+              ),
             ),
-            predicate<ModelLoadingFailedError>(
-              (error) =>
-                  error.details != null &&
-                  error.details['variant'] == 'invalid-model',
-            ),
-          )),
+          ),
         );
       });
 
@@ -380,10 +382,7 @@ void main() {
         );
 
         // Act & Assert
-        expect(
-          () => whisperKit.deviceName(),
-          throwsA(isA<UnknownError>()),
-        );
+        expect(() => whisperKit.deviceName(), throwsA(isA<UnknownError>()));
       });
 
       test('handles error without message', () async {
@@ -397,11 +396,14 @@ void main() {
         // Act & Assert
         expect(
           () => whisperKit.setupModels(),
-          throwsA(allOf(
-            isA<UnknownError>(),
-            predicate<UnknownError>(
-                (error) => error.message == 'Mystery error'),
-          )),
+          throwsA(
+            allOf(
+              isA<UnknownError>(),
+              predicate<UnknownError>(
+                (error) => error.message == 'Mystery error',
+              ),
+            ),
+          ),
         );
       });
 
@@ -431,10 +433,7 @@ void main() {
         );
 
         // Act & Assert
-        expect(
-          () => whisperKit.unloadModels(),
-          throwsA(isA<UnknownError>()),
-        );
+        expect(() => whisperKit.unloadModels(), throwsA(isA<UnknownError>()));
       });
 
       test('handles error code exactly at boundary 6000', () async {
@@ -493,12 +492,14 @@ void main() {
         // Act & Assert
         expect(
           () => whisperKit.recommendedModels(),
-          throwsA(allOf(
-            isA<TranscriptionFailedError>(),
-            predicate<TranscriptionFailedError>(
-              (error) => error.details == originalDetails,
+          throwsA(
+            allOf(
+              isA<TranscriptionFailedError>(),
+              predicate<TranscriptionFailedError>(
+                (error) => error.details == originalDetails,
+              ),
             ),
-          )),
+          ),
         );
       });
     });

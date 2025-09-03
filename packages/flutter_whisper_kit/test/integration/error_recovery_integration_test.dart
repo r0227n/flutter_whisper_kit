@@ -45,17 +45,14 @@ void main() {
         );
 
         // Example: Retry model loading with recovery
-        final result = await executor.executeWithRetry<String>(
-          () async {
-            // Simulate operation that might fail
-            final loadResult = await whisperKit.loadModelWithResult('tiny');
-            return loadResult.when(
-              success: (path) => path,
-              failure: (exception) => throw exception,
-            );
-          },
-          operationName: 'model loading',
-        );
+        final result = await executor.executeWithRetry<String>(() async {
+          // Simulate operation that might fail
+          final loadResult = await whisperKit.loadModelWithResult('tiny');
+          return loadResult.when(
+            success: (path) => path,
+            failure: (exception) => throw exception,
+          );
+        }, operationName: 'model loading');
 
         expect(result, isA<Result<String, WhisperKitError>>());
       });
@@ -79,8 +76,9 @@ void main() {
         );
 
         // Apply fallback options
-        final fallbackDecodingOptions =
-            fallbackOptions.applyToDecodingOptions(originalOptions);
+        final fallbackDecodingOptions = fallbackOptions.applyToDecodingOptions(
+          originalOptions,
+        );
 
         // Verify fallback options are applied correctly
         expect(fallbackDecodingOptions.wordTimestamps, isFalse);
@@ -94,8 +92,10 @@ void main() {
           options: fallbackDecodingOptions,
         );
 
-        expect(transcriptionResult,
-            isA<Result<TranscriptionResult?, WhisperKitError>>());
+        expect(
+          transcriptionResult,
+          isA<Result<TranscriptionResult?, WhisperKitError>>(),
+        );
       });
 
       test('should handle custom recovery strategy', () async {
@@ -137,49 +137,53 @@ void main() {
         expect(recoveryAttempts, equals(1));
       });
 
-      test('should use production configuration for robust error handling',
-          () async {
-        final prodConfig = WhisperKitConfiguration.production();
+      test(
+        'should use production configuration for robust error handling',
+        () async {
+          final prodConfig = WhisperKitConfiguration.production();
 
-        expect(prodConfig.errorRecovery.type, equals(RecoveryType.automatic));
-        expect(prodConfig.errorRecovery.retryPolicy.maxAttempts, equals(3));
-        expect(
-            prodConfig.errorRecovery.fallbackOptions?.useOfflineModel, isTrue);
-        expect(
-            prodConfig.errorRecovery.fallbackOptions?.degradeQuality, isTrue);
-        expect(prodConfig.enableLogging, isTrue);
-        expect(prodConfig.logLevel, equals(LogLevel.warning));
+          expect(prodConfig.errorRecovery.type, equals(RecoveryType.automatic));
+          expect(prodConfig.errorRecovery.retryPolicy.maxAttempts, equals(3));
+          expect(
+            prodConfig.errorRecovery.fallbackOptions?.useOfflineModel,
+            isTrue,
+          );
+          expect(
+            prodConfig.errorRecovery.fallbackOptions?.degradeQuality,
+            isTrue,
+          );
+          expect(prodConfig.enableLogging, isTrue);
+          expect(prodConfig.logLevel, equals(LogLevel.warning));
 
-        // Example: Use production configuration for transcription
-        final executor = RecoveryExecutor(
-          retryPolicy: prodConfig.retryPolicy,
-          fallbackOptions: prodConfig.fallbackOptions,
-          logger: prodConfig.enableLogging
-              ? (message, level) {
-                  if (level.index >= prodConfig.logLevel.index) {
-                    // print('[${level.name}] $message');
+          // Example: Use production configuration for transcription
+          final executor = RecoveryExecutor(
+            retryPolicy: prodConfig.retryPolicy,
+            fallbackOptions: prodConfig.fallbackOptions,
+            logger: prodConfig.enableLogging
+                ? (message, level) {
+                    if (level.index >= prodConfig.logLevel.index) {
+                      // print('[${level.name}] $message');
+                    }
                   }
-                }
-              : null,
-        );
+                : null,
+          );
 
-        final result = await executor.executeWithRetry<TranscriptionResult?>(
-          () async {
-            final transcriptionResult =
-                await whisperKit.transcribeFileWithResult(
-              '/path/to/audio.wav',
-            );
+          final result = await executor.executeWithRetry<TranscriptionResult?>(
+            () async {
+              final transcriptionResult = await whisperKit
+                  .transcribeFileWithResult('/path/to/audio.wav');
 
-            return transcriptionResult.when(
-              success: (result) => result,
-              failure: (exception) => throw exception,
-            );
-          },
-          operationName: 'audio transcription',
-        );
+              return transcriptionResult.when(
+                success: (result) => result,
+                failure: (exception) => throw exception,
+              );
+            },
+            operationName: 'audio transcription',
+          );
 
-        expect(result, isA<Result<TranscriptionResult?, WhisperKitError>>());
-      });
+          expect(result, isA<Result<TranscriptionResult?, WhisperKitError>>());
+        },
+      );
 
       test('should handle multiple retry attempts with jitter', () async {
         final retryPolicy = RetryPolicy(
@@ -200,61 +204,68 @@ void main() {
 
         // Verify delays increase with backoff
         expect(
-            delays[0].inMilliseconds, greaterThanOrEqualTo(80)); // 100ms - 20%
+          delays[0].inMilliseconds,
+          greaterThanOrEqualTo(80),
+        ); // 100ms - 20%
         expect(delays[0].inMilliseconds, lessThanOrEqualTo(120)); // 100ms + 20%
 
         expect(
-            delays[1].inMilliseconds, greaterThanOrEqualTo(160)); // 200ms - 20%
+          delays[1].inMilliseconds,
+          greaterThanOrEqualTo(160),
+        ); // 200ms - 20%
         expect(delays[1].inMilliseconds, lessThanOrEqualTo(240)); // 200ms + 20%
 
         expect(
-            delays[2].inMilliseconds, greaterThanOrEqualTo(320)); // 400ms - 20%
+          delays[2].inMilliseconds,
+          greaterThanOrEqualTo(320),
+        ); // 400ms - 20%
         expect(delays[2].inMilliseconds, lessThanOrEqualTo(480)); // 400ms + 20%
       });
 
       test(
-          'should combine Result API with recovery for complete error handling',
-          () async {
-        final logMessages = <String>[];
+        'should combine Result API with recovery for complete error handling',
+        () async {
+          final logMessages = <String>[];
 
-        final executor = RecoveryExecutor(
-          retryPolicy: const RetryPolicy(
-            maxAttempts: 2,
-            initialDelay: Duration(milliseconds: 50),
-          ),
-          logger: (message, level) => logMessages.add('[$level] $message'),
-        );
+          final executor = RecoveryExecutor(
+            retryPolicy: const RetryPolicy(
+              maxAttempts: 2,
+              initialDelay: Duration(milliseconds: 50),
+            ),
+            logger: (message, level) => logMessages.add('[$level] $message'),
+          );
 
-        // Simulate language detection with recovery
-        final result =
-            await executor.executeWithRetry<LanguageDetectionResult?>(
-          () async {
-            final detectionResult = await whisperKit.detectLanguageWithResult(
-              '/path/to/audio.wav',
-            );
+          // Simulate language detection with recovery
+          final result = await executor
+              .executeWithRetry<LanguageDetectionResult?>(() async {
+                final detectionResult = await whisperKit
+                    .detectLanguageWithResult('/path/to/audio.wav');
 
-            return detectionResult.when(
-              success: (result) => result,
-              failure: (exception) {
-                // Check if error is recoverable
-                if (ErrorCode.isRecoverable(exception.code)) {
-                  throw exception;
-                } else {
-                  // Return null for non-recoverable errors
-                  return null;
-                }
-              },
-            );
-          },
-          operationName: 'language detection',
-        );
+                return detectionResult.when(
+                  success: (result) => result,
+                  failure: (exception) {
+                    // Check if error is recoverable
+                    if (ErrorCode.isRecoverable(exception.code)) {
+                      throw exception;
+                    } else {
+                      // Return null for non-recoverable errors
+                      return null;
+                    }
+                  },
+                );
+              }, operationName: 'language detection');
 
-        // Verify logging occurred
-        expect(logMessages.any((msg) => msg.contains('language detection')),
-            isTrue);
-        expect(
-            result, isA<Result<LanguageDetectionResult?, WhisperKitError>>());
-      });
+          // Verify logging occurred
+          expect(
+            logMessages.any((msg) => msg.contains('language detection')),
+            isTrue,
+          );
+          expect(
+            result,
+            isA<Result<LanguageDetectionResult?, WhisperKitError>>(),
+          );
+        },
+      );
     });
 
     group('Error code based recovery', () {

@@ -119,8 +119,10 @@ class _MyAppState extends State<MyApp> {
       (progress) {
         setState(() {
           _progressEventCount++;
-          _streamEvents.insert(0,
-              'Progress: ${(progress.fractionCompleted * 100).toStringAsFixed(1)}% (Event #$_progressEventCount)');
+          _streamEvents.insert(
+            0,
+            'Progress: ${(progress.fractionCompleted * 100).toStringAsFixed(1)}% (Event #$_progressEventCount)',
+          );
           if (_streamEvents.length > 10) {
             _streamEvents = _streamEvents.take(10).toList();
           }
@@ -133,27 +135,29 @@ class _MyAppState extends State<MyApp> {
       },
     );
 
-    _transcriptionSubscription =
-        _flutterWhisperkitPlugin.transcriptionStream.listen(
-      (result) {
-        setState(() {
-          _transcriptionEventCount++;
-          final truncatedText = result.text.length > 30
-              ? '${result.text.substring(0, 30)}...'
-              : result.text;
-          _streamEvents.insert(0,
-              'Transcription: "$truncatedText" (Event #$_transcriptionEventCount)');
-          if (_streamEvents.length > 10) {
-            _streamEvents = _streamEvents.take(10).toList();
-          }
-        });
-      },
-      onError: (error) {
-        setState(() {
-          _streamEvents.insert(0, 'Transcription Error: $error');
-        });
-      },
-    );
+    _transcriptionSubscription = _flutterWhisperkitPlugin.transcriptionStream
+        .listen(
+          (result) {
+            setState(() {
+              _transcriptionEventCount++;
+              final truncatedText = result.text.length > 30
+                  ? '${result.text.substring(0, 30)}...'
+                  : result.text;
+              _streamEvents.insert(
+                0,
+                'Transcription: "$truncatedText" (Event #$_transcriptionEventCount)',
+              );
+              if (_streamEvents.length > 10) {
+                _streamEvents = _streamEvents.take(10).toList();
+              }
+            });
+          },
+          onError: (error) {
+            setState(() {
+              _streamEvents.insert(0, 'Transcription Error: $error');
+            });
+          },
+        );
   }
 
   Future<String> _loadModel() async {
@@ -189,8 +193,8 @@ class _MyAppState extends State<MyApp> {
 
     try {
       final filePath = await FilePicker.platform.pickFiles().then(
-            (file) => file?.files.firstOrNull?.path,
-          );
+        (file) => file?.files.firstOrNull?.path,
+      );
 
       if (filePath == null) {
         setState(() {
@@ -258,21 +262,23 @@ class _MyAppState extends State<MyApp> {
         );
 
         await _flutterWhisperkitPlugin.startRecording(options: options);
-        _transcriptionSubscription =
-            _flutterWhisperkitPlugin.transcriptionStream.listen((result) {
-          setState(() {
-            _transcriptionText = result.text;
-            // Only add segments that don't already exist in the result
-            for (final segment in result.segments) {
-              if (!_transcriptionResult.any(
-                (existing) =>
-                    existing.id == segment.id && existing.text == segment.text,
-              )) {
-                _transcriptionResult.add(segment);
-              }
-            }
-          });
-        });
+        _transcriptionSubscription = _flutterWhisperkitPlugin
+            .transcriptionStream
+            .listen((result) {
+              setState(() {
+                _transcriptionText = result.text;
+                // Only add segments that don't already exist in the result
+                for (final segment in result.segments) {
+                  if (!_transcriptionResult.any(
+                    (existing) =>
+                        existing.id == segment.id &&
+                        existing.text == segment.text,
+                  )) {
+                    _transcriptionResult.add(segment);
+                  }
+                }
+              });
+            });
       }
 
       setState(() {
@@ -404,8 +410,8 @@ class _MyAppState extends State<MyApp> {
 
     try {
       final filePath = await FilePicker.platform.pickFiles().then(
-            (file) => file?.files.firstOrNull?.path,
-          );
+        (file) => file?.files.firstOrNull?.path,
+      );
 
       if (filePath == null) {
         setState(() {
@@ -669,12 +675,12 @@ class _MyAppState extends State<MyApp> {
 
     try {
       final filePath = await FilePicker.platform.pickFiles().then(
-            (file) => file?.files.firstOrNull?.path,
-          );
+        (file) => file?.files.firstOrNull?.path,
+      );
 
       if (filePath != null) {
-        final detectResult =
-            await _flutterWhisperkitPlugin.detectLanguageWithResult(filePath);
+        final detectResult = await _flutterWhisperkitPlugin
+            .detectLanguageWithResult(filePath);
         detectResult.when(
           success: (result) {
             setState(() {
@@ -702,8 +708,8 @@ class _MyAppState extends State<MyApp> {
       });
 
       if (filePath != null) {
-        final transcribeResult =
-            await _flutterWhisperkitPlugin.transcribeFileWithResult(filePath);
+        final transcribeResult = await _flutterWhisperkitPlugin
+            .transcribeFileWithResult(filePath);
         transcribeResult.when(
           success: (result) {
             setState(() {
@@ -986,12 +992,14 @@ class AdditionalModelManagementSection extends StatelessWidget {
             ElevatedButton(
               onPressed: isDownloadingModel ? null : onDownloadModelPressed,
               child: Text(
-                  isDownloadingModel ? 'Downloading...' : 'Download Model'),
+                isDownloadingModel ? 'Downloading...' : 'Download Model',
+              ),
             ),
             ElevatedButton(
               onPressed: isPrewarmingModels ? null : onPrewarmModelsPressed,
-              child:
-                  Text(isPrewarmingModels ? 'Prewarming...' : 'Prewarm Models'),
+              child: Text(
+                isPrewarmingModels ? 'Prewarming...' : 'Prewarm Models',
+              ),
             ),
             ElevatedButton(
               onPressed: isUnloadingModels ? null : onUnloadModelsPressed,
@@ -1030,7 +1038,8 @@ class AdditionalModelManagementSection extends StatelessWidget {
                   clearStateResult.isEmpty &&
                   loggingResult.isEmpty)
                 const Text(
-                    'Press buttons above to test additional model management functions'),
+                  'Press buttons above to test additional model management functions',
+                ),
             ],
           ),
         ),
@@ -1127,7 +1136,9 @@ class StreamMonitoringSection extends StatelessWidget {
                     return Text(
                       streamEvents[index],
                       style: const TextStyle(
-                          fontSize: 12, fontFamily: 'monospace'),
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                      ),
                     );
                   },
                 ),
@@ -1168,10 +1179,7 @@ class ModelSelectionDropdown extends StatelessWidget {
               }
             },
             items: modelVariants.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
+              return DropdownMenuItem<String>(value: value, child: Text(value));
             }).toList(),
           ),
         ),
@@ -1187,23 +1195,23 @@ class LanguageSelectionDropdown extends StatelessWidget {
     required this.selectedLanguage,
     required this.onLanguageChanged,
   }) : _languages = const [
-          'auto', // Auto-detect
-          'en', // English
-          'ja', // Japanese
-          'zh', // Chinese
-          'de', // German
-          'es', // Spanish
-          'ru', // Russian
-          'ko', // Korean
-          'fr', // French
-          'it', // Italian
-          'pt', // Portuguese
-          'tr', // Turkish
-          'pl', // Polish
-          'nl', // Dutch
-          'ar', // Arabic
-          'hi', // Hindi
-        ];
+         'auto', // Auto-detect
+         'en', // English
+         'ja', // Japanese
+         'zh', // Chinese
+         'de', // German
+         'es', // Spanish
+         'ru', // Russian
+         'ko', // Korean
+         'fr', // French
+         'it', // Italian
+         'pt', // Portuguese
+         'tr', // Turkish
+         'pl', // Polish
+         'nl', // Dutch
+         'ar', // Arabic
+         'hi', // Hindi
+       ];
 
   final String selectedLanguage;
   final List<String> _languages;

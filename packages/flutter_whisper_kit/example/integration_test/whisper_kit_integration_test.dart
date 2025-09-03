@@ -12,38 +12,39 @@ void main() {
       // Mock the method channels to prevent MissingPluginException
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('flutter_whisper_kit'),
-        (MethodCall methodCall) async {
-          return null;
-        },
-      );
+            const MethodChannel('flutter_whisper_kit'),
+            (MethodCall methodCall) async {
+              return null;
+            },
+          );
 
       // Mock event channels for streams
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('flutter_whisper_kit/transcription_stream'),
-        (MethodCall methodCall) async {
-          if (methodCall.method == 'listen') {
-            return null;
-          }
-          return null;
-        },
-      );
+            const MethodChannel('flutter_whisper_kit/transcription_stream'),
+            (MethodCall methodCall) async {
+              if (methodCall.method == 'listen') {
+                return null;
+              }
+              return null;
+            },
+          );
 
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(
-        const MethodChannel('flutter_whisper_kit/model_progress_stream'),
-        (MethodCall methodCall) async {
-          if (methodCall.method == 'listen') {
-            return null;
-          }
-          return null;
-        },
-      );
+            const MethodChannel('flutter_whisper_kit/model_progress_stream'),
+            (MethodCall methodCall) async {
+              if (methodCall.method == 'listen') {
+                return null;
+              }
+              return null;
+            },
+          );
     });
 
-    testWidgets('App loads and main UI sections are present',
-        (WidgetTester tester) async {
+    testWidgets('App loads and main UI sections are present', (
+      WidgetTester tester,
+    ) async {
       // Launch the app
       await tester.pumpWidget(const MyApp());
       // Use pump with fixed duration instead of pumpAndSettle to avoid timeout
@@ -62,8 +63,9 @@ void main() {
       expect(find.text('Select Model: '), findsOneWidget);
     });
 
-    testWidgets('Model dropdown and language selection',
-        (WidgetTester tester) async {
+    testWidgets('Model dropdown and language selection', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const MyApp());
       await tester.pump(const Duration(seconds: 1));
 

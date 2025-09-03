@@ -39,8 +39,9 @@ class ModelDiscoverySection extends StatelessWidget {
 
         // Fetch Available Models
         ElevatedButton(
-          onPressed:
-              isLoadingAvailableModels ? null : onFetchAvailableModelsPressed,
+          onPressed: isLoadingAvailableModels
+              ? null
+              : onFetchAvailableModelsPressed,
           child: Text(
             isLoadingAvailableModels ? 'Loading...' : 'Fetch Available Models',
           ),
@@ -64,8 +65,9 @@ class ModelDiscoverySection extends StatelessWidget {
                   ? const Text('Press the button to fetch available models')
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children:
-                          availableModels.map((model) => Text(model)).toList(),
+                      children: availableModels
+                          .map((model) => Text(model))
+                          .toList(),
                     ),
             ],
           ),
@@ -74,8 +76,9 @@ class ModelDiscoverySection extends StatelessWidget {
 
         // Get Recommended Models
         ElevatedButton(
-          onPressed:
-              isLoadingRecommendedModels ? null : onGetRecommendedModelsPressed,
+          onPressed: isLoadingRecommendedModels
+              ? null
+              : onGetRecommendedModelsPressed,
           child: Text(
             isLoadingRecommendedModels
                 ? 'Loading...'

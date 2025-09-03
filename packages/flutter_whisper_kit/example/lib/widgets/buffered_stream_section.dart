@@ -51,7 +51,9 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
   void _addLog(String message) {
     setState(() {
       _streamLogs.insert(
-          0, '[${DateTime.now().millisecondsSinceEpoch % 100000}] $message');
+        0,
+        '[${DateTime.now().millisecondsSinceEpoch % 100000}] $message',
+      );
       if (_streamLogs.length > 20) {
         _streamLogs.removeLast();
       }
@@ -78,44 +80,39 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
     );
 
     _addLog(
-        'Created streams with buffer size: $_bufferSize, strategy: $_overflowStrategy');
+      'Created streams with buffer size: $_bufferSize, strategy: $_overflowStrategy',
+    );
 
     // Subscribe to transcription stream results
-    _transcriptionSubscription = _transcriptionStream!.results.listen(
-      (result) {
-        _addLog(
-            '📄 Transcription result: "${result.text.length > 30 ? '${result.text.substring(0, 30)}...' : result.text}"');
-        setState(() {
-          _transcriptionEvents++;
-        });
-      },
-      onError: (error) => _addLog('❌ Transcription error: $error'),
-    );
+    _transcriptionSubscription = _transcriptionStream!.results.listen((result) {
+      _addLog(
+        '📄 Transcription result: "${result.text.length > 30 ? '${result.text.substring(0, 30)}...' : result.text}"',
+      );
+      setState(() {
+        _transcriptionEvents++;
+      });
+    }, onError: (error) => _addLog('❌ Transcription error: $error'));
 
     // Subscribe to transcription stream progress
-    _progressSubscription = _transcriptionStream!.progress.listen(
-      (progress) {
-        _addLog('📊 Progress: ${(progress * 100).toStringAsFixed(1)}%');
-        setState(() {
-          _progressEvents++;
-        });
-      },
-      onError: (error) => _addLog('❌ Progress error: $error'),
-    );
+    _progressSubscription = _transcriptionStream!.progress.listen((progress) {
+      _addLog('📊 Progress: ${(progress * 100).toStringAsFixed(1)}%');
+      setState(() {
+        _progressEvents++;
+      });
+    }, onError: (error) => _addLog('❌ Progress error: $error'));
 
     // Subscribe to buffered stream events
-    _bufferedSubscription = _bufferedStream!.events.listen(
-      (event) {
-        if (event is TranscriptionResultEvent) {
-          _addLog(
-              '🔄 Buffered transcription: "${event.result.text.length > 20 ? '${event.result.text.substring(0, 20)}...' : event.result.text}"');
-        } else if (event is ProgressEvent) {
-          _addLog(
-              '🔄 Buffered progress: ${(event.progress * 100).toStringAsFixed(1)}%');
-        }
-      },
-      onError: (error) => _addLog('❌ Buffered stream error: $error'),
-    );
+    _bufferedSubscription = _bufferedStream!.events.listen((event) {
+      if (event is TranscriptionResultEvent) {
+        _addLog(
+          '🔄 Buffered transcription: "${event.result.text.length > 20 ? '${event.result.text.substring(0, 20)}...' : event.result.text}"',
+        );
+      } else if (event is ProgressEvent) {
+        _addLog(
+          '🔄 Buffered progress: ${(event.progress * 100).toStringAsFixed(1)}%',
+        );
+      }
+    }, onError: (error) => _addLog('❌ Buffered stream error: $error'));
 
     _addLog('✅ Stream testing started');
   }
@@ -157,7 +154,8 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
           });
 
           _addLog(
-              '🟢 Sent progress event: ${(progressValues[i] * 100).toStringAsFixed(1)}%');
+            '🟢 Sent progress event: ${(progressValues[i] * 100).toStringAsFixed(1)}%',
+          );
 
           // Check buffer size for overflow detection
           if (_bufferedStream!.currentBufferSize >= _bufferSize) {
@@ -165,7 +163,8 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
               _droppedEvents++;
             });
             _addLog(
-                '⚠️ Buffer overflow detected (size: ${_bufferedStream!.currentBufferSize})');
+              '⚠️ Buffer overflow detected (size: ${_bufferedStream!.currentBufferSize})',
+            );
           }
         }
       });
@@ -207,7 +206,8 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
               _droppedEvents++;
             });
             _addLog(
-                '⚠️ Buffer overflow detected (size: ${_bufferedStream!.currentBufferSize})');
+              '⚠️ Buffer overflow detected (size: ${_bufferedStream!.currentBufferSize})',
+            );
           }
         }
       });
@@ -246,7 +246,8 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
     if (_bufferedStream != null) {
       _bufferedStream!.clearBuffer();
       _addLog(
-          '🧹 Buffer cleared (size now: ${_bufferedStream!.currentBufferSize})');
+        '🧹 Buffer cleared (size now: ${_bufferedStream!.currentBufferSize})',
+      );
     }
   }
 
@@ -268,8 +269,10 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Configuration',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  'Configuration',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 Row(
                   children: [
                     const Text('Buffer Size: '),
@@ -357,15 +360,18 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Statistics',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  'Statistics',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 Text('Total Events Sent: $_totalEvents'),
                 Text('Transcription Events: $_transcriptionEvents'),
                 Text('Progress Events: $_progressEvents'),
                 Text('Dropped Events: $_droppedEvents'),
                 if (_bufferedStream != null)
                   Text(
-                      'Current Buffer Size: ${_bufferedStream!.currentBufferSize}'),
+                    'Current Buffer Size: ${_bufferedStream!.currentBufferSize}',
+                  ),
                 Text('Strategy: ${_overflowStrategy.name}'),
                 Text('Max Buffer Size: $_bufferSize'),
               ],
@@ -382,8 +388,10 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Event Log',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  'Event Log',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Container(
                   height: 300,
@@ -394,13 +402,15 @@ class _BufferedStreamSectionState extends State<BufferedStreamSection> {
                   ),
                   child: _streamLogs.isEmpty
                       ? const Text(
-                          'No events yet. Start stream testing and simulate events.')
+                          'No events yet. Start stream testing and simulate events.',
+                        )
                       : ListView.builder(
                           itemCount: _streamLogs.length,
                           itemBuilder: (context, index) {
                             return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 1.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 1.0,
+                              ),
                               child: Text(
                                 _streamLogs[index],
                                 style: const TextStyle(

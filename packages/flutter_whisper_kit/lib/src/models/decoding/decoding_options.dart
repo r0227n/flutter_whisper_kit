@@ -48,8 +48,8 @@ class DecodingOptions {
           : 0.0,
       temperatureIncrementOnFallback:
           json['temperatureIncrementOnFallback'] != null
-              ? (json['temperatureIncrementOnFallback'] as num).toDouble()
-              : 0.2,
+          ? (json['temperatureIncrementOnFallback'] as num).toDouble()
+          : 0.2,
       temperatureFallbackCount: json['temperatureFallbackCount'] as int? ?? 5,
       sampleLength: json['sampleLength'] as int? ?? 224,
       topK: json['topK'] as int? ?? 5,
@@ -194,8 +194,9 @@ class DecodingOptions {
       'firstTokenLogProbThreshold': firstTokenLogProbThreshold,
       'noSpeechThreshold': noSpeechThreshold,
       'concurrentWorkerCount': concurrentWorkerCount,
-      'chunkingStrategy':
-          chunkingStrategy == ChunkingStrategy.vad ? 'vad' : 'none',
+      'chunkingStrategy': chunkingStrategy == ChunkingStrategy.vad
+          ? 'vad'
+          : 'none',
     };
   }
 }

@@ -23,8 +23,10 @@ void main() {
         message: 'Transcription failed',
       );
 
-      expect(error.toString(),
-          equals('TranscriptionFailedError(2001): Transcription failed'));
+      expect(
+        error.toString(),
+        equals('TranscriptionFailedError(2001): Transcription failed'),
+      );
     });
   });
 
@@ -60,8 +62,9 @@ void main() {
             message: 'Fallback message',
           );
 
-          final error =
-              WhisperKitError.fromPlatformException(platformException);
+          final error = WhisperKitError.fromPlatformException(
+            platformException,
+          );
 
           expect(error.code, equals(testCase.code));
           expect(error.message, equals(testCase.message));
@@ -82,10 +85,7 @@ void main() {
       });
 
       test('should preserve details from PlatformException', () {
-        final details = {
-          'filePath': '/path/to/audio.wav',
-          'errorCode': 1234,
-        };
+        final details = {'filePath': '/path/to/audio.wav', 'errorCode': 1234};
         final platformException = PlatformException(
           code: 'Domain=WhisperKitError Code=1234 "Test error"',
           message: 'Test message',
@@ -113,8 +113,9 @@ void main() {
             message: testCase.message,
           );
 
-          final error =
-              WhisperKitError.fromPlatformException(platformException);
+          final error = WhisperKitError.fromPlatformException(
+            platformException,
+          );
 
           expect(error.code, equals(testCase.expectedCode));
           expect(error.message, equals(testCase.message));
@@ -122,9 +123,7 @@ void main() {
       });
 
       test('should handle null message in PlatformException', () {
-        final platformException = PlatformException(
-          code: 'UNKNOWN_ERROR',
-        );
+        final platformException = PlatformException(code: 'UNKNOWN_ERROR');
 
         final error = WhisperKitError.fromPlatformException(platformException);
 
@@ -249,9 +248,7 @@ void main() {
       });
 
       test('handles null message in PlatformException', () {
-        final platformException = PlatformException(
-          code: 'UNKNOWN_ERROR',
-        );
+        final platformException = PlatformException(code: 'UNKNOWN_ERROR');
 
         final error = WhisperKitError.fromPlatformException(platformException);
 
@@ -273,8 +270,9 @@ void main() {
                 'Domain=WhisperKitError Code=${testCase.code} "Boundary test"',
           );
 
-          final error =
-              WhisperKitError.fromPlatformException(platformException);
+          final error = WhisperKitError.fromPlatformException(
+            platformException,
+          );
 
           expect(error.runtimeType, equals(testCase.expectedType));
         }
@@ -285,9 +283,13 @@ void main() {
       test('includes error type and message for all error types', () {
         final errors = [
           const ModelLoadingFailedError(
-              message: 'Failed to load model', code: 1001),
+            message: 'Failed to load model',
+            code: 1001,
+          ),
           const TranscriptionFailedError(
-              message: 'Transcription failed', code: 2001),
+            message: 'Transcription failed',
+            code: 2001,
+          ),
           const RecordingFailedError(message: 'Recording failed', code: 3001),
           const InvalidArgumentsError(message: 'Invalid arguments', code: 5002),
           const PermissionDeniedError(message: 'Permission denied', code: 4001),
@@ -296,8 +298,10 @@ void main() {
 
         for (final error in errors) {
           final result = error.toString();
-          expect(result,
-              equals('${error.runtimeType}(${error.code}): ${error.message}'));
+          expect(
+            result,
+            equals('${error.runtimeType}(${error.code}): ${error.message}'),
+          );
         }
       });
     });
