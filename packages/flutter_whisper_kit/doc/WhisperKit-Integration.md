@@ -97,7 +97,7 @@ Future<String?> transcribeAudioFile(String filePath) async {
         modelSize: 'medium',
       ),
     );
-    
+
     return result.text;
   } catch (e) {
     print('Transcription failed: $e');
@@ -119,7 +119,7 @@ Future<void> startRecording() async {
         enableVAD: true,
       ),
     );
-    
+
     // Listen for transcription updates
     flutterWhisperkitApple.onTranscriptionProgress.listen((result) {
       print('Partial transcription: ${result.text}');
@@ -211,7 +211,7 @@ class _TranscriptionAppState extends State<TranscriptionApp> {
       setState(() {
         isInitialized = true;
       });
-      
+
       // Listen for transcription updates
       flutterWhisperkitApple.onTranscriptionProgress.listen((result) {
         setState(() {
@@ -320,6 +320,7 @@ void main() {
 ### Debugging Tips
 
 1. Enable debug logging in the plugin:
+
    ```dart
    flutterWhisperkitApple.setDebugLogging(true);
    ```
@@ -331,11 +332,13 @@ void main() {
 ### Platform-Specific Considerations
 
 #### iOS
+
 - Ensure your app targets iOS 14.0 or later
 - Test on physical devices for accurate performance metrics
 - Consider app backgrounding behavior for long transcriptions
 
 #### macOS
+
 - Verify sandbox entitlements for microphone access
 - Test with different input devices
 - Consider performance on different Mac models

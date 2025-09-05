@@ -192,10 +192,7 @@ class FlutterWhisperKit {
     ),
     bool loop = true,
   }) async {
-    return _recordingService.startRecording(
-      options: options,
-      loop: loop,
-    );
+    return _recordingService.startRecording(options: options, loop: loop);
   }
 
   /// Stops recording audio and optionally triggers transcription.
@@ -255,10 +252,7 @@ class FlutterWhisperKit {
       chunkingStrategy: ChunkingStrategy.vad,
     ),
   }) async {
-    return _transcriptionService.transcribeFromFile(
-      filePath,
-      options: options,
-    );
+    return _transcriptionService.transcribeFromFile(filePath, options: options);
   }
 
   /// Detects the language of an audio file.
@@ -360,7 +354,7 @@ class FlutterWhisperKit {
   /// Delegates to [ResultApiService.transcribeFileWithResult].
   /// See [ResultApiService.transcribeFileWithResult] for detailed documentation.
   Future<Result<TranscriptionResult?, WhisperKitError>>
-      transcribeFileWithResult(
+  transcribeFileWithResult(
     String path, {
     DecodingOptions? options,
     Function(Progress progress)? onProgress,
@@ -377,9 +371,7 @@ class FlutterWhisperKit {
   /// Delegates to [ResultApiService.detectLanguageWithResult].
   /// See [ResultApiService.detectLanguageWithResult] for detailed documentation.
   Future<Result<LanguageDetectionResult?, WhisperKitError>>
-      detectLanguageWithResult(
-    String audioPath,
-  ) async {
+  detectLanguageWithResult(String audioPath) async {
     return _resultApiService.detectLanguageWithResult(audioPath);
   }
 }

@@ -15,34 +15,39 @@ void main() {
     });
 
     tearDown(() {
-      (platform as MockFlutterWhisperkitPlatform)
-          .transcriptionController
+      (platform as MockFlutterWhisperkitPlatform).transcriptionController
           .close();
       (platform as MockFlutterWhisperkitPlatform).progressController.close();
     });
 
-    test('startRecording initiates audio recording with default options',
-        () async {
-      final result = await platform.startRecording();
+    test(
+      'startRecording initiates audio recording with default options',
+      () async {
+        final result = await platform.startRecording();
 
-      expect(result, equals('Recording started'));
-    });
+        expect(result, equals('Recording started'));
+      },
+    );
 
-    test('startRecording initiates audio recording with custom options',
-        () async {
-      final options = DecodingOptions(
-        language: 'en',
-        temperature: 0.5,
-        wordTimestamps: true,
-        detectLanguage: true,
-        chunkingStrategy: ChunkingStrategy.vad,
-      );
+    test(
+      'startRecording initiates audio recording with custom options',
+      () async {
+        final options = DecodingOptions(
+          language: 'en',
+          temperature: 0.5,
+          wordTimestamps: true,
+          detectLanguage: true,
+          chunkingStrategy: ChunkingStrategy.vad,
+        );
 
-      final result =
-          await platform.startRecording(options: options, loop: true);
+        final result = await platform.startRecording(
+          options: options,
+          loop: true,
+        );
 
-      expect(result, equals('Recording started'));
-    });
+        expect(result, equals('Recording started'));
+      },
+    );
 
     test('stopRecording ends audio recording', () async {
       final result = await platform.stopRecording();
@@ -117,8 +122,9 @@ void main() {
       final options = DecodingOptions(detectLanguage: true);
 
       await platform.startRecording(options: options);
-      final transcriptions =
-          await platform.transcriptionStream.take(1).toList();
+      final transcriptions = await platform.transcriptionStream
+          .take(1)
+          .toList();
 
       expect(transcriptions, hasLength(1));
       expect(transcriptions[0].text, equals('Test transcription'));

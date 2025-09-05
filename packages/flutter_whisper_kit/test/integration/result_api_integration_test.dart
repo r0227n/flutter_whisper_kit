@@ -20,17 +20,16 @@ void main() {
     });
 
     group('loadModelWithResult', () {
-      test('should return success with model path when loading succeeds',
-          () async {
-        // Note: This is an integration test that requires actual implementation
-        // In a real test environment, you would mock the platform channel
+      test(
+        'should return success with model path when loading succeeds',
+        () async {
+          // Note: This is an integration test that requires actual implementation
+          // In a real test environment, you would mock the platform channel
 
-        // For now, we'll create a unit test structure
-        expect(
-          whisperKit.loadModelWithResult,
-          isA<Function>(),
-        );
-      });
+          // For now, we'll create a unit test structure
+          expect(whisperKit.loadModelWithResult, isA<Function>());
+        },
+      );
 
       test('should handle progress updates correctly', () async {
         final progressUpdates = <Progress>[];
@@ -53,16 +52,19 @@ void main() {
         // In actual implementation, this would be mocked
       });
 
-      test('should return failure with WhisperKitError on platform exception',
-          () async {
-        // This tests error handling from platform exceptions
-      });
+      test(
+        'should return failure with WhisperKitError on platform exception',
+        () async {
+          // This tests error handling from platform exceptions
+        },
+      );
 
       test(
-          'should return failure with generic error code on unexpected exception',
-          () async {
-        // This tests the catch-all error handling
-      });
+        'should return failure with generic error code on unexpected exception',
+        () async {
+          // This tests the catch-all error handling
+        },
+      );
     });
 
     group('transcribeFileWithResult', () {
@@ -70,10 +72,7 @@ void main() {
         // Note: There's a bug in the implementation - it calls transcribeFile()
         // instead of transcribeFromFile()
 
-        expect(
-          whisperKit.transcribeFileWithResult,
-          isA<Function>(),
-        );
+        expect(whisperKit.transcribeFileWithResult, isA<Function>());
       });
 
       test('should handle decoding options correctly', () async {
@@ -87,8 +86,10 @@ void main() {
           '/path/to/audio.wav',
           options: options,
         );
-        expect(future,
-            isA<Future<Result<TranscriptionResult?, WhisperKitError>>>());
+        expect(
+          future,
+          isA<Future<Result<TranscriptionResult?, WhisperKitError>>>(),
+        );
       });
 
       test('should handle progress callbacks', () async {
@@ -99,36 +100,42 @@ void main() {
           '/path/to/audio.wav',
           onProgress: (progress) => progressUpdates.add(progress),
         );
-        expect(future,
-            isA<Future<Result<TranscriptionResult?, WhisperKitError>>>());
+        expect(
+          future,
+          isA<Future<Result<TranscriptionResult?, WhisperKitError>>>(),
+        );
       });
 
-      test('should return failure with error code 2001 on transcription error',
-          () async {
-        // This tests the specific error code for transcription failures
-      });
+      test(
+        'should return failure with error code 2001 on transcription error',
+        () async {
+          // This tests the specific error code for transcription failures
+        },
+      );
     });
 
     group('detectLanguageWithResult', () {
       test('should return success with language detection result', () async {
-        expect(
-          whisperKit.detectLanguageWithResult,
-          isA<Function>(),
-        );
+        expect(whisperKit.detectLanguageWithResult, isA<Function>());
       });
 
       test('should accept audio path parameter', () async {
         // This tests that the audio path is passed correctly
-        final future =
-            whisperKit.detectLanguageWithResult('/path/to/audio.wav');
-        expect(future,
-            isA<Future<Result<LanguageDetectionResult?, WhisperKitError>>>());
+        final future = whisperKit.detectLanguageWithResult(
+          '/path/to/audio.wav',
+        );
+        expect(
+          future,
+          isA<Future<Result<LanguageDetectionResult?, WhisperKitError>>>(),
+        );
       });
 
-      test('should return failure with error code 2002 on detection error',
-          () async {
-        // This tests the specific error code for language detection failures
-      });
+      test(
+        'should return failure with error code 2002 on detection error',
+        () async {
+          // This tests the specific error code for language detection failures
+        },
+      );
 
       test('should handle WhisperKitError from platform', () async {
         // This tests proper error propagation
@@ -177,10 +184,12 @@ void main() {
 
           final mappedResult = result
               .map((path) => 'Model at: $path')
-              .mapError((error) => UnknownError(
-                    code: error.code,
-                    message: 'Wrapped: ${error.message}',
-                  ));
+              .mapError(
+                (error) => UnknownError(
+                  code: error.code,
+                  message: 'Wrapped: ${error.message}',
+                ),
+              );
 
           expect(mappedResult, isA<Result<String, WhisperKitError>>());
         }
@@ -197,16 +206,13 @@ void main() {
             retryPolicy: const RetryPolicy(maxAttempts: 3),
           );
 
-          final result = await executor.executeWithRetry(
-            () async {
-              final loadResult = await whisperKit.loadModelWithResult('tiny');
-              return loadResult.when(
-                success: (path) => path,
-                failure: (exception) => throw exception,
-              );
-            },
-            operationName: 'Load WhisperKit model',
-          );
+          final result = await executor.executeWithRetry(() async {
+            final loadResult = await whisperKit.loadModelWithResult('tiny');
+            return loadResult.when(
+              success: (path) => path,
+              failure: (exception) => throw exception,
+            );
+          }, operationName: 'Load WhisperKit model');
 
           expect(result, isA<Result<String, WhisperKitError>>());
         }
@@ -241,18 +247,20 @@ void main() {
       whisperKit = FlutterWhisperKit();
     });
 
-    test('should return success with model path when download succeeds',
-        () async {
-      // Test the method exists and returns the correct type
-      expect(
-        () => whisperKit.downloadWithResult(variant: 'tiny'),
-        isA<Function>(),
-      );
+    test(
+      'should return success with model path when download succeeds',
+      () async {
+        // Test the method exists and returns the correct type
+        expect(
+          () => whisperKit.downloadWithResult(variant: 'tiny'),
+          isA<Function>(),
+        );
 
-      // Test the return type
-      final future = whisperKit.downloadWithResult(variant: 'tiny');
-      expect(future, isA<Future<Result<String, WhisperKitError>>>());
-    });
+        // Test the return type
+        final future = whisperKit.downloadWithResult(variant: 'tiny');
+        expect(future, isA<Future<Result<String, WhisperKitError>>>());
+      },
+    );
 
     test('should handle progress updates', () async {
       final progressUpdates = <Progress>[];
@@ -286,10 +294,7 @@ void main() {
     });
 
     test('should return success with model list', () async {
-      expect(
-        whisperKit.fetchAvailableModelsWithResult,
-        isA<Function>(),
-      );
+      expect(whisperKit.fetchAvailableModelsWithResult, isA<Function>());
 
       final future = whisperKit.fetchAvailableModelsWithResult();
       expect(future, isA<Future<Result<List<String>, WhisperKitError>>>());
@@ -314,10 +319,7 @@ void main() {
     });
 
     test('should return success when recording starts', () async {
-      expect(
-        whisperKit.startRecordingWithResult,
-        isA<Function>(),
-      );
+      expect(whisperKit.startRecordingWithResult, isA<Function>());
 
       final future = whisperKit.startRecordingWithResult();
       expect(future, isA<Future<Result<String, WhisperKitError>>>());
@@ -337,10 +339,7 @@ void main() {
     });
 
     test('should return success when recording stops', () async {
-      expect(
-        whisperKit.stopRecordingWithResult,
-        isA<Function>(),
-      );
+      expect(whisperKit.stopRecordingWithResult, isA<Function>());
 
       final future = whisperKit.stopRecordingWithResult();
       expect(future, isA<Future<Result<String, WhisperKitError>>>());
@@ -361,28 +360,43 @@ void main() {
 
     test('all WithResult methods follow consistent error handling pattern', () {
       // All methods should return Result<T, WhisperKitError>
-      expect(whisperKit.loadModelWithResult('tiny'),
-          isA<Future<Result<String, WhisperKitError>>>());
-      expect(whisperKit.transcribeFileWithResult('/path/to/audio.wav'),
-          isA<Future<Result<TranscriptionResult?, WhisperKitError>>>());
-      expect(whisperKit.detectLanguageWithResult('/path/to/audio.wav'),
-          isA<Future<Result<LanguageDetectionResult?, WhisperKitError>>>());
-      expect(whisperKit.downloadWithResult(variant: 'tiny'),
-          isA<Future<Result<String, WhisperKitError>>>());
-      expect(whisperKit.fetchAvailableModelsWithResult(),
-          isA<Future<Result<List<String>, WhisperKitError>>>());
-      expect(whisperKit.startRecordingWithResult(),
-          isA<Future<Result<String, WhisperKitError>>>());
-      expect(whisperKit.stopRecordingWithResult(),
-          isA<Future<Result<String, WhisperKitError>>>());
+      expect(
+        whisperKit.loadModelWithResult('tiny'),
+        isA<Future<Result<String, WhisperKitError>>>(),
+      );
+      expect(
+        whisperKit.transcribeFileWithResult('/path/to/audio.wav'),
+        isA<Future<Result<TranscriptionResult?, WhisperKitError>>>(),
+      );
+      expect(
+        whisperKit.detectLanguageWithResult('/path/to/audio.wav'),
+        isA<Future<Result<LanguageDetectionResult?, WhisperKitError>>>(),
+      );
+      expect(
+        whisperKit.downloadWithResult(variant: 'tiny'),
+        isA<Future<Result<String, WhisperKitError>>>(),
+      );
+      expect(
+        whisperKit.fetchAvailableModelsWithResult(),
+        isA<Future<Result<List<String>, WhisperKitError>>>(),
+      );
+      expect(
+        whisperKit.startRecordingWithResult(),
+        isA<Future<Result<String, WhisperKitError>>>(),
+      );
+      expect(
+        whisperKit.stopRecordingWithResult(),
+        isA<Future<Result<String, WhisperKitError>>>(),
+      );
     });
 
     test('all WithResult methods support Result pattern operations', () async {
       // Example showing all methods support when/fold/map operations
       void exampleUsage() async {
         // downloadWithResult
-        final downloadResult =
-            await whisperKit.downloadWithResult(variant: 'tiny');
+        final downloadResult = await whisperKit.downloadWithResult(
+          variant: 'tiny',
+        );
         downloadResult.when(
           success: (path) => debugPrint('Downloaded to: $path'),
           failure: (error) => debugPrint('Download failed: ${error.message}'),
@@ -400,15 +414,18 @@ void main() {
         final startResult = await whisperKit.startRecordingWithResult();
         final mappedStart = startResult
             .map((msg) => 'Started: $msg')
-            .mapError((err) => UnknownError(
-                  code: err.code,
-                  message: 'Recording error: ${err.message}',
-                ));
+            .mapError(
+              (err) => UnknownError(
+                code: err.code,
+                message: 'Recording error: ${err.message}',
+              ),
+            );
         debugPrint('Mapped result: $mappedStart');
 
         // stopRecordingWithResult
-        final stopResult =
-            await whisperKit.stopRecordingWithResult(loop: false);
+        final stopResult = await whisperKit.stopRecordingWithResult(
+          loop: false,
+        );
         if (stopResult.isSuccess) {
           debugPrint('Recording stopped successfully');
         }

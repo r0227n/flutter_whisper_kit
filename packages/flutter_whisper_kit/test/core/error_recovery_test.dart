@@ -18,8 +18,10 @@ void main() {
     group('getDelayForAttempt', () {
       test('should return initial delay for negative attempt', () {
         const policy = RetryPolicy(initialDelay: Duration(milliseconds: 100));
-        expect(policy.getDelayForAttempt(-1),
-            equals(const Duration(milliseconds: 100)));
+        expect(
+          policy.getDelayForAttempt(-1),
+          equals(const Duration(milliseconds: 100)),
+        );
       });
 
       test('should calculate exponential backoff correctly', () {
@@ -91,7 +93,9 @@ void main() {
 
         // Permission errors should not be retryable
         expect(
-            policy.shouldRetry(ErrorCode.microphonePermissionDenied), isFalse);
+          policy.shouldRetry(ErrorCode.microphonePermissionDenied),
+          isFalse,
+        );
 
         // Validation errors should not be retryable
         expect(policy.shouldRetry(ErrorCode.invalidAudioFormat), isFalse);
@@ -140,10 +144,14 @@ void main() {
         expect(result.wordTimestamps, equals(originalOptions.wordTimestamps));
         expect(result.topK, equals(originalOptions.topK));
         expect(result.sampleLength, equals(originalOptions.sampleLength));
-        expect(result.concurrentWorkerCount,
-            equals(originalOptions.concurrentWorkerCount));
         expect(
-            result.chunkingStrategy, equals(originalOptions.chunkingStrategy));
+          result.concurrentWorkerCount,
+          equals(originalOptions.concurrentWorkerCount),
+        );
+        expect(
+          result.chunkingStrategy,
+          equals(originalOptions.chunkingStrategy),
+        );
       });
 
       test('should skip word timestamps when fallback enabled', () {
@@ -290,101 +298,88 @@ void main() {
     group('executeWithRetry', () {
       test('should succeed on first attempt', () async {
         int attempts = 0;
-        final result = await executor.executeWithRetry(
-          () async {
-            attempts++;
-            return 'success';
-          },
-          operationName: 'test operation',
-        );
+        final result = await executor.executeWithRetry(() async {
+          attempts++;
+          return 'success';
+        }, operationName: 'test operation');
 
         expect(result.isSuccess, isTrue);
         expect(
-            result.when(
-              success: (value) => value,
-              failure: (_) => null,
-            ),
-            equals('success'));
+          result.when(success: (value) => value, failure: (_) => null),
+          equals('success'),
+        );
         expect(attempts, equals(1));
       });
 
       test('should retry on retryable errors', () async {
         int attempts = 0;
-        final result = await executor.executeWithRetry(
-          () async {
-            attempts++;
-            if (attempts < 3) {
-              throw RecordingFailedError(
-                code: ErrorCode.networkTimeout,
-                message: 'Network timeout',
-              );
-            }
-            return 'success after retries';
-          },
-        );
+        final result = await executor.executeWithRetry(() async {
+          attempts++;
+          if (attempts < 3) {
+            throw RecordingFailedError(
+              code: ErrorCode.networkTimeout,
+              message: 'Network timeout',
+            );
+          }
+          return 'success after retries';
+        });
 
         expect(result.isSuccess, isTrue);
         expect(
-            result.when(
-              success: (value) => value,
-              failure: (_) => null,
-            ),
-            equals('success after retries'));
+          result.when(success: (value) => value, failure: (_) => null),
+          equals('success after retries'),
+        );
         expect(attempts, equals(3));
       });
 
       test('should not retry non-retryable errors', () async {
         int attempts = 0;
-        final result = await executor.executeWithRetry(
-          () async {
-            attempts++;
-            throw ModelLoadingFailedError(
-              code: ErrorCode.modelNotFound,
-              message: 'Model not found',
-            );
-          },
-        );
+        final result = await executor.executeWithRetry(() async {
+          attempts++;
+          throw ModelLoadingFailedError(
+            code: ErrorCode.modelNotFound,
+            message: 'Model not found',
+          );
+        });
 
         expect(result.isFailure, isTrue);
         expect(
-            result.when(
-              success: (_) => null,
-              failure: (exception) => exception.code,
-            ),
-            equals(ErrorCode.modelNotFound));
+          result.when(
+            success: (_) => null,
+            failure: (exception) => exception.code,
+          ),
+          equals(ErrorCode.modelNotFound),
+        );
         expect(attempts, equals(1));
       });
 
       test('should fail after max attempts', () async {
         int attempts = 0;
-        final result = await executor.executeWithRetry(
-          () async {
-            attempts++;
-            throw RecordingFailedError(
-              code: ErrorCode.networkTimeout,
-              message: 'Network timeout',
-            );
-          },
-        );
+        final result = await executor.executeWithRetry(() async {
+          attempts++;
+          throw RecordingFailedError(
+            code: ErrorCode.networkTimeout,
+            message: 'Network timeout',
+          );
+        });
 
         expect(result.isFailure, isTrue);
         expect(attempts, equals(3));
       });
 
       test('should handle non-WhisperKitError exceptions', () async {
-        final result = await executor.executeWithRetry(
-          () async {
-            throw Exception('Generic error');
-          },
-        );
+        final result = await executor.executeWithRetry(() async {
+          throw Exception('Generic error');
+        });
 
         expect(result.isFailure, isTrue);
         expect(
-            result.when(
-              success: (_) => null,
-              failure: (exception) => exception.code,
-            ),
-            equals(ErrorCode.transcriptionFailed));
+          result.when(
+            success: (_) => null,
+            failure: (exception) => exception.code,
+          ),
+          equals(ErrorCode.transcriptionFailed),
+        );
       });
 
       test('should log operations correctly', () async {
@@ -394,8 +389,9 @@ void main() {
         );
 
         expect(
-            logMessages.any((msg) => msg.contains('Executing test operation')),
-            isTrue);
+          logMessages.any((msg) => msg.contains('Executing test operation')),
+          isTrue,
+        );
         expect(logMessages.any((msg) => msg.contains('attempt 1/3')), isTrue);
       });
     });

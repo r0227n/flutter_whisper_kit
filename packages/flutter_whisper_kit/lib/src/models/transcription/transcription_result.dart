@@ -52,12 +52,11 @@ class TranscriptionSegment {
           : 0.0,
       words: json['words'] != null
           ? (json['words'] as List)
-              .map(
-                (e) => WordTiming.fromJson(
-                  Map<String, dynamic>.from(e as Map),
-                ),
-              )
-              .toList()
+                .map(
+                  (e) =>
+                      WordTiming.fromJson(Map<String, dynamic>.from(e as Map)),
+                )
+                .toList()
           : null,
     );
   }
@@ -204,12 +203,15 @@ class TranscriptionTimings {
       audioProcessing: json['audioProcessing'] != null
           ? (json['audioProcessing'] as num).toDouble()
           : 0.0,
-      logmels:
-          json['logmels'] != null ? (json['logmels'] as num).toDouble() : 0.0,
-      encoding:
-          json['encoding'] != null ? (json['encoding'] as num).toDouble() : 0.0,
-      prefill:
-          json['prefill'] != null ? (json['prefill'] as num).toDouble() : 0.0,
+      logmels: json['logmels'] != null
+          ? (json['logmels'] as num).toDouble()
+          : 0.0,
+      encoding: json['encoding'] != null
+          ? (json['encoding'] as num).toDouble()
+          : 0.0,
+      prefill: json['prefill'] != null
+          ? (json['prefill'] as num).toDouble()
+          : 0.0,
       decodingInit: json['decodingInit'] != null
           ? (json['decodingInit'] as num).toDouble()
           : 0.0,
@@ -444,7 +446,8 @@ class TranscriptionResult {
   factory TranscriptionResult.fromJson(Map<String, dynamic> json) {
     return TranscriptionResult(
       text: json['text'] as String? ?? '',
-      segments: (json['segments'] as List?)
+      segments:
+          (json['segments'] as List?)
               ?.map(
                 (e) => TranscriptionSegment.fromJson(
                   Map<String, dynamic>.from(e as Map),

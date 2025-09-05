@@ -60,14 +60,20 @@ void main() {
 
     test('error codes should have descriptive messages', () {
       // Given & When & Then
-      expect(ErrorCode.getDescription(ErrorCode.modelNotFound),
-          contains('Model not found'));
+      expect(
+        ErrorCode.getDescription(ErrorCode.modelNotFound),
+        contains('Model not found'),
+      );
 
-      expect(ErrorCode.getDescription(ErrorCode.transcriptionFailed),
-          contains('Transcription failed'));
+      expect(
+        ErrorCode.getDescription(ErrorCode.transcriptionFailed),
+        contains('Transcription failed'),
+      );
 
-      expect(ErrorCode.getDescription(ErrorCode.networkTimeout),
-          contains('Network timeout'));
+      expect(
+        ErrorCode.getDescription(ErrorCode.networkTimeout),
+        contains('Network timeout'),
+      );
     });
 
     test('error codes should map to correct error types', () {
@@ -92,20 +98,30 @@ void main() {
 
     test('should provide category for error codes', () {
       // Given & When & Then
-      expect(ErrorCategory.fromCode(ErrorCode.modelNotFound),
-          ErrorCategory.initialization);
+      expect(
+        ErrorCategory.fromCode(ErrorCode.modelNotFound),
+        ErrorCategory.initialization,
+      );
 
-      expect(ErrorCategory.fromCode(ErrorCode.transcriptionFailed),
-          ErrorCategory.runtime);
+      expect(
+        ErrorCategory.fromCode(ErrorCode.transcriptionFailed),
+        ErrorCategory.runtime,
+      );
 
-      expect(ErrorCategory.fromCode(ErrorCode.networkTimeout),
-          ErrorCategory.network);
+      expect(
+        ErrorCategory.fromCode(ErrorCode.networkTimeout),
+        ErrorCategory.network,
+      );
 
-      expect(ErrorCategory.fromCode(ErrorCode.microphonePermissionDenied),
-          ErrorCategory.permission);
+      expect(
+        ErrorCategory.fromCode(ErrorCode.microphonePermissionDenied),
+        ErrorCategory.permission,
+      );
 
-      expect(ErrorCategory.fromCode(ErrorCode.invalidAudioFormat),
-          ErrorCategory.validation);
+      expect(
+        ErrorCategory.fromCode(ErrorCode.invalidAudioFormat),
+        ErrorCategory.validation,
+      );
     });
   });
 }

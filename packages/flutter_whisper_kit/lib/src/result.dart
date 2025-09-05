@@ -26,10 +26,7 @@ sealed class Result<S, E extends Exception> {
     required T Function(S value) onSuccess,
     required T Function(E exception) onFailure,
   }) {
-    return when(
-      success: onSuccess,
-      failure: onFailure,
-    );
+    return when(success: onSuccess, failure: onFailure);
   }
 
   /// Maps the success value to a new value
@@ -42,7 +39,8 @@ sealed class Result<S, E extends Exception> {
 
   /// Maps the failure exception to a new exception
   Result<S, F> mapError<F extends Exception>(
-      F Function(E exception) transform) {
+    F Function(E exception) transform,
+  ) {
     return switch (this) {
       Success(:final value) => Success(value),
       Failure(:final exception) => Failure(transform(exception)),

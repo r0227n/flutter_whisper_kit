@@ -9,9 +9,9 @@ class MockFlutterWhisperkitPlatform
     with MockPlatformInterfaceMixin
     implements FlutterWhisperKitPlatform {
   MockFlutterWhisperkitPlatform()
-      : _progressController = StreamController<Progress>.broadcast(),
-        _transcriptionController =
-            StreamController<TranscriptionResult>.broadcast();
+    : _progressController = StreamController<Progress>.broadcast(),
+      _transcriptionController =
+          StreamController<TranscriptionResult>.broadcast();
 
   /// Exception to throw for testing error handling
   Exception? _throwError;
@@ -35,25 +35,31 @@ class MockFlutterWhisperkitPlatform
   /// Emit progress updates for testing
   void emitProgressUpdates() {
     Future.delayed(const Duration(milliseconds: 10), () {
-      _progressController.add(const Progress(
-        fractionCompleted: 0.25,
-        completedUnitCount: 25,
-        totalUnitCount: 100,
-      ));
+      _progressController.add(
+        const Progress(
+          fractionCompleted: 0.25,
+          completedUnitCount: 25,
+          totalUnitCount: 100,
+        ),
+      );
     });
     Future.delayed(const Duration(milliseconds: 20), () {
-      _progressController.add(const Progress(
-        fractionCompleted: 0.5,
-        completedUnitCount: 50,
-        totalUnitCount: 100,
-      ));
+      _progressController.add(
+        const Progress(
+          fractionCompleted: 0.5,
+          completedUnitCount: 50,
+          totalUnitCount: 100,
+        ),
+      );
     });
     Future.delayed(const Duration(milliseconds: 30), () {
-      _progressController.add(const Progress(
-        fractionCompleted: 1.0,
-        completedUnitCount: 100,
-        totalUnitCount: 100,
-      ));
+      _progressController.add(
+        const Progress(
+          fractionCompleted: 1.0,
+          completedUnitCount: 100,
+          totalUnitCount: 100,
+        ),
+      );
     });
   }
 
@@ -81,7 +87,7 @@ class MockFlutterWhisperkitPlatform
         supported: [
           'openai_whisper-tiny',
           'openai_whisper-base',
-          'openai_whisper-small'
+          'openai_whisper-small',
         ],
         disabled: [],
       ),
@@ -102,9 +108,7 @@ class MockFlutterWhisperkitPlatform
   @override
   Future<List<String>> formatModelFiles(List<String> modelPaths) {
     _checkThrowError();
-    return Future.value(
-      modelPaths.map((path) => 'formatted_$path').toList(),
-    );
+    return Future.value(modelPaths.map((path) => 'formatted_$path').toList());
   }
 
   @override
@@ -143,7 +147,9 @@ class MockFlutterWhisperkitPlatform
 
     if (filePath.isEmpty || filePath.contains('../')) {
       throw InvalidArgumentsError(
-          message: 'File path cannot be empty', code: 5003);
+        message: 'File path cannot be empty',
+        code: 5003,
+      );
     }
 
     // Mock JSON response for a successful transcription
@@ -292,14 +298,13 @@ class MockFlutterWhisperkitPlatform
     String? downloadBase,
     String repo = 'argmaxinc/whisperkit-coreml',
     String? token,
-  }) =>
-      Future.value(
-        ModelSupport(
-          defaultModel: 'tiny',
-          supported: ['tiny', 'base', 'small', 'medium', 'large'],
-          disabled: [],
-        ),
-      );
+  }) => Future.value(
+    ModelSupport(
+      defaultModel: 'tiny',
+      supported: ['tiny', 'base', 'small', 'medium', 'large'],
+      disabled: [],
+    ),
+  );
 
   @override
   Future<String?> setupModels({

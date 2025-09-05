@@ -44,10 +44,7 @@ void main() {
         mockPlatform.setThrowError(Exception('Generic error'));
 
         // Act & Assert
-        expect(
-          () => whisperKit.loadModel('tiny'),
-          throwsA(isA<Exception>()),
-        );
+        expect(() => whisperKit.loadModel('tiny'), throwsA(isA<Exception>()));
       });
     });
 
@@ -74,10 +71,7 @@ void main() {
 
       test('loads model with redownload flag', () async {
         // Act
-        final result = await whisperKit.loadModel(
-          'small',
-          redownload: true,
-        );
+        final result = await whisperKit.loadModel('small', redownload: true);
 
         // Assert
         expect(result, isNotNull);
@@ -100,10 +94,16 @@ void main() {
         await expectLater(
           stream,
           emitsInOrder([
-            isA<Progress>()
-                .having((p) => p.fractionCompleted, 'fractionCompleted', 0.5),
-            isA<Progress>()
-                .having((p) => p.fractionCompleted, 'fractionCompleted', 1.0),
+            isA<Progress>().having(
+              (p) => p.fractionCompleted,
+              'fractionCompleted',
+              0.5,
+            ),
+            isA<Progress>().having(
+              (p) => p.fractionCompleted,
+              'fractionCompleted',
+              1.0,
+            ),
           ]),
         );
         await loadFuture;
@@ -117,10 +117,7 @@ void main() {
         });
 
         // Act
-        final loadFuture = whisperKit.loadModel(
-          'tiny',
-          onProgress: (_) {},
-        );
+        final loadFuture = whisperKit.loadModel('tiny', onProgress: (_) {});
 
         // Emit progress updates to trigger the listener
         mockPlatform.emitProgressUpdates();
@@ -219,8 +216,10 @@ void main() {
         final formatted = await whisperKit.formatModelFiles(modelFiles);
 
         // Assert
-        expect(formatted,
-            ['formatted_model1.mlmodel', 'formatted_model2.mlmodel']);
+        expect(formatted, [
+          'formatted_model1.mlmodel',
+          'formatted_model2.mlmodel',
+        ]);
       });
     });
 
@@ -274,9 +273,7 @@ void main() {
     group('download', () {
       test('downloads model successfully without progress callback', () async {
         // Act
-        final result = await whisperKit.download(
-          variant: 'tiny',
-        );
+        final result = await whisperKit.download(variant: 'tiny');
 
         // Assert
         expect(result, contains('tiny'));
@@ -298,10 +295,16 @@ void main() {
         await expectLater(
           stream,
           emitsInOrder([
-            isA<Progress>()
-                .having((p) => p.fractionCompleted, 'fractionCompleted', 0.5),
-            isA<Progress>()
-                .having((p) => p.fractionCompleted, 'fractionCompleted', 1.0),
+            isA<Progress>().having(
+              (p) => p.fractionCompleted,
+              'fractionCompleted',
+              0.5,
+            ),
+            isA<Progress>().having(
+              (p) => p.fractionCompleted,
+              'fractionCompleted',
+              1.0,
+            ),
           ]),
         );
         await downloadFuture;
@@ -323,10 +326,7 @@ void main() {
 
       test('cancels progress subscription after download', () async {
         // Act
-        await whisperKit.download(
-          variant: 'tiny',
-          onProgress: (_) {},
-        );
+        await whisperKit.download(variant: 'tiny', onProgress: (_) {});
 
         // Assert - subscription should be cancelled
         // (tested by ensuring no memory leaks)
@@ -367,10 +367,7 @@ void main() {
     group('loggingCallback', () {
       test('sets logging callback with default level', () async {
         // Act & Assert
-        await expectLater(
-          whisperKit.loggingCallback(),
-          completes,
-        );
+        await expectLater(whisperKit.loggingCallback(), completes);
       });
 
       test('sets logging callback with custom level', () async {

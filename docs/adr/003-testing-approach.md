@@ -1,9 +1,11 @@
 # ADR-003: Testing Approach
 
 ## Status
+
 Accepted
 
 ## Date
+
 2024-12-29
 
 ## Context
@@ -18,6 +20,7 @@ The Flutter WhisperKit plugin required a comprehensive testing strategy to ensur
 6. **Integration complexity**: Multiple components working together
 
 The existing testing approach had several limitations:
+
 - Scattered test utilities and mocks
 - Inconsistent testing patterns across packages
 - Limited coverage of error scenarios
@@ -44,16 +47,17 @@ We implemented a **Multi-Layer Testing Strategy** with standardized utilities an
 ### 2. Standardized Test Utilities
 
 #### Shared Mock Platform
+
 ```dart
 // packages/flutter_whisper_kit/test/test_utils/mocks.dart
-class MockFlutterWhisperkitPlatform extends Mock 
-    with MockPlatformInterfaceMixin 
+class MockFlutterWhisperkitPlatform extends Mock
+    with MockPlatformInterfaceMixin
     implements FlutterWhisperKitPlatform {
-  
+
   final StreamController<TranscriptionResult> transcriptionController;
   final StreamController<Progress> progressController;
-  
-  MockFlutterWhisperkitPlatform() : 
+
+  MockFlutterWhisperkitPlatform() :
     transcriptionController = StreamController.broadcast(),
     progressController = StreamController.broadcast();
 }
@@ -67,6 +71,7 @@ MockFlutterWhisperkitPlatform setUpMockPlatform() {
 ```
 
 #### Test Data Factories
+
 ```dart
 class TestDataFactory {
   static TranscriptionResult createTranscriptionResult({
@@ -80,7 +85,7 @@ class TestDataFactory {
       segments: segments ?? [createTranscriptionSegment()],
     );
   }
-  
+
   static Progress createProgress({
     double fractionCompleted = 0.5,
     int completedUnitCount = 50,
@@ -98,6 +103,7 @@ class TestDataFactory {
 ### 3. Test Categories and Organization
 
 #### Unit Tests (70% of test suite)
+
 ```
 test/
 ├── models/
@@ -117,6 +123,7 @@ test/
 ```
 
 #### Integration Tests (20% of test suite)
+
 ```
 test/
 ├── integration/
@@ -130,6 +137,7 @@ test/
 ```
 
 #### End-to-End Tests (10% of test suite)
+
 ```
 integration_test/
 ├── whisper_kit_e2e_test.dart
@@ -143,15 +151,16 @@ integration_test/
 ### 4. Result Pattern Testing Strategy
 
 #### Testing Success Cases
+
 ```dart
 group('Result API Success Cases', () {
   testWidgets('loadModelWithResult returns success', (tester) async {
     // Arrange
     mockPlatform.mockLoadModel(result: '/path/to/model');
-    
+
     // Act
     final result = await whisperKit.loadModelWithResult('tiny');
-    
+
     // Assert
     expect(result, isA<Success<String, WhisperKitError>>());
     result.when(
@@ -163,16 +172,17 @@ group('Result API Success Cases', () {
 ```
 
 #### Testing Error Cases
+
 ```dart
 group('Result API Error Cases', () {
   testWidgets('loadModelWithResult handles platform errors', (tester) async {
     // Arrange
     final platformError = WhisperKitError(code: 1001, message: 'Model not found');
     mockPlatform.mockLoadModelError(error: platformError);
-    
+
     // Act
     final result = await whisperKit.loadModelWithResult('invalid');
-    
+
     // Assert
     expect(result, isA<Failure<String, WhisperKitError>>());
     result.when(
@@ -189,6 +199,7 @@ group('Result API Error Cases', () {
 ### 5. Stream Testing Patterns
 
 #### Real-time Transcription Testing
+
 ```dart
 group('Transcription Stream', () {
   testWidgets('emits transcription results', (tester) async {
@@ -197,19 +208,19 @@ group('Transcription Stream', () {
       TestDataFactory.createTranscriptionResult(text: 'Hello'),
       TestDataFactory.createTranscriptionResult(text: 'World'),
     ];
-    
+
     // Act
     final streamResults = <TranscriptionResult>[];
     final subscription = whisperKit.transcriptionStream.listen(
       streamResults.add,
     );
-    
+
     // Simulate platform events
     for (final result in expectedResults) {
       mockPlatform.emitTranscriptionResult(result);
       await tester.pump();
     }
-    
+
     // Assert
     expect(streamResults, expectedResults);
     await subscription.cancel();
@@ -220,13 +231,14 @@ group('Transcription Stream', () {
 ### 6. Platform-Specific Testing
 
 #### iOS/macOS Specific Tests
+
 ```dart
 @TestOn('mac-os || ios')
 group('Apple Platform Specific', () {
   testWidgets('supports background downloads', (tester) async {
     expect(FlutterWhisperKitPlatform.instance.supportsBackgroundDownloads, isTrue);
   });
-  
+
   testWidgets('handles audio session interruptions', (tester) async {
     // Test iOS-specific audio session behavior
   });
@@ -234,12 +246,13 @@ group('Apple Platform Specific', () {
 ```
 
 #### Mock Platform Behavior Validation
+
 ```dart
 group('Platform Mock Validation', () {
   test('mock platform maintains state correctly', () {
     // Verify mock behavior matches real platform expectations
     final mock = setUpMockPlatform();
-    
+
     // Test state transitions
     expect(mock.isRecording, isFalse);
     mock.mockStartRecording(result: 'Recording started');
@@ -259,6 +272,7 @@ Following the **Red-Green-Refactor** cycle documented in `docs/TEST_DRIVEN_DEVEL
 3. **Refactor**: Improve design while keeping tests green
 
 #### Example TDD Implementation
+
 ```dart
 // 1. Red: Write failing test
 test('downloadWithResult should return success with model path', () async {
@@ -285,6 +299,7 @@ Future<Result<String, WhisperKitError>> downloadWithResult({required String vari
 ### Error Scenario Testing
 
 #### Comprehensive Error Coverage
+
 ```dart
 class ErrorScenarioTests {
   static void testAllErrorCodes() {
@@ -293,7 +308,7 @@ class ErrorScenarioTests {
         test('handles error code $errorCode correctly', () async {
           final error = WhisperKitError(code: errorCode, message: 'Test error');
           final result = await simulateErrorScenario(error);
-          
+
           expect(result.isFailure, isTrue);
           expect(result.error.code, errorCode);
         });
@@ -306,15 +321,16 @@ class ErrorScenarioTests {
 ### Performance Testing
 
 #### Benchmark Integration
+
 ```dart
 group('Performance Benchmarks', () {
   testWidgets('model loading performance', (tester) async {
     final stopwatch = Stopwatch()..start();
-    
+
     final result = await whisperKit.loadModelWithResult('tiny');
-    
+
     stopwatch.stop();
-    
+
     expect(result.isSuccess, isTrue);
     expect(stopwatch.elapsedMilliseconds, lessThan(5000)); // 5 second limit
   });
@@ -385,12 +401,12 @@ test_quality_standards:
   coverage:
     minimum: 90%
     target: 95%
-  
+
   performance:
     unit_test_max_time: 100ms
     integration_test_max_time: 5s
     e2e_test_max_time: 30s
-  
+
   reliability:
     flaky_test_tolerance: 0%
     test_isolation: required

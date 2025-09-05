@@ -28,7 +28,7 @@ enum OverflowStrategy {
 class TranscriptionStream implements IDisposable {
   /// Creates a new TranscriptionStream
   TranscriptionStream()
-      : _controller = StreamController<TranscriptionEvent>.broadcast();
+    : _controller = StreamController<TranscriptionEvent>.broadcast();
   final StreamController<TranscriptionEvent> _controller;
   bool _disposed = false;
 

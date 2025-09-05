@@ -81,10 +81,7 @@ class RetryPolicy {
 
     // Apply max delay cap
     final cappedDelay = exponentialDelay
-        .clamp(
-          initialDelay.inMilliseconds,
-          maxDelay.inMilliseconds,
-        )
+        .clamp(initialDelay.inMilliseconds, maxDelay.inMilliseconds)
         .toInt();
 
     // Add jitter
@@ -137,8 +134,9 @@ class FallbackOptions {
       chunkingStrategy: original.chunkingStrategy,
       wordTimestamps: skipWordTimestamps ? false : original.wordTimestamps,
       topK: degradeQuality ? 1 : original.topK,
-      concurrentWorkerCount:
-          reduceConcurrency ? 1 : original.concurrentWorkerCount,
+      concurrentWorkerCount: reduceConcurrency
+          ? 1
+          : original.concurrentWorkerCount,
       temperatureIncrementOnFallback: original.temperatureIncrementOnFallback,
       temperatureFallbackCount: original.temperatureFallbackCount,
       usePrefillPrompt: original.usePrefillPrompt,
@@ -297,16 +295,19 @@ class RecoveryExecutor {
     while (attempt < retryPolicy.maxAttempts) {
       try {
         _log(
-            'Executing ${operationName ?? 'operation'} (attempt ${attempt + 1}/${retryPolicy.maxAttempts})',
-            LogLevel.debug);
+          'Executing ${operationName ?? 'operation'} (attempt ${attempt + 1}/${retryPolicy.maxAttempts})',
+          LogLevel.debug,
+        );
 
         final result = await operation();
         return Success(result);
       } on WhisperKitError catch (e) {
         lastError = e;
 
-        _log('Error on attempt ${attempt + 1}: ${e.message} (code: ${e.code})',
-            LogLevel.warning);
+        _log(
+          'Error on attempt ${attempt + 1}: ${e.message} (code: ${e.code})',
+          LogLevel.warning,
+        );
 
         // Check if error is retryable
         if (!retryPolicy.shouldRetry(e.code)) {
@@ -337,11 +338,13 @@ class RecoveryExecutor {
     }
 
     // Should not reach here, but return last error if we do
-    return Failure(lastError ??
-        TranscriptionFailedError(
-          code: ErrorCode.transcriptionFailed,
-          message: 'Operation failed after retries',
-        ));
+    return Failure(
+      lastError ??
+          TranscriptionFailedError(
+            code: ErrorCode.transcriptionFailed,
+            message: 'Operation failed after retries',
+          ),
+    );
   }
 
   void _log(String message, LogLevel level) {

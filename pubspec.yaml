@@ -1,10 +1,55 @@
 name: workspace
-publish_to: none 
+publish_to: none
 
 environment:
-  sdk: '^3.6.0'
+  sdk: ">=3.9.0 <4.0.0"
+
+dev_dependencies:
+  melos: ^7.1.0
 
 workspace:
   - packages/flutter_whisper_kit
   - packages/flutter_whisper_kit/example
   - packages/flutter_whisper_kit_apple
+
+melos:
+  name: flutter_whisper_kit
+
+  packages:
+    - app/
+    - packages/**
+
+  command:
+    clean:
+      hooks:
+        pre: melos exec -- "flutter clean"
+
+  scripts:
+    # Clean and get dependencies for all packages
+    get:
+      description: Get dependencies for all packages
+      run: melos exec -- "flutter pub get"
+
+    # Analyze all packages
+    analyze:
+      description: Analyze all packages
+      run: melos exec -- "dart analyze"
+
+    # Format all packages
+    format:
+      description: Format all packages
+      run: melos exec -- "dart format ."
+
+    # Run tests for all packages
+    test:
+      description: Run tests for all packages
+      run: melos exec --fail-fast --concurrency=1 -- "flutter test"
+
+    # Check if formatting is correct (for CI)
+    ci:format:
+      description: Check if all packages are formatted correctly
+      run: melos exec -- "dart format --output=none --set-exit-if-changed ."
+
+  environment:
+    sdk: ">=3.9.0 <4.0.0"
+    flutter: ">=3.35.0"

@@ -1,0 +1,60 @@
+[tools]
+flutter = "3.35.3"
+bun = "1.2.17"
+
+# Main workflow tasks
+[tasks.dev]
+description = "Complete development workflow"
+run = """
+melos run get
+melos run gen
+melos run analyze
+melos run test
+"""
+
+[tasks.setup]
+description = "Initial project setup"
+run = """
+eval "$(mise activate bash)"
+melos bootstrap
+bun install
+"""
+
+[tasks.quality]
+description = "Code quality workflow"
+run = """
+melos run ci:format
+melos run analyze
+melos run analyze:slang
+melos run test
+"""
+
+[tasks.ci-check]
+description = "Complete CI workflow"
+run = """
+set -e
+melos run ci:format
+melos run analyze
+melos run test
+bun run ci:check
+"""
+
+[tasks.analyze]
+description = "Static analysis"
+run = "melos run analyze"
+
+[tasks.test]
+description = "Run tests"
+run = "melos run test"
+
+# Formatting tasks
+[tasks.format]
+description = "Format all files"
+run = """
+melos run format
+bun run format
+"""
+
+[tasks.clean-branch]
+description = "Clean git branches/worktrees"
+run = "./scripts/clean-branch.sh"
