@@ -7,7 +7,7 @@
   // ===========================================
   // Flutter & Dart Configuration
   // ===========================================
-  "dart.flutterSdkPath": "~/.local/share/mise/installs/flutter/3.32.5-stable",
+  "dart.flutterSdkPath": "~/.local/share/mise/installs/flutter/3.35.3-stable",
   "dart.previewFlutterUiGuides": true,
   "dart.previewFlutterUiGuidesCustomTracking": true,
 

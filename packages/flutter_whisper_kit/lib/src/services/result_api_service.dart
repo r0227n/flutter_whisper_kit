@@ -14,9 +14,9 @@ class ResultApiService {
     required ModelManagementService modelService,
     required RecordingService recordingService,
     required TranscriptionService transcriptionService,
-  })  : _modelService = modelService,
-        _recordingService = recordingService,
-        _transcriptionService = transcriptionService;
+  }) : _modelService = modelService,
+       _recordingService = recordingService,
+       _transcriptionService = transcriptionService;
   final ModelManagementService _modelService;
   final RecordingService _recordingService;
   final TranscriptionService _transcriptionService;
@@ -71,12 +71,7 @@ class ResultApiService {
     } on WhisperKitError catch (e) {
       return Failure(e);
     } catch (e) {
-      return Failure(
-        UnknownError(
-          code: 1000,
-          message: 'Unexpected error: $e',
-        ),
-      );
+      return Failure(UnknownError(code: 1000, message: 'Unexpected error: $e'));
     }
   }
 
@@ -127,12 +122,7 @@ class ResultApiService {
     } on WhisperKitError catch (e) {
       return Failure(e);
     } catch (e) {
-      return Failure(
-        UnknownError(
-          code: 1000,
-          message: 'Download failed: $e',
-        ),
-      );
+      return Failure(UnknownError(code: 1000, message: 'Download failed: $e'));
     }
   }
 
@@ -268,7 +258,7 @@ class ResultApiService {
   /// - Success: A [TranscriptionResult] with the transcribed text
   /// - Failure: A [WhisperKitError] describing what went wrong
   Future<Result<TranscriptionResult?, WhisperKitError>>
-      transcribeFileWithResult(
+  transcribeFileWithResult(
     String path, {
     DecodingOptions? options,
     Function(Progress progress)? onProgress,
@@ -297,9 +287,7 @@ class ResultApiService {
   /// - Success: A [LanguageDetectionResult] with detected language info
   /// - Failure: A [WhisperKitError] describing what went wrong
   Future<Result<LanguageDetectionResult?, WhisperKitError>>
-      detectLanguageWithResult(
-    String audioPath,
-  ) async {
+  detectLanguageWithResult(String audioPath) async {
     try {
       final result = await _transcriptionService.detectLanguage(audioPath);
       return Success(result);

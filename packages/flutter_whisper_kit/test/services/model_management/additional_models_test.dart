@@ -52,7 +52,7 @@ void main() {
           'default': 'small',
           'supported': ['tiny', 'base', 'small'],
           'disabled': ['medium', 'large'],
-        }
+        },
       };
 
       // Act
@@ -338,17 +338,19 @@ void main() {
         noSpeechProb: 0.1,
         words: [
           WordTiming(
-              word: 'Test',
-              tokens: [1],
-              start: 2.0,
-              end: 2.5,
-              probability: 0.9),
+            word: 'Test',
+            tokens: [1],
+            start: 2.0,
+            end: 2.5,
+            probability: 0.9,
+          ),
           WordTiming(
-              word: 'segment',
-              tokens: [2],
-              start: 2.5,
-              end: 4.0,
-              probability: 0.95),
+            word: 'segment',
+            tokens: [2],
+            start: 2.5,
+            end: 4.0,
+            probability: 0.95,
+          ),
         ],
       );
 
@@ -459,10 +461,7 @@ void main() {
 
     test('toJson returns correct map', () {
       // Arrange
-      const timings = TranscriptionTimings(
-        fullPipeline: 1.5,
-        encoding: 0.2,
-      );
+      const timings = TranscriptionTimings(fullPipeline: 1.5, encoding: 0.2);
 
       // Act
       final json = timings.toJson();

@@ -28,14 +28,12 @@ void main() {
         final completer = Completer<void>();
 
         // Act
-        final subscription = whisperKit.transcriptionStream.listen(
-          (result) {
-            transcriptionResults.add(result);
-            if (transcriptionResults.length >= 3) {
-              completer.complete();
-            }
-          },
-        );
+        final subscription = whisperKit.transcriptionStream.listen((result) {
+          transcriptionResults.add(result);
+          if (transcriptionResults.length >= 3) {
+            completer.complete();
+          }
+        });
 
         // Start recording
         await whisperKit.startRecording();
@@ -43,15 +41,17 @@ void main() {
         // Simulate transcription results
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 100));
-          mockPlatform.transcriptionController.add(TranscriptionResult(
-            text: 'Test transcription $i',
-            segments: [],
-            language: 'en',
-            timings: TranscriptionTimings(
-              totalDecodingLoops: 1.0,
-              fullPipeline: 0.1,
+          mockPlatform.transcriptionController.add(
+            TranscriptionResult(
+              text: 'Test transcription $i',
+              segments: [],
+              language: 'en',
+              timings: TranscriptionTimings(
+                totalDecodingLoops: 1.0,
+                fullPipeline: 0.1,
+              ),
             ),
-          ));
+          );
         }
 
         // Wait for results
@@ -149,14 +149,12 @@ void main() {
         final completer = Completer<void>();
 
         // Act
-        final subscription = whisperKit.modelProgressStream.listen(
-          (progress) {
-            progressUpdates.add(progress);
-            if (progress.fractionCompleted >= 1.0) {
-              completer.complete();
-            }
-          },
-        );
+        final subscription = whisperKit.modelProgressStream.listen((progress) {
+          progressUpdates.add(progress);
+          if (progress.fractionCompleted >= 1.0) {
+            completer.complete();
+          }
+        });
 
         // Load model with progress tracking
         final loadFuture = whisperKit.loadModel('tiny');
@@ -241,12 +239,12 @@ void main() {
 
         // Act
         // Slow consumer with processing delay
-        final slowSubscription = whisperKit.transcriptionStream.listen(
-          (result) async {
-            await Future.delayed(Duration(milliseconds: 100));
-            slowResults.add(result);
-          },
-        );
+        final slowSubscription = whisperKit.transcriptionStream.listen((
+          result,
+        ) async {
+          await Future.delayed(Duration(milliseconds: 100));
+          slowResults.add(result);
+        });
 
         // Fast consumer
         final fastSubscription = whisperKit.transcriptionStream.listen(
@@ -258,15 +256,17 @@ void main() {
         // Simulate rapid transcription events
         for (int i = 0; i < 10; i++) {
           await Future.delayed(Duration(milliseconds: 50));
-          mockPlatform.transcriptionController.add(TranscriptionResult(
-            text: 'Event $i',
-            segments: [],
-            language: 'en',
-            timings: TranscriptionTimings(
-              totalDecodingLoops: 1.0,
-              fullPipeline: 0.1,
+          mockPlatform.transcriptionController.add(
+            TranscriptionResult(
+              text: 'Event $i',
+              segments: [],
+              language: 'en',
+              timings: TranscriptionTimings(
+                totalDecodingLoops: 1.0,
+                fullPipeline: 0.1,
+              ),
             ),
-          ));
+          );
         }
 
         await whisperKit.stopRecording();
@@ -297,15 +297,17 @@ void main() {
         // Emit some results before pause
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 50));
-          mockPlatform.transcriptionController.add(TranscriptionResult(
-            text: 'Before pause $i',
-            segments: [],
-            language: 'en',
-            timings: TranscriptionTimings(
-              totalDecodingLoops: 1.0,
-              fullPipeline: 0.1,
+          mockPlatform.transcriptionController.add(
+            TranscriptionResult(
+              text: 'Before pause $i',
+              segments: [],
+              language: 'en',
+              timings: TranscriptionTimings(
+                totalDecodingLoops: 1.0,
+                fullPipeline: 0.1,
+              ),
             ),
-          ));
+          );
         }
 
         // Pause stream
@@ -315,15 +317,17 @@ void main() {
         // Try to emit while paused
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 50));
-          mockPlatform.transcriptionController.add(TranscriptionResult(
-            text: 'While paused $i',
-            segments: [],
-            language: 'en',
-            timings: TranscriptionTimings(
-              totalDecodingLoops: 1.0,
-              fullPipeline: 0.1,
+          mockPlatform.transcriptionController.add(
+            TranscriptionResult(
+              text: 'While paused $i',
+              segments: [],
+              language: 'en',
+              timings: TranscriptionTimings(
+                totalDecodingLoops: 1.0,
+                fullPipeline: 0.1,
+              ),
             ),
-          ));
+          );
         }
 
         // Resume stream
@@ -332,15 +336,17 @@ void main() {
         // Emit after resume
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 50));
-          mockPlatform.transcriptionController.add(TranscriptionResult(
-            text: 'After resume $i',
-            segments: [],
-            language: 'en',
-            timings: TranscriptionTimings(
-              totalDecodingLoops: 1.0,
-              fullPipeline: 0.1,
+          mockPlatform.transcriptionController.add(
+            TranscriptionResult(
+              text: 'After resume $i',
+              segments: [],
+              language: 'en',
+              timings: TranscriptionTimings(
+                totalDecodingLoops: 1.0,
+                fullPipeline: 0.1,
+              ),
             ),
-          ));
+          );
         }
 
         await whisperKit.stopRecording();
@@ -360,9 +366,7 @@ void main() {
 
         // Act
         for (int i = 0; i < 10; i++) {
-          subscriptions.add(
-            whisperKit.transcriptionStream.listen((_) {}),
-          );
+          subscriptions.add(whisperKit.transcriptionStream.listen((_) {}));
         }
 
         // Cancel all subscriptions
@@ -394,15 +398,17 @@ void main() {
         // Emit some transcription results
         for (int i = 0; i < 5; i++) {
           await Future.delayed(Duration(milliseconds: 100));
-          mockPlatform.transcriptionController.add(TranscriptionResult(
-            text: 'Test text $i',
-            segments: [],
-            language: 'en',
-            timings: TranscriptionTimings(
-              totalDecodingLoops: 1.0,
-              fullPipeline: 0.1,
+          mockPlatform.transcriptionController.add(
+            TranscriptionResult(
+              text: 'Test text $i',
+              segments: [],
+              language: 'en',
+              timings: TranscriptionTimings(
+                totalDecodingLoops: 1.0,
+                fullPipeline: 0.1,
+              ),
             ),
-          ));
+          );
         }
 
         await whisperKit.stopRecording();
@@ -412,8 +418,10 @@ void main() {
 
         // Assert
         expect(transformedResults, everyElement(isNotEmpty));
-        expect(transformedResults.toSet().length,
-            equals(transformedResults.length));
+        expect(
+          transformedResults.toSet().length,
+          equals(transformedResults.length),
+        );
       });
     });
 
@@ -426,18 +434,18 @@ void main() {
         final results = <TranscriptionResult>[];
 
         // Act
-        final result = await executor.executeWithRetry(
-          () async {
-            final subscription = whisperKit.transcriptionStream
-                .timeout(Duration(seconds: 1))
-                .listen((result) => results.add(result));
+        final result = await executor.executeWithRetry(() async {
+          final subscription = whisperKit.transcriptionStream
+              .timeout(Duration(seconds: 1))
+              .listen((result) => results.add(result));
 
-            await whisperKit.startRecording();
+          await whisperKit.startRecording();
 
-            // Emit some transcription results
-            for (int i = 0; i < 3; i++) {
-              await Future.delayed(Duration(milliseconds: 50));
-              mockPlatform.transcriptionController.add(TranscriptionResult(
+          // Emit some transcription results
+          for (int i = 0; i < 3; i++) {
+            await Future.delayed(Duration(milliseconds: 50));
+            mockPlatform.transcriptionController.add(
+              TranscriptionResult(
                 text: 'Retry test $i',
                 segments: [],
                 language: 'en',
@@ -445,16 +453,15 @@ void main() {
                   totalDecodingLoops: 1.0,
                   fullPipeline: 0.1,
                 ),
-              ));
-            }
+              ),
+            );
+          }
 
-            await whisperKit.stopRecording();
+          await whisperKit.stopRecording();
 
-            await subscription.cancel();
-            return Success<bool, WhisperKitError>(true);
-          },
-          operationName: 'Stream recording with retry',
-        );
+          await subscription.cancel();
+          return Success<bool, WhisperKitError>(true);
+        }, operationName: 'Stream recording with retry');
 
         // Assert
         expect(result.isSuccess, isTrue);
@@ -466,12 +473,14 @@ void main() {
 
         // Act
         final subscription = whisperKit.transcriptionStream
-            .map((result) =>
-                Success<TranscriptionResult, WhisperKitError>(result))
+            .map(
+              (result) => Success<TranscriptionResult, WhisperKitError>(result),
+            )
             .handleError(
-                (error) => Failure<TranscriptionResult, WhisperKitError>(
-                      UnknownError(code: 2001, message: error.toString()),
-                    ))
+              (error) => Failure<TranscriptionResult, WhisperKitError>(
+                UnknownError(code: 2001, message: error.toString()),
+              ),
+            )
             .listen((result) => streamResults.add(result));
 
         await whisperKit.startRecording();
@@ -479,15 +488,17 @@ void main() {
         // Emit some transcription results
         for (int i = 0; i < 3; i++) {
           await Future.delayed(Duration(milliseconds: 50));
-          mockPlatform.transcriptionController.add(TranscriptionResult(
-            text: 'Result pattern test $i',
-            segments: [],
-            language: 'en',
-            timings: TranscriptionTimings(
-              totalDecodingLoops: 1.0,
-              fullPipeline: 0.1,
+          mockPlatform.transcriptionController.add(
+            TranscriptionResult(
+              text: 'Result pattern test $i',
+              segments: [],
+              language: 'en',
+              timings: TranscriptionTimings(
+                totalDecodingLoops: 1.0,
+                fullPipeline: 0.1,
+              ),
             ),
-          ));
+          );
         }
 
         await whisperKit.stopRecording();

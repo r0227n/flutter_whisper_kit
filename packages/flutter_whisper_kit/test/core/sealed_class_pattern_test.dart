@@ -121,10 +121,7 @@ void main() {
       }
 
       final result = Success<String, WhisperKitError>('data');
-      expect(
-        processResult(result, onEmpty: () => 'default'),
-        equals('data'),
-      );
+      expect(processResult(result, onEmpty: () => 'default'), equals('data'));
 
       final emptyResult = Failure<String, WhisperKitError>(
         UnknownError(code: 404, message: 'Not found'),

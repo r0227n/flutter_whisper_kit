@@ -99,11 +99,13 @@ class MockFlutterWhisperKitPlatform
       for (double progress = 0.0; progress <= 1.0; progress += 0.25) {
         await Future.delayed(Duration(milliseconds: 10));
         if (!_progressController.isClosed) {
-          _progressController.add(Progress(
-            fractionCompleted: progress,
-            totalUnitCount: 100,
-            completedUnitCount: (progress * 100).toInt(),
-          ));
+          _progressController.add(
+            Progress(
+              fractionCompleted: progress,
+              totalUnitCount: 100,
+              completedUnitCount: (progress * 100).toInt(),
+            ),
+          );
         }
       }
     });
@@ -142,15 +144,17 @@ class MockFlutterWhisperKitPlatform
     // Simulate transcription results
     _transcriptionTimer = Timer.periodic(Duration(milliseconds: 100), (_) {
       if (_isRecording) {
-        _transcriptionController.add(TranscriptionResult(
-          text: 'Test transcription ${DateTime.now().millisecondsSinceEpoch}',
-          segments: [],
-          language: 'en',
-          timings: TranscriptionTimings(
-            totalDecodingLoops: 1.0,
-            fullPipeline: 0.1,
+        _transcriptionController.add(
+          TranscriptionResult(
+            text: 'Test transcription ${DateTime.now().millisecondsSinceEpoch}',
+            segments: [],
+            language: 'en',
+            timings: TranscriptionTimings(
+              totalDecodingLoops: 1.0,
+              fullPipeline: 0.1,
+            ),
           ),
-        ));
+        );
       }
     });
 

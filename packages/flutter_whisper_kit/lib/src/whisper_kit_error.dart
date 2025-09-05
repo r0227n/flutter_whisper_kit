@@ -17,10 +17,14 @@ sealed class WhisperKitError implements Exception {
 
     // Create appropriate error type based on code range
     return switch (code) {
-      >= 1000 && <= 1999 =>
-        ModelLoadingFailedError(code: code, message: message),
-      >= 2000 && <= 2999 =>
-        TranscriptionFailedError(code: code, message: message),
+      >= 1000 && <= 1999 => ModelLoadingFailedError(
+        code: code,
+        message: message,
+      ),
+      >= 2000 && <= 2999 => TranscriptionFailedError(
+        code: code,
+        message: message,
+      ),
       >= 3000 && <= 3999 => RecordingFailedError(code: code, message: message),
       >= 4000 && <= 4999 => PermissionDeniedError(code: code, message: message),
       >= 5000 && <= 5999 => InvalidArgumentsError(code: code, message: message),
@@ -46,45 +50,45 @@ sealed class WhisperKitError implements Exception {
         return switch (errorCode) {
           // Handle all other model initialization errors (1000-1999)
           >= 1000 && <= 1999 => ModelLoadingFailedError(
-              code: errorCode,
-              message: errorMessage,
-              details: details,
-            ),
+            code: errorCode,
+            message: errorMessage,
+            details: details,
+          ),
 
           // Transcription and Processing (2000-2999)
           >= 2000 && <= 2999 => TranscriptionFailedError(
-              code: errorCode,
-              message: errorMessage,
-              details: details,
-            ),
+            code: errorCode,
+            message: errorMessage,
+            details: details,
+          ),
 
           // Recording and Audio Capture (3000-3999)
           >= 3000 && <= 3999 => RecordingFailedError(
-              code: errorCode,
-              message: errorMessage,
-              details: details,
-            ),
+            code: errorCode,
+            message: errorMessage,
+            details: details,
+          ),
 
           // File System and Permissions (4000-4999)
           >= 4000 && <= 4999 => PermissionDeniedError(
-              code: errorCode,
-              message: errorMessage,
-              details: details,
-            ),
+            code: errorCode,
+            message: errorMessage,
+            details: details,
+          ),
 
           // Configuration and Parameters (5000-5999)
           >= 5000 && <= 5999 => InvalidArgumentsError(
-              code: errorCode,
-              message: errorMessage,
-              details: details,
-            ),
+            code: errorCode,
+            message: errorMessage,
+            details: details,
+          ),
 
           // Default case for unhandled numeric error codes
           _ => UnknownError(
-              code: errorCode,
-              message: errorMessage,
-              details: details,
-            ),
+            code: errorCode,
+            message: errorMessage,
+            details: details,
+          ),
         };
       }
     }
@@ -99,11 +103,7 @@ sealed class WhisperKitError implements Exception {
       errorCode = 3001;
     }
 
-    return UnknownError(
-      code: errorCode,
-      message: message,
-      details: details,
-    );
+    return UnknownError(code: errorCode, message: message, details: details);
   }
 
   /// The error code

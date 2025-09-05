@@ -425,8 +425,10 @@ private class WhisperKitApiImpl: WhisperKitMessage {
   ///   - modelRepo: The repository to fetch models from
   ///   - completion: Callback with result of the operation
   func fetchAvailableModels(
-    modelRepo: String, matching: [String], token: String?,
-    completion: @escaping (Result<[String?], Error>) -> Void
+    modelRepo: String, 
+    matching: [String], 
+    token: String?,
+    completion: @escaping (Result<[String], Error>) -> Void
   ) {
     Task {
       do {

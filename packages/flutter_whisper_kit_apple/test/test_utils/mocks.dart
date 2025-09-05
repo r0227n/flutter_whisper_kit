@@ -21,23 +21,27 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
     // Emit progress updates when model loading starts
     Future.delayed(const Duration(milliseconds: 50), () {
       if (!_progressController.isClosed) {
-        _progressController.add(Progress(
-          completedUnitCount: 50,
-          totalUnitCount: 100,
-          fractionCompleted: 0.5,
-          isIndeterminate: false,
-        ));
+        _progressController.add(
+          Progress(
+            completedUnitCount: 50,
+            totalUnitCount: 100,
+            fractionCompleted: 0.5,
+            isIndeterminate: false,
+          ),
+        );
       }
     });
 
     Future.delayed(const Duration(milliseconds: 100), () {
       if (!_progressController.isClosed) {
-        _progressController.add(Progress(
-          completedUnitCount: 100,
-          totalUnitCount: 100,
-          fractionCompleted: 1.0,
-          isIndeterminate: false,
-        ));
+        _progressController.add(
+          Progress(
+            completedUnitCount: 100,
+            totalUnitCount: 100,
+            fractionCompleted: 1.0,
+            isIndeterminate: false,
+          ),
+        );
       }
     });
 
@@ -192,7 +196,8 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
     // Emit transcription result when recording starts
     Future.delayed(const Duration(milliseconds: 100), () {
       if (!_transcriptionController.isClosed) {
-        _transcriptionController.add(TranscriptionResult.fromJsonString('''
+        _transcriptionController.add(
+          TranscriptionResult.fromJsonString('''
         {
           "text": "Test transcription",
           "segments": [
@@ -211,7 +216,8 @@ class MockFlutterWhisperkitPlatform extends FlutterWhisperKitPlatform {
           ],
           "language": "en"
         }
-        '''));
+        '''),
+        );
       }
     });
 

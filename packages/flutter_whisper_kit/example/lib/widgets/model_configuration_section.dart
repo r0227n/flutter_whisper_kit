@@ -137,7 +137,8 @@ class ModelConfigurationSection extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                    'Chip: ${deviceSupport.chips ?? "Unknown"}'),
+                                  'Chip: ${deviceSupport.chips ?? "Unknown"}',
+                                ),
                                 Text(
                                   'Identifiers: ${deviceSupport.identifiers.join(", ")}',
                                 ),

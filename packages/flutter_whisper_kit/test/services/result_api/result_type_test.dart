@@ -62,25 +62,22 @@ void main() {
 
         expect(mapped.isSuccess, isTrue);
         expect(
-            mapped.when(
-              success: (value) => value,
-              failure: (_) => '',
-            ),
-            equals('10'));
+          mapped.when(success: (value) => value, failure: (_) => ''),
+          equals('10'),
+        );
       });
 
       test('should not map error on success', () {
         final result = Success<String, TestException>('test');
-        final mapped =
-            result.mapError((exception) => TestException(exception.toString()));
+        final mapped = result.mapError(
+          (exception) => TestException(exception.toString()),
+        );
 
         expect(mapped.isSuccess, isTrue);
         expect(
-            mapped.when(
-              success: (value) => value,
-              failure: (_) => '',
-            ),
-            equals('test'));
+          mapped.when(success: (value) => value, failure: (_) => ''),
+          equals('test'),
+        );
       });
     });
 
@@ -94,8 +91,9 @@ void main() {
       });
 
       test('should return error with when pattern matching', () {
-        final result =
-            Failure<String, TestException>(TestException('Not found', 404));
+        final result = Failure<String, TestException>(
+          TestException('Not found', 404),
+        );
 
         final value = result.when(
           success: (value) => value,
@@ -122,50 +120,57 @@ void main() {
 
         expect(mapped.isFailure, isTrue);
         expect(
-            mapped.when(
-              success: (_) => 0,
-              failure: (exception) => exception.message,
-            ),
-            equals('error'));
+          mapped.when(
+            success: (_) => 0,
+            failure: (exception) => exception.message,
+          ),
+          equals('error'),
+        );
       });
 
       test('should map error on failure', () {
-        final result =
-            Failure<String, TestException>(TestException('Not found', 404));
+        final result = Failure<String, TestException>(
+          TestException('Not found', 404),
+        );
         final mapped = result.mapError(
-            (exception) => TestException('Error code: ${exception.code}'));
+          (exception) => TestException('Error code: ${exception.code}'),
+        );
 
         expect(mapped.isFailure, isTrue);
         expect(
-            mapped.when(
-              success: (_) => '',
-              failure: (exception) => exception.message,
-            ),
-            equals('Error code: 404'));
+          mapped.when(
+            success: (_) => '',
+            failure: (exception) => exception.message,
+          ),
+          equals('Error code: 404'),
+        );
       });
     });
 
     group('Complex type scenarios', () {
       test('should work with nullable types', () {
         final successResult = Success<String?, TestException>(null);
-        final failureResult =
-            Failure<String?, TestException>(TestException('error', 0));
+        final failureResult = Failure<String?, TestException>(
+          TestException('error', 0),
+        );
 
         expect(successResult.isSuccess, isTrue);
         expect(
-            successResult.when(
-              success: (value) => value,
-              failure: (_) => 'error',
-            ),
-            isNull);
+          successResult.when(
+            success: (value) => value,
+            failure: (_) => 'error',
+          ),
+          isNull,
+        );
 
         expect(failureResult.isFailure, isTrue);
         expect(
-            failureResult.when(
-              success: (_) => 'success',
-              failure: (exception) => exception.code,
-            ),
-            equals(0));
+          failureResult.when(
+            success: (_) => 'success',
+            failure: (exception) => exception.code,
+          ),
+          equals(0),
+        );
       });
 
       test('should work with custom error types', () {
@@ -174,11 +179,9 @@ void main() {
 
         expect(result.isFailure, isTrue);
         expect(
-            result.when(
-              success: (_) => null,
-              failure: (e) => e,
-            ),
-            equals(error));
+          result.when(success: (_) => null, failure: (e) => e),
+          equals(error),
+        );
       });
 
       test('should chain multiple transformations', () {
@@ -191,47 +194,52 @@ void main() {
 
         expect(transformed.isSuccess, isTrue);
         expect(
-            transformed.when(
-              success: (value) => value,
-              failure: (_) => '',
-            ),
-            equals('Result: 20'));
+          transformed.when(success: (value) => value, failure: (_) => ''),
+          equals('Result: 20'),
+        );
       });
 
       test('should chain error transformations', () {
-        final result =
-            Failure<int, TestException>(TestException('Not found', 404));
+        final result = Failure<int, TestException>(
+          TestException('Not found', 404),
+        );
 
         final transformed = result
             .mapError((exception) => TestException('Error ${exception.code}'))
             .mapError(
-                (exception) => TestException('${exception.message} not found'))
+              (exception) => TestException('${exception.message} not found'),
+            )
             .mapError(
-                (exception) => TestException(exception.message.toUpperCase()));
+              (exception) => TestException(exception.message.toUpperCase()),
+            );
 
         expect(transformed.isFailure, isTrue);
         expect(
-            transformed.when(
-              success: (_) => '',
-              failure: (exception) => exception.message,
-            ),
-            equals('ERROR 404 NOT FOUND'));
+          transformed.when(
+            success: (_) => '',
+            failure: (exception) => exception.message,
+          ),
+          equals('ERROR 404 NOT FOUND'),
+        );
       });
 
       test('should preserve error type through value transformations', () {
-        final result =
-            Failure<int, TestException>(TestException('original error'));
+        final result = Failure<int, TestException>(
+          TestException('original error'),
+        );
 
-        final transformed =
-            result.map((value) => value * 2).map((value) => value.toString());
+        final transformed = result
+            .map((value) => value * 2)
+            .map((value) => value.toString());
 
         expect(transformed.isFailure, isTrue);
         expect(
-            transformed.when(
-              success: (_) => '',
-              failure: (exception) => exception.message,
-            ),
-            equals('original error'));
+          transformed.when(
+            success: (_) => '',
+            failure: (exception) => exception.message,
+          ),
+          equals('original error'),
+        );
       });
     });
 
