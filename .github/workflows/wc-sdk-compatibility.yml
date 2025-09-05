@@ -42,10 +42,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter with Flutter
+      - name: Setup Flutter
         uses: ./.github/actions/setup-flutter
         with:
-          flutter-version-override: "stable"
+          flutter-version-override: "3.35.3"
 
       - name: Get Flutter stable version
         id: flutter_version
@@ -97,10 +97,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter with Flutter
+      - name: Setup Flutter
         uses: ./.github/actions/setup-flutter
         with:
-          flutter-version-override: "stable"
+          flutter-version-override: "3.35.3"
 
       - name: Get Flutter stable version
         id: flutter_version
