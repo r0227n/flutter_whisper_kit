@@ -81,7 +81,7 @@ flowchart TD
     F --> G[リリースタグ作成]
     G --> H[developにマージバック]
     H --> I[リリースブランチ削除]
-    
+
     style A fill:#e1f5fe
     style F fill:#c8e6c9
     style G fill:#fff3e0
@@ -267,7 +267,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # git-flow操作に必要
+          fetch-depth: 0 # git-flow操作に必要
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -284,7 +284,7 @@ jobs:
         run: |
           # リリース用にmainブランチにいることを確認
           git checkout main
-          
+
           # タグがmainブランチに存在することを確認
           if ! git tag --merged main | grep -q "${{ github.ref_name }}"; then
             echo "Error: Tag ${{ github.ref_name }} is not on main branch"
