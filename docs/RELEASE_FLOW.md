@@ -188,7 +188,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.27.2"
+          flutter-version: "3.35.2"
 
       - name: Install dependencies
         run: |
