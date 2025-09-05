@@ -1,5 +1,5 @@
 [tools]
-flutter = "3.35.2"
+flutter = "3.35.3"
 bun = "1.2.17"
 
 # Main workflow tasks
