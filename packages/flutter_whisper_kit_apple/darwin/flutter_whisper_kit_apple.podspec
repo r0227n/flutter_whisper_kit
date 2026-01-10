@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_whisper_kit_apple'
-  s.version          = '0.2.0'
+  s.version          = '0.3.0'
   s.summary          = 'iOS and macOS implementation of the flutter_whisper_kit plugin for on-device speech recognition.'
   s.description      = <<-DESC
 iOS and macOS implementation of the flutter_whisper_kit plugin, providing on-device speech recognition and transcription capabilities using WhisperKit.
@@ -22,11 +22,13 @@ iOS and macOS implementation of the flutter_whisper_kit plugin, providing on-dev
   # see https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
   # s.resource_bundles = {'flutter_whisperkit_apple_privacy' => ['flutter_whisper_kit_apple/Sources/flutter_whisper_kit_apple/PrivacyInfo.xcprivacy']}
 
-  s.dependency 'Flutter'
-  s.platform = :ios, '16.0'
+  # Platform deployment targets (both iOS and macOS are supported)
+  s.ios.deployment_target = '16.0'
+  s.osx.deployment_target = '13.0'
 
-  s.dependency 'FlutterMacOS'
-  s.platform = :osx, '13.0'
+  # Platform-specific dependencies
+  s.ios.dependency 'Flutter'
+  s.osx.dependency 'FlutterMacOS'
 
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
   s.swift_version = '5.0'

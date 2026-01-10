@@ -1,3 +1,17 @@
+## 0.3.0
+
+- **Flutter SDK Compatibility Update**:
+  - Updated Flutter SDK version requirement to 3.35.0+
+  - Updated minimum Dart SDK version to 3.9.0+
+  - Enhanced compatibility with latest Flutter framework features
+- **Build Configuration Improvements**:
+  - Fixed CocoaPods author syntax in flutter_whisper_kit_apple.podspec
+  - Improved package metadata and repository configuration
+  - Enhanced build system reliability with latest Flutter toolchain
+- **Development Environment**:
+  - Improved workspace resolution configuration
+  - Updated dependency management for better development experience
+
 ## 0.2.0
 
 - **Model Download Progress Tracking**:
